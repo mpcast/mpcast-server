@@ -76,11 +76,11 @@ module.exports = [
         // ctx.res.setHeader('X-Powered-By', 'Nodepress 1.0.0');
         // console.log(ctx.accept.headers.origin + '------')
         // if (!whitelist.includes(requestOrigin)) {
-          // return ctx.throw(`🙈 ${requestOrigin} is not a valid origin`);
-          // let err = new Error(`🙈 ${requestOrigin} 请求无效!`);
-          // err.status = 403;
-          // throw err;
-          // return ctx.throw(`🙈 ${requestOrigin} 请求无效!`);
+        // return ctx.throw(`🙈 ${requestOrigin} is not a valid origin`);
+        // let err = new Error(`🙈 ${requestOrigin} 请求无效!`);
+        // err.status = 403;
+        // throw err;
+        // return ctx.throw(`🙈 ${requestOrigin} 请求无效!`);
         // }
         // console.log(ctx.header)
         // Custom 401 handling if you don't want to expose koa-jwt errors to users

@@ -69,6 +69,32 @@ module.exports = class extends Base {
   }
 
   /**
+   * 按标题查找相似的内容
+   *
+   * @param title
+   * @param page
+   * @returns {Promise<Object>}
+   */
+  async findByTitle (title, page = 1) {
+    const list = await this.where({
+        title: ['like', `%${title}%`]
+    }).page(page, 20).countSelect()
+    return list
+  }
+
+  /**
+   * 按名称查找唯一值
+   * @param name
+   * @returns {Promise<any>}
+   */
+  async findByName (name) {
+    const res = await this.where({
+      name: name
+    }).find()
+
+    return res
+  }
+  /**
    * 获取推荐内容
    * @param stickys
    * @returns {Promise.<*>}

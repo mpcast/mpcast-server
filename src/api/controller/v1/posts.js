@@ -1,7 +1,5 @@
 /* eslint-disable no-undef,no-return-await,default-case,max-depth,no-warning-comments,comma-spacing */
 const BaseRest = require('./Base')
-const slug = require('limax')
-
 let fields = [
   'id',
   'author',
@@ -10,30 +8,18 @@ let fields = [
   'title',
   'name',
   'content',
-  'sort',
   'excerpt',
   'date',
   'modified',
   'parent'
 ]
-
 module.exports = class extends BaseRest {
   async indexAction () {
-    // 格式旧数据用的
-/*    let array = []
-    if (this.get('print')) {
-      for (const i of [147,149,165,168,170,171,173,174,176,177,179,201,204,206,208,210,212,225,227,231]) {
-        let obj = {
-          "id": `${i}`,
-          "status": "approved"
-        }
-        array.unshift(obj)
-      }
-      return this.success(array)
-    }*/
+    console.log('get all posts')
     const data = await this.getAllFromPage()
     return this.success(data)
   }
+
   async getAction () {
     const format = this.get('format')
     const termId = this.get('term_id')
@@ -77,7 +63,6 @@ module.exports = class extends BaseRest {
         'title',
         'name',
         'content',
-        'sort',
         'excerpt',
         'date',
         'modified',
@@ -163,7 +148,7 @@ module.exports = class extends BaseRest {
       }
       return data
     }
-  // }
+    // }
     // return data
     // return this.success(data)
     // console.log(JSON.stringify(data))
@@ -189,29 +174,29 @@ module.exports = class extends BaseRest {
     //     item.url = ''
     //     const userModel = this.model('users');
     //     如果有作者信息
-        // if (!Object.is(item.meta._author_id, undefined)) {
-        //   const authorInfo = await userModel.where({id: item.meta._author_id}).find()
-        //   item.authorInfo = authorInfo
-        //   查询 出对应的作者信息
-        // } else {
-        //   item.authorInfo = await userModel.where({id: item.author}).find()
-        // }
-        // _formatOneMeta(item.authorInfo)
-        // if (item.authorInfo.hasOwnProperty('meta')) {
-        //   if (item.authorInfo.meta.hasOwnProperty('avatar')) {
-        //     item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
-        //   }
-        // }
-        // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-        // if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        //   item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // }
-      // }
-      // return {
-      // "count":21,"totalPages":3,"pagesize":10,"currentPage":1,
-      // }
-      // Reflect.deleteProperty(objects, 'ids')
-      // return think.extend({}, objects, {data: podcasts})
+    // if (!Object.is(item.meta._author_id, undefined)) {
+    //   const authorInfo = await userModel.where({id: item.meta._author_id}).find()
+    //   item.authorInfo = authorInfo
+    //   查询 出对应的作者信息
+    // } else {
+    //   item.authorInfo = await userModel.where({id: item.author}).find()
+    // }
+    // _formatOneMeta(item.authorInfo)
+    // if (item.authorInfo.hasOwnProperty('meta')) {
+    //   if (item.authorInfo.meta.hasOwnProperty('avatar')) {
+    //     item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
+    //   }
+    // }
+    // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+    // if (!Object.is(item.meta._thumbnail_id, undefined)) {
+    //   item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+    // }
+    // }
+    // return {
+    // "count":21,"totalPages":3,"pagesize":10,"currentPage":1,
+    // }
+    // Reflect.deleteProperty(objects, 'ids')
+    // return think.extend({}, objects, {data: podcasts})
     //   // return Object.assign({}, podcasts, objects)
     // }
     // Reflect.deleteProperty(objects, 'ids')
@@ -286,7 +271,14 @@ module.exports = class extends BaseRest {
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
 
     } else {
-      list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
+      // list = await this.model('posts').select()
+      list = await this.model('posts')
+      // .where(query)
+        .field(fields.join(","))
+        .order('modified ASC')
+        .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30)
+        .countSelect()
+      console.log(JSON.stringify(list))
     }
     _formatMeta(list.data)
     const metaModel = this.model('postmeta', {appId: this.appId})
@@ -315,11 +307,11 @@ module.exports = class extends BaseRest {
       const userModel = this.model('users');
       // TODO: 如果有多作者信息
       // if (!Object.is(item.meta._author_id, undefined)) {
-        // const authorInfo = await userModel.where({id: item.meta._author_id}).find()
-        // const authorInfo = await userModel.getById(item.meta_author_id)
-        // userInfo.avatar = await this.model('postmeta').getAttachment('file', userInfo.meta.avatar)
-        // item.author = authorInfo
-        // 查询 出对应的作者信息
+      // const authorInfo = await userModel.where({id: item.meta._author_id}).find()
+      // const authorInfo = await userModel.getById(item.meta_author_id)
+      // userInfo.avatar = await this.model('postmeta').getAttachment('file', userInfo.meta.avatar)
+      // item.author = authorInfo
+      // 查询 出对应的作者信息
       // } else {
       //   item.author = await userModel.getById(item.author)
       // }
@@ -327,22 +319,22 @@ module.exports = class extends BaseRest {
       item.author = await userModel.getById(item.author)
 
       // await this.dealLikes(item)
-      // console.log(JSON.stringify(this.ctx.state))
-      // const userId = this.ctx.state.user.id
+      console.log(JSON.stringify(this.ctx.state.user))
+      const userId = this.ctx.state.user.id
       item.like_count = await metaModel.getLikedCount(item.id)
 
       // 获取当前用户是否喜欢
-      // const iLike = await metaModel.getLikeStatus(userId, item.id)
-      // item.i_like = iLike.contain > 0
-      // item.likes_enabled = true
-      // item.sharing_enabled = true
+      const iLike = await metaModel.getLikeStatus(userId, item.id)
+      item.i_like = iLike.contain > 0
+      item.likes_enabled = true
+      item.sharing_enabled = true
 
-      // _formatOneMeta(item.author)
-      // if (item.author.hasOwnProperty('meta')) {
-      //   if (item.author.meta.hasOwnProperty('avatar')) {
-      //     item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
-      //   }
-      // }
+      _formatOneMeta(item.author)
+      if (item.author.hasOwnProperty('meta')) {
+        if (item.author.meta.hasOwnProperty('avatar')) {
+          item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+        }
+      }
       const repliesCount = await this.model('comments', {appId: this.appId}).where({'comment_post_id': item.id}).count()
       // const user = this.ctx.state.user
       // item.author = user
@@ -382,7 +374,6 @@ module.exports = class extends BaseRest {
       'title',
       'name',
       'content',
-      'sort',
       'excerpt',
       'date',
       'modified',
@@ -457,7 +448,7 @@ module.exports = class extends BaseRest {
   }
 
   async getPodcastList (query, fields) {
-    const list = await this.modelInstance.where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), 10).countSelect()
+    const list = await this.modelInstance.where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
     // 处理播放列表音频 Meta 信息
     _formatMeta(list.data)
     // 根据 Meta 信息中的音频附件 id 查询出音频地址
@@ -516,7 +507,7 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<void>}
    */
   async getPodcast (query, fields) {
-    const list = await this.modelInstance.where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), 10).countSelect()
+    const list = await this.modelInstance.where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
 
     // 处理播放列表音频 Meta 信息
     _formatMeta(list.data)
@@ -572,39 +563,15 @@ module.exports = class extends BaseRest {
     return this.success(list.data[0])
   }
 
-  /**
-   * 搜索主题关键词
-   * @returns {Promise<void>}
-   */
-  async searchAction () {
-    const title = this.get('param')
-    const postModel = this.model('posts', {appId: this.appId})
-    const list = await postModel.findByTitle(title, this.get('page'))
-    return this.success(list)
-  }
-
   async newAction () {
     const data = this.post()
-    if (think.isEmpty(data.title)) {
-      return this.fail('主题为空')
-    }
-    const slugName = slug(data.title, {tone: false, separateNumbers: false})
-    if (think.isEmpty(slugName)) {
-      return this.fail('最爱主题创建失败，请检查文字')
-    }
-    data.name = slugName
-
-    const postModel = this.model('posts', {appId: this.appId})
-    const res = await postModel.findByName(slugName)
-    if (!think.isEmpty(res)) {
-      return this.success(res)
-    }
     if (think.isEmpty(data.type)) {
       data.type = 'post_format'
     }
     const currentTime = new Date().getTime();
     data.date = currentTime
     data.modified = currentTime
+    // console.log(JSON.stringify(this.ctx.state.user.userInfo.id))
     if (think.isEmpty(data.author)) {
       data.author = this.ctx.state.user.userInfo.id
     }
@@ -621,24 +588,10 @@ module.exports = class extends BaseRest {
     // 3 添加内容与 term 分类之间的关联
     // term_taxonomy_id
     const defaultTerm = this.options.default.term
-    // console.log(JSON.toString(defaultTerm))
-    let categories = []
-    if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
-     categories = categories.concat(defaultTerm)
-    } else {
-      // 处理提交过来的分类信息，可能是单分类 id 也可能是数组, 分类 id 为 term_taxonomy_id
-      categories = categories.concat(JSON.parse(data.categories))
-    }
-    // 4 获取内容的格式类别
-    if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
-      categories = categories.concat(data.format)
-    }
-    for (const cate of categories) {
-      await this.model('taxonomy', {appId: this.appId}).relationships(postId, cate)
-    }
+    await this.model('taxonomy').relationships(postId, defaultTerm)
     // 5 如果有关联信息，更新关联对象信息
     if (!Object.is(data.relateTo, undefined) && !think.isEmpty(data.relateTo)) {
-      const metaModel = this.model('postmeta', {appId: this.appId})
+      const metaModel = this.model('postmeta')
       // 保存关联对象的 meta 信息
       await metaModel.related(data.relateTo, postId, data.relateStatus)
     }
@@ -655,7 +608,6 @@ module.exports = class extends BaseRest {
       'title',
       'name',
       'content',
-      'sort',
       'excerpt',
       'date',
       'modified',
@@ -667,11 +619,10 @@ module.exports = class extends BaseRest {
     query.id = post_id
     query = {status: ['NOT IN', 'trash'], id: post_id}
 
-    const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), 10).countSelect()
-
+    const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
     // 处理播放列表音频 Meta 信息
     _formatMeta(list.data)
-
+    // console.log(JSON.stringify(list))
     // 根据 Meta 信息中的音频附件 id 查询出音频地址
     const metaModel = this.model('postmeta', {appId: this.appId})
     for (const item of list.data) {
@@ -704,57 +655,18 @@ module.exports = class extends BaseRest {
       // lrc
 
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      // if (!Object.is(item.meta['_featured_image']))
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail = {
-        //   id: item.meta['_thumbnail_id']
-        // }
-        // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
       }
-
-      // 获取内容的分类信息
-      // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-      // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
-    await this.dealTerms(list)
+    // await this.dealTerms(list)
     // 处理标签信息
-    await this.dealTags(list)
+    // await this.dealTags(list)
 
     await this.dealLikes(list.data[0])
 
     return list.data[0]
-  }
-
-  /**
-   * 处理分类信息，为查询的结果添加分类信息
-   * @param list
-   * @returns {Promise.<*>}
-   */
-  async dealTerms (list) {
-    const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    for (const item of list.data) {
-      item.categories = await _taxonomy.findCategoriesByObject(item.id)
-    }
-    // 处理内容层级
-    // let treeList = await arr_to_tree(list.data, 0);
-    list.data = await arr_to_tree(list.data, 0);
-
-    return list
-  }
-
-  /**
-   * 处理内容标签信息
-   * @param list
-   * @returns {Promise.<void>}
-   */
-  async dealTags (list) {
-    const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    for (const item of list.data) {
-      item.tags = await _taxonomy.findTagsByObject(item.id)
-    }
   }
 
   // async

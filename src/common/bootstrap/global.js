@@ -129,7 +129,7 @@ global._formatOneMeta = (item) => {
 
   // for (const item of list) {
   item.meta = {};
-  if (!think.isEmpty(item.metas)) {
+  if (!think.isEmpty(item.metas) && item.metas.length > 0) {
     for (const meta of item.metas) {
       item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
     }
@@ -148,7 +148,7 @@ global._formatMeta = (list) => {
 
   for (const item of list) {
     item.meta = {};
-    if (!Object.is(item.metas, undefined)) {
+    if (!Object.is(item.metas, undefined) && item.metas.length > 0) {
       for (const meta of item.metas) {
         if (meta.meta_key.includes('_capabilities') && meta.meta_key.includes('picker_')) {
           Object.assign(item, JSON.parse(meta.meta_value))
