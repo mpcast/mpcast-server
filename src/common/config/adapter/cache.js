@@ -8,8 +8,7 @@ module.exports = {
   },
   redis: {
     handle: redisCache,
-    port: 6380,
-    // host: '127.0.0.1',
+    port: isDev ? 6379 : 6380,
     host: isDev ? '127.0.0.1' : '114.55.230.6',
     password: isDev ? '' : '__2018@caixie-redis'
   }

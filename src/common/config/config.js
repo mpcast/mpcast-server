@@ -1,3 +1,4 @@
+// const isDev = think.env === 'development'
 const fs = require('fs')
 let port;
 const portFile = think.ROOT_PATH + '/port'
