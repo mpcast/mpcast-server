@@ -3,17 +3,6 @@
 const Base = require('./base');
 
 module.exports = class extends Base {
-  // constructor(...args) {
-  //   super(...args);
-  //   this.appId = ''
-  //   if (this.config['appId'] !== undefined) {
-  //     this.appId = this.config['appId'] + '_'
-  //   }
-  // }
-  //
-  // get tablePrefix() {
-  //   return 'picker_'+ this.appId;
-  // }
   async getAttachment (type, post_id) {
     let query = {}
     query.post_id = post_id
