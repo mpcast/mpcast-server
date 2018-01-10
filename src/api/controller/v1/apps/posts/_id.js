@@ -660,10 +660,16 @@ module.exports = class extends BaseRest {
         const list = JSON.parse(result.meta_value)
         totalCount = list.length
         for (const u of list) {
-          const user = await userModel.where({id: u.id}).find()
+          let user = await userModel.where({id: u.id}).find()
           likes.push(user)
         }
       }
+    }
+
+    _formatMeta(likes)
+
+    for (let user of likes) {
+      Reflect.deleteProperty(user, 'meta')
     }
     post.like_count = totalCount
     post.i_like = iLike

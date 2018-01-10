@@ -131,6 +131,10 @@ global._formatOneMeta = (item) => {
   item.meta = {};
   if (!think.isEmpty(item.metas) && item.metas.length > 0) {
     for (const meta of item.metas) {
+      if (meta.meta_key.includes('_liked_posts') && meta.meta_key.includes('picker_')) {
+        item.liked = JSON.parse(meta.meta_value)
+        // Object.assign(item, JSON.parse(meta.meta_value))
+      }
       item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
     }
   }
@@ -152,6 +156,14 @@ global._formatMeta = (list) => {
       for (const meta of item.metas) {
         if (meta.meta_key.includes('_capabilities') && meta.meta_key.includes('picker_')) {
           Object.assign(item, JSON.parse(meta.meta_value))
+        }
+        if (meta.meta_key.includes('_wechat') && meta.meta_key.includes('picker_')) {
+          const wechat = JSON.parse(meta.meta_value)
+          // console.log(wechat.avatarUrl)
+          Object.assign(item, {
+            avatar: wechat.avatarUrl
+          })
+          // Object.assign(item, JSON.parse(meta.meta_value))
         }
         item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
       }

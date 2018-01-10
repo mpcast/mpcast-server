@@ -773,7 +773,7 @@ module.exports = class extends BaseRest {
     }).find()
     // 当前登录用户是否喜欢
     let iLike = false
-    const likes = []
+    let likes = []
     const userModel = this.model('users')
     let totalCount = 0
 
@@ -787,10 +787,13 @@ module.exports = class extends BaseRest {
         totalCount = list.length
         for (const u of list) {
           const user = await userModel.where({id: u.id}).find()
+          _formatOneMeta(user)
           likes.push(user)
         }
       }
     }
+    // console.log(JSON.toString(likes))
+
     post.like_count = totalCount
     post.i_like = iLike
     post.likes = likes

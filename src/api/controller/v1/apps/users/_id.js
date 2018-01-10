@@ -21,12 +21,14 @@ module.exports = class extends Base {
       if (!think.isEmpty(userId)) {
         const user = await this.model('users').where({id: userId}).find()
         _formatOneMeta(user)
+
         if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
           user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
           // user.type = 'wechat'
         } else {
           user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
         }
+        Reflect.deleteProperty(user, 'meta')
         return this.success(user)
       } else {
         if (think.isEmpty(type)) {
@@ -75,6 +77,51 @@ module.exports = class extends Base {
     }
   }
 
+  /**
+   * 处理内容喜欢的信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async dealLikes (user) {
+
+    // dealUser = _formatOneMeta(user)
+    // const userId = this.ctx.state.user.id
+    // const postMeta = this.model('postmeta', {appId: this.appId})
+    //
+    // const result = await postMeta.where({
+    //   post_id: post.id,
+    //   meta_key: '_liked'
+    // }).find()
+    // 当前登录用户是否喜欢
+    // let iLike = false
+    // const likes = []
+    // const userModel = this.model('users')
+    // let totalCount = 0
+    //
+    // if (!think.isEmpty(result)) {
+    //   if (!think.isEmpty(result.meta_value)) {
+    //     const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId])
+    //     if (exists) {
+    //       iLike = true
+    //     }
+    //     const list = JSON.parse(result.meta_value)
+    //     totalCount = list.length
+    //     for (const u of list) {
+    //       let user = await userModel.where({id: u.id}).find()
+    //       likes.push(user)
+    //     }
+    //   }
+    // }
+    //
+    // _formatMeta(likes)
+    //
+    // for (let user of likes) {
+    //   Reflect.deleteProperty(user, 'meta')
+    // }
+    // post.like_count = totalCount
+    // post.i_like = iLike
+    // post.likes = likes
+  }
 
   async put () {
     const data = this.post()

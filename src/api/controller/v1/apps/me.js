@@ -11,7 +11,9 @@ module.exports = class extends Base {
 
   async indexAction () {
     const curUser = this.ctx.state.user
-
+    // if (!think.isEmpty(curUser)) {
+    //   return this.sus
+    // }
     let user = await this.DAO.getById(curUser.id)
     // const user = await this.model('users').where({id: curUser.id}).find()
     _formatOneMeta(user)

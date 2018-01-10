@@ -35,6 +35,8 @@ module.exports = class extends BaseRest {
         }
       }
     }
+
+    _formatMeta(likes)
     return this.success({
       found: totalCount,
       i_like: iLike,

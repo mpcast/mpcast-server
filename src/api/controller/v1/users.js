@@ -10,7 +10,6 @@ module.exports = class extends Base {
   }
 
   async indexAction () {
-    console.log('userid ----------')
     const userId = this.get('id')
     // const appid = this.get('appId')
     const userMeta = this.model('usermeta')
