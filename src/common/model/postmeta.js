@@ -98,7 +98,21 @@ module.exports = class extends Base {
       'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('id', '${user_id}','ip', '${_ip2int(ip)}'))`]
     })
   }
-
+  /**
+   * 更新 Like 日期
+   * @param userId
+   * @param postId
+   * @param date
+   * @returns {Promise<number>}
+   */
+  async updateLikeDate (userId, postId, date) {
+    // CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '3', NULL , '$**.id')
+    // 这个是为了处理 JSON 返回的值 $[0] 这样的，来处理对应的 json array 下的 json object Key value
+    const res = await this.where(`post_id = '${postId}' AND meta_key = '_liked' AND JSON_SEARCH(meta_value, 'one', ${userId}) IS NOT NULL`).update({
+      'meta_value': ['exp', `JSON_REPLACE(meta_value, CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '${userId}', NULL , '$**.id'), '"', ''), '.', 1),'.date'), '${date}')`]
+    })
+    return res
+  }
   /**
    * UnLike post
    * @param user_id

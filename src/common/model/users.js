@@ -1,4 +1,4 @@
-/* eslint-disable prefer-promise-reject-errors,no-console,prefer-promise-reject-errors,prefer-promise-reject-errors,no-warning-comments */
+/* eslint-disable prefer-promise-reject-errors,no-console,prefer-promise-reject-errors,prefer-promise-reject-errors,no-warning-comments,no-undef */
 const Base = require('./base');
 const {PasswordHash} = require('phpass');
 let fields = [
@@ -404,12 +404,27 @@ async updateWechatUser (data) {
     const data = await userMeta.where(`meta_value ->'$.post_id' = '${post_id}' and meta_key = 'picker_${appid}_liked_posts'`).select()
   }
   /**
+   * 更新 Like 日期
+   * @param userId
+   * @param postId
+   * @param date
+   * @returns {Promise<number>}
+   */
+  async updateLikeDate (userId, appId, postId, date) {
+    // CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '3', NULL , '$**.id')
+    // 这个是为了处理 JSON 返回的值 $[0] 这样的，来处理对应的 json array 下的 json object Key value
+    const res = await this.model('usermeta').where(`user_id = '${userId}' AND meta_key = 'picker_${appId}_liked_posts' AND JSON_SEARCH(meta_value, 'one', ${postId}) IS NOT NULL`).update({
+      'meta_value': ['exp', `JSON_REPLACE(meta_value, CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '${postId}', NULL , '$**.post_id'), '"', ''), '.', 1),'.date'), '${date}')`]
+    })
+    return res
+  }
+  /**
    * 添加新喜欢的人员
    * @param user_id
    * @param post_id
    * @returns {Promise.<void>}
    */
-  async newLike (user_id, app_id, post_id) {
+  async newLike (user_id, app_id, post_id, date) {
     const userMeta = this.model('usermeta')
 
     const result = await userMeta.where({
@@ -429,9 +444,11 @@ async updateWechatUser (data) {
           }).update({
             'user_id': user_id,
             'meta_key': `picker_${app_id}_liked_posts`,
-            'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('post_id', '${post_id}','date', '${new Date().getTime()}'))`]
+            'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('post_id', '${post_id}','date', '${date}', 'modified', '${new Date().getTime()}'))`]
           })
           likeCount++
+        } else {
+          await this.updateLikeDate(user_id, app_id, post_id, date)
         }
       }
     } else {
@@ -439,7 +456,7 @@ async updateWechatUser (data) {
       const res = await userMeta.add({
         user_id: user_id,
         meta_key: `picker_${app_id}_liked_posts`,
-        meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('post_id', '${post_id}', 'date', '${new Date().getTime()}'))`]
+        meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('post_id', '${post_id}', 'date', '${date}', 'modified', '${new Date().getTime()}'))`]
       })
       if (res > 0) {
         likeCount++

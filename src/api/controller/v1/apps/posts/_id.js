@@ -604,13 +604,10 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async dealTerms (list) {
-    console.log('********************')
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    console.log(list)
+    // console.log(list)
     for (let item of list.data) {
       item.categories = await _taxonomy.findCategoriesByObject(item.id.toString())
-      console.log('______')
-      console.log(JSON.stringify(item.categories))
     }
 
     // 处理内容层级
@@ -650,12 +647,12 @@ module.exports = class extends BaseRest {
     const likes = []
     const userModel = this.model('users')
     let totalCount = 0
-
     if (!think.isEmpty(result)) {
       if (!think.isEmpty(result.meta_value)) {
-        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId])
+        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
         if (exists) {
           iLike = true
+          post.like_date = exists.date
         }
         const list = JSON.parse(result.meta_value)
         totalCount = list.length

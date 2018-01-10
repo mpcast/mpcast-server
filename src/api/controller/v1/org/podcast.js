@@ -12,7 +12,6 @@ module.exports = class extends BaseRest {
     // console.log(this.ctx.state.user)
     const id = this.get('id')
     // console.log('lala')
-    console.log(id + '---')
     const type = 'podcast'
     let query = {}
     query.status = ['NOT IN', 'trash']

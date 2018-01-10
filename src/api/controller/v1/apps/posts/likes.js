@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* eslint-disable no-undef,radix */
 const BaseRest = require('../Base');
 module.exports = class extends BaseRest {
 
@@ -42,6 +42,7 @@ module.exports = class extends BaseRest {
       likes: likes
     })
   }
+
   /**
    * New like
    * @returns {Promise.<*>}
@@ -49,6 +50,18 @@ module.exports = class extends BaseRest {
   async newAction () {
     const userId = this.ctx.state.user.id
     const id = this.get('id')
+    let date = this.post('date')
+    // 日期是要检查 的
+    if (!think.isEmpty(date)) {
+      // 验证日期的正确性
+      const d = (new Date(date).getMonth() + 1) === Number(date.substring(date.length - 2))
+      if (!d) {
+        return this.fail('日期格式错误')
+        // return this.success(new Date(date).getMonth())
+      }
+    } else {
+      date = getDate()
+    }
     const postMeta = this.model('postmeta', {appId: this.appId})
     // const userMeta = this.model('usermeta')
 
@@ -64,6 +77,8 @@ module.exports = class extends BaseRest {
         if (!iLike) {
           await postMeta.newLike(userId, id, this.ip)
           likeCount++
+        } else {
+          await postMeta.updateLikeDate(userId, id, date)
         }
       }
     } else {
@@ -71,26 +86,19 @@ module.exports = class extends BaseRest {
       const res = await postMeta.add({
         post_id: id,
         meta_key: '_liked',
-        meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('id', '${userId}', 'ip', '${_ip2int(this.ip)}'))`]
+        meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('id', '${userId}', 'ip', '${_ip2int(this.ip)}', 'date', '${date}', 'modified', '${new Date().getTime()}'))`]
       })
-      // await usermeta.thenUpdate({
-      //   user_id: `${userId}`,
-      //   meta_key: `picker_${this.appId}_liked_posts`,
-      //   meta_value:
-      // }, {
-      //   user_id: `${data.userId}`,
-      //   meta_key: `picker_${data.appId}_wechat`
-      // })
       if (res > 0) {
         likeCount++
       }
     }
-    await this.model('users').newLike(userId, this.appId, id)
+    await this.model('users').newLike(userId, this.appId, id, date)
 
     return this.success({
       i_like: true,
       like_count: likeCount,
-      post_id: id
+      post_id: id,
+      date: date
     })
     // .exp
     //   "success": true,

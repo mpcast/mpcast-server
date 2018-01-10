@@ -196,3 +196,12 @@ global.verifyMsgCode = async (identity, code, destory = false) => {
   // }
   return false
 }
+
+global.getDate = () => {
+  const date = new Date
+  const year = date.getFullYear()
+  let month = date.getMonth() + 1
+  month = (month < 10 ? "0" + month : month)
+  const mydate = (year.toString() + '-' + month.toString())
+  return mydate
+}

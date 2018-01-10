@@ -464,13 +464,10 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async dealTerms (list) {
-    console.log('********************')
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     console.log(list)
     for (let item of list.data) {
       item.categories = await _taxonomy.findCategoriesByObject(item.id.toString())
-      console.log('______')
-      console.log(JSON.stringify(item.categories))
     }
 
     // 处理内容层级

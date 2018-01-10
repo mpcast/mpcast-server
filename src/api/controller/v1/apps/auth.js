@@ -264,12 +264,12 @@ module.exports = class extends BaseRest {
       try {
         const user_login = this.ctx.state.user.user_login
         const wxUser = await think.cache(user_login)
-        console.log(wxUser)
+        // console.log(wxUser)
         const sha1 = crypto.createHash('sha1')
         sha1.update(rawData.toString() + wxUser.session_key)
         const signature2 = sha1.digest('hex')
-        console.log(signature1 + 'xxxxxxxxxx')
-        console.log(signature2 + '---------')
+        // console.log(signature1 + 'xxxxxxxxxx')
+        // console.log(signature2 + '---------')
         if (signature1 === signature2) {
           return this.success()
         } else {
