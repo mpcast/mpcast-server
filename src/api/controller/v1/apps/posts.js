@@ -20,17 +20,6 @@ let fields = [
 module.exports = class extends BaseRest {
   async indexAction () {
     // 格式旧数据用的
-/*    let array = []
-    if (this.get('print')) {
-      for (const i of [147,149,165,168,170,171,173,174,176,177,179,201,204,206,208,210,212,225,227,231]) {
-        let obj = {
-          "id": `${i}`,
-          "status": "approved"
-        }
-        array.unshift(obj)
-      }
-      return this.success(array)
-    }*/
     const data = await this.getAllFromPage()
     return this.success(data)
   }
