@@ -205,3 +205,8 @@ global.getDate = () => {
   const mydate = (year.toString() + '-' + month.toString())
   return mydate
 }
+
+global.getMonthFormatted = (m) => {
+  let month = m + 1;
+  return month < 10 ? '0' + month : '' + month; // 如果是1-9月，那么前面补0
+}

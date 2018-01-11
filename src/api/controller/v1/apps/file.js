@@ -41,7 +41,7 @@ module.exports = class extends BaseRest {
       if (!think.isEmpty(upload)) {
         const data = {
           // 验证权限 后获取
-          author: this.ctx.state.user.userInfo.id,
+          author: this.ctx.state.user.id,
           title: file.name.split('.')[0],
           name: upload.hash,
           // path: '/upload/picture/' + dateformat(new Date().getTime(), "Y-m-d") + '/' + basename,

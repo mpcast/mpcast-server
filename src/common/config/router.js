@@ -11,7 +11,6 @@ module.exports = [
   // /apps/$app/users/$user_ID/delete
   // [/\/v1\/file?/, '/api/v1/file', 'rest'],
   [/\/v1\/apps\/(\w+)\/taxonomies\/(\w+)\/terms\/slug:(\w+)$/, '/api/v1/apps/taxonomies/_slug?appId=:1&taxonomy=:2&slug=:3', 'get, post'],
-  // [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/search?/, '/api/v1/apps/posts/:3/search?appId=:1&id=:2', 'get'],
 
   [/\/v1\/apps\/(\w+)\/users\/(\d+)/, '/api/v1/apps/users/_id?appId=:1&id=:2', 'get, post'],
   [/\/v1\/apps\/(\w+)\/file?/, '/api/v1/apps/file?appId=:1', 'rest'],
@@ -39,8 +38,9 @@ module.exports = [
   // GET POST
   // apps/$app/taxonomies/$taxonomy/terms/slug:$slug
   [/\/v1\/apps\/(\w+)$/, '/api/v1/apps/app?appId=:1', 'get'],
-  [/\/v1\/apps\/(\w+)\/(\w+)\/(\w+)?/, '/api/v1/apps/:2/:3?appId=:1', 'post'],
+  [/\/v1\/apps\/(\w+)\/(\w+)\/(\w+)?/, '/api/v1/apps/:2/:3?appId=:1', 'get, post'],
   [/\/v1\/apps\/(\w+)\/(\w+)$/, '/api/v1/apps/:2?appId=:1', 'get'],
+  // [/\/v1\/apps\/(\w+)\/posts\/search?/, '/api/v1/apps/posts/search?appId=:1', 'get'],
 
 
 

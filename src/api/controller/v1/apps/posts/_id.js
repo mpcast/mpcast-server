@@ -28,7 +28,8 @@ module.exports = class extends BaseRest {
       // data.date = currentTime
       data.modified = currentTime
       if (think.isEmpty(data.author)) {
-        data.author = this.ctx.state.user.userInfo.id
+        // data.author = this.ctx.state.user.userInfo.id
+        data.author = this.ctx.state.user.id
       }
       const metaModel = await this.model('postmeta', {appId: this.appId})
 

@@ -88,14 +88,14 @@ module.exports = class extends Base {
    * @param post_id
    * @returns {Promise.<void>}
    */
-  async newLike (user_id, post_id, ip) {
+  async newLike (user_id, post_id, ip, date) {
     await this.where({
       post_id: post_id,
       meta_key: '_liked'
     }).update({
       'post_id': post_id,
       'meta_key': '_liked',
-      'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('id', '${user_id}','ip', '${_ip2int(ip)}'))`]
+      'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('id', '${user_id}','ip', '${_ip2int(ip)}', 'date', '${date}', 'modified', '${new Date().getTime()}'))`]
     })
   }
   /**

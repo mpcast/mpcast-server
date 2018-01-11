@@ -8,11 +8,22 @@ module.exports = class extends BaseRest {
    */
   async indexAction () {
     const id = this.get('id')
-    const userId = this.ctx.state.user.userInfo.id
+    const userId = this.ctx.state.user.id
+    const postMeta = this.model('postmeta', {appId: this.appId})
+
+    return this.dealLikes(id)
+  }
+  /**
+   * 处理内容喜欢的信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async dealLikes (post_id) {
+    const userId = this.ctx.state.user.id
     const postMeta = this.model('postmeta', {appId: this.appId})
 
     const result = await postMeta.where({
-      post_id: id,
+      post_id: post_id,
       meta_key: '_liked'
     }).find()
     // 当前登录用户是否喜欢
@@ -20,25 +31,32 @@ module.exports = class extends BaseRest {
     const likes = []
     const userModel = this.model('users')
     let totalCount = 0
-
     if (!think.isEmpty(result)) {
       if (!think.isEmpty(result.meta_value)) {
-        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId])
+        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
         if (exists) {
           iLike = true
+          // post.like_date = exists.date
         }
         const list = JSON.parse(result.meta_value)
         totalCount = list.length
         for (const u of list) {
-          const user = await userModel.where({id: u.id}).find()
+          let user = await userModel.where({id: u.id}).find()
           likes.push(user)
         }
       }
     }
+
+    _formatMeta(likes)
+
+    for (let user of likes) {
+      Reflect.deleteProperty(user, 'meta')
+    }
+
     return this.success({
       found: totalCount,
       i_like: iLike,
-      post_id: id,
+      post_id: post_id,
       likes: likes
     })
   }
@@ -54,10 +72,9 @@ module.exports = class extends BaseRest {
     // 日期是要检查 的
     if (!think.isEmpty(date)) {
       // 验证日期的正确性
-      const d = (new Date(date).getMonth() + 1) === Number(date.substring(date.length - 2))
-      if (!d) {
+      const d = getMonthFormatted(new Date(date).getMonth())
+      if (d === 'NaN') {
         return this.fail('日期格式错误')
-        // return this.success(new Date(date).getMonth())
       }
     } else {
       date = getDate()
@@ -75,7 +92,7 @@ module.exports = class extends BaseRest {
         likeCount = JSON.parse(result.meta_value).length
         const iLike = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
         if (!iLike) {
-          await postMeta.newLike(userId, id, this.ip)
+          await postMeta.newLike(userId, id, this.ip, date)
           likeCount++
         } else {
           await postMeta.updateLikeDate(userId, id, date)
@@ -92,7 +109,7 @@ module.exports = class extends BaseRest {
         likeCount++
       }
     }
-    await this.model('users').newLike(userId, this.appId, id, date)
+    await this.model('users').newLike(userId, this.appId, id)
 
     return this.success({
       i_like: true,

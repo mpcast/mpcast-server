@@ -163,59 +163,6 @@ module.exports = class extends BaseRest {
       }
       return data
     }
-  // }
-    // return data
-    // return this.success(data)
-    // console.log(JSON.stringify(data))
-    // const query = {
-    //   status: ['NOT IN', 'trash']
-    // }
-    // let status = ['NOT IN', 'trash']
-    // console.log('------------------------------')
-    // console.log(this.get('status'))
-    // if (!think.isEmpty(this.get('status'))) {
-    //   status = 'publish'
-    // }
-    // const taxonomyModel = this.model('taxonomy', {appId: this.appId})
-    // const objects = await taxonomyModel.getObjectsInTermsByPage(termIds, page, this.get('pagesize'))
-    // console.log(JSON.stringify(objects))
-    // if (!think.isEmpty(objects) && objects.ids.length > 0) {
-    //   const postsModel = this.model('posts', {appId: this.appId})
-    //   const podcasts = await postsModel.where({id: ['IN', objects.ids], status}).order('id DESC').select();
-    //   const metaModel = this.model('postmeta', {appId: this.appId})
-    //   _formatMeta(podcasts)
-    //
-    //   for (const item of podcasts) {
-    //     item.url = ''
-    //     const userModel = this.model('users');
-    //     如果有作者信息
-        // if (!Object.is(item.meta._author_id, undefined)) {
-        //   const authorInfo = await userModel.where({id: item.meta._author_id}).find()
-        //   item.authorInfo = authorInfo
-        //   查询 出对应的作者信息
-        // } else {
-        //   item.authorInfo = await userModel.where({id: item.author}).find()
-        // }
-        // _formatOneMeta(item.authorInfo)
-        // if (item.authorInfo.hasOwnProperty('meta')) {
-        //   if (item.authorInfo.meta.hasOwnProperty('avatar')) {
-        //     item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
-        //   }
-        // }
-        // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-        // if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        //   item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // }
-      // }
-      // return {
-      // "count":21,"totalPages":3,"pagesize":10,"currentPage":1,
-      // }
-      // Reflect.deleteProperty(objects, 'ids')
-      // return think.extend({}, objects, {data: podcasts})
-    //   // return Object.assign({}, podcasts, objects)
-    // }
-    // Reflect.deleteProperty(objects, 'ids')
-    // return think.extend({}, objects, {data: []})
   }
 
   async getObjectsInTermsByLimit (terms) {
@@ -264,10 +211,7 @@ module.exports = class extends BaseRest {
     } else {
       query.status = status
     }
-    // query.parent = 0
     query.parent = !think.isEmpty(this.get('parent')) ? this.get('parent') : 0
-    // query.parent = this.get('parent')
-    // query.type = 'post_format'
     query.type = !think.isEmpty(this.get('type')) ? this.get('type') : 'post_format'
     // query.sticky = fals
     // query.sticky = this.get('sticky')
@@ -361,99 +305,6 @@ module.exports = class extends BaseRest {
       }
     }
     return list
-  }
-
-  /**
-   * 获取分类信息
-   * /api/category 获取全部栏目（树结构）
-   * /api/category/1 获取栏目id为1的栏目信息
-   * @returns {Promise.<*>}
-   */
-  async get1Action () {
-    const id = this.get('id')
-    const type = this.get('type')
-    const status = this.get('status')
-    let query = {}
-    let fields = [
-      'id',
-      'author',
-      'status',
-      'type',
-      'title',
-      'name',
-      'content',
-      'sort',
-      'excerpt',
-      'date',
-      'modified',
-      'parent'
-    ];
-    fields = unique(fields);
-
-    if (!think.isEmpty(id)) {
-      query.id = id
-    }
-    if (!think.isEmpty(type)) {
-      query.type = type
-    }
-    fields.push('content')
-    // 查询单条数据
-    if (!think.isEmpty(id)) {
-      // query = {status: ['NOT IN', 'trash'], _complex: {id: id, parent: id, _logic: 'OR'}}
-      query = {status: ['NOT IN', 'trash'], id: id}
-      return await this.getPodcast(query, fields)
-    } else {
-      const parent = this.get('parent')
-      if (!think.isEmpty(parent)) {
-        query.parent = parent
-      }
-      query.status = ['NOT IN', 'trash']
-      // let queryType = think.isEmpty(status) ? 'publish' : status
-      // let queryType = think.isEmpty(status) ? '' : status
-      if (!think.isEmpty(status)) {
-        if (status === 'my') {
-          // query.status = ['NOT IN', 'trash']
-          query.author = this.ctx.state.user.id
-        }
-        if (status === 'drafts') {
-          query.status = ['like', '%draft%']
-        } else {
-          query.status = status
-        }
-      }
-      return await this.getPodcastList(query, fields)
-
-    }
-    /*
-    if (!think.isEmpty(type)) {
-      query.type = type;
-      switch (query.type) {
-        case 'podcast':
-          break;
-        case "article":
-          break;
-        case "resume":
-          fields.push('content_json')
-          // fields.push('content')
-          break;
-        case "snippets":
-          break;
-        case "pages":
-          break;
-      }
-    }*/
-    // 条件查询
-    // let list = await this.modelInstance.where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), 10).countSelect()
-    // 处理分类
-    // let _taxonomy = this.model('taxonomy', {appId: this.appId})
-    // for (let item of list.data) {
-    //   item.terms = await _taxonomy.getTermsByObject(item.id)
-    // }
-    // 处理内容层级
-    // let treeList = await arr_to_tree(list.data, 0);
-    // list.data = treeList;
-    //
-    // return this.success(list)
   }
 
   async getPodcastList (query, fields) {
@@ -580,6 +431,16 @@ module.exports = class extends BaseRest {
     const title = this.get('param')
     const postModel = this.model('posts', {appId: this.appId})
     const list = await postModel.findByTitle(title, this.get('page'))
+    const metaModel = this.model('postmeta', {appId: this.appId})
+    _formatMeta(list.data)
+
+    for (const item of list.data) {
+      item.url = ''
+      // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+      if (!Object.is(item.meta._thumbnail_id, undefined)) {
+        item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+      }
+    }
     return this.success(list)
   }
 
@@ -606,7 +467,7 @@ module.exports = class extends BaseRest {
     data.date = currentTime
     data.modified = currentTime
     if (think.isEmpty(data.author)) {
-      data.author = this.ctx.state.user.userInfo.id
+      data.author = this.ctx.state.user.id
     }
     if (think.isEmpty(data.status)) {
       data.status = 'auto-draft';
