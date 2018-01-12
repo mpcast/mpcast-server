@@ -137,14 +137,20 @@ module.exports = class extends BaseRest {
       // 查询 出对应的作者信息
       // } else {
       // const author = await userModel.where({id: item.author}).find()
-      const author = await userModel.getById(item.author)
+      const user = await userModel.getById(item.author)
       // console.log(JSON.stringify(author))
-      _formatOneMeta(author)
-      item.author = author
+      _formatOneMeta(user)
+      item.author = user
       // }
       // 取得头像地址
-      if (!Object.is(item.author.meta.avatar, undefined)) {
-        item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+      // if (!Object.is(item.author.meta.avatar, undefined)) {
+      //   item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+      // }
+      if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+        user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+        // user.type = 'wechat'
+      } else {
+        user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
       }
       // 作者简历
       if (!Object.is(item.author.meta.resume, undefined)) {
