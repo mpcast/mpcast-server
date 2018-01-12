@@ -193,7 +193,6 @@ module.exports = class extends BaseRest {
     if (!think.isEmpty(author)) {
       query.author = author
     }
-    // date query
     const status = this.get('status')
     if (think.isEmpty(status) || status === 'all') {
       query.status = ['NOT IN', 'trash']
@@ -202,18 +201,11 @@ module.exports = class extends BaseRest {
     }
     query.parent = !think.isEmpty(this.get('parent')) ? this.get('parent') : 0
     query.type = !think.isEmpty(this.get('type')) ? this.get('type') : 'post_format'
-    // query.sticky = fals
-    // query.sticky = this.get('sticky')
     let list = []
     const category = this.get('category')
-    // if (!think.isEmpty(category)) {
-    //
-    // }
     if (!think.isEmpty(category)) {
       // list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 100)
       list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), 12)
-      // return list
-      // console.log(JSON.stringify(list))
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
@@ -233,7 +225,8 @@ module.exports = class extends BaseRest {
     for (const item of list.data) {
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
-        // think._.reverse(item.items)
+        // think._.reverse(item.items
+
       }
       Reflect.deleteProperty(item.meta, '_items')
 
@@ -258,7 +251,14 @@ module.exports = class extends BaseRest {
       // }
       // 单作者
       item.author = await userModel.getById(item.author)
-
+      _formatOneMeta(item.author)
+      if (!Object.is(item.author.meta, undefined)) {
+        if (!Object.is(item.author.meta[`picker_${this.appId}_wechat`], undefined)) {
+          item.author.avatar = item.author.meta[`picker_${this.appId}_wechat`].avatarUrl
+        } else {
+          item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+        }
+      }
       // await this.dealLikes(item)
       // console.log(JSON.stringify(this.ctx.state))
       // const userId = this.ctx.state.user.id
