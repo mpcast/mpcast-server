@@ -211,7 +211,7 @@ module.exports = class extends BaseRest {
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
 
     } else {
-      list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
+      list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
     }
     _formatMeta(list.data)
     const metaModel = this.model('postmeta', {appId: this.appId})
