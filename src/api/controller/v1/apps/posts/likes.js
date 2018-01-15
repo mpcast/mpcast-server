@@ -109,7 +109,7 @@ module.exports = class extends BaseRest {
         likeCount++
       }
     }
-    await this.model('users').newLike(userId, this.appId, id)
+    await this.model('users').newLike(userId, this.appId, id, date)
 
     return this.success({
       i_like: true,

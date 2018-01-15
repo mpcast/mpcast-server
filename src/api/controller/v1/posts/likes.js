@@ -75,14 +75,6 @@ module.exports = class extends BaseRest {
         meta_key: '_liked',
         meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('id', '${userId}', 'ip', '${_ip2int(this.ip)}'))`]
       })
-      // await usermeta.thenUpdate({
-      //   user_id: `${userId}`,
-      //   meta_key: `picker_${this.appId}_liked_posts`,
-      //   meta_value:
-      // }, {
-      //   user_id: `${data.userId}`,
-      //   meta_key: `picker_${data.appId}_wechat`
-      // })
       if (res > 0) {
         likeCount++
       }

@@ -14,15 +14,18 @@ module.exports = class extends BaseRest {
           const subdomain = this.get('subdomain')
           return await this.subdomainValidation(subdomain)
         }
+        case 'shortid' : {
+          return this.success(think.id.generate())
+        }
         default: {
           return this.fail('非法请求！')
         }
       }
     }
-    const options = this.model('options')
-    const la = await options.get(true)
-    return this.success(la)
-    if (!think.isEmpty(this.get('orgId'))) {
+    // const options = this.model('options')
+    // const la = await options.get(true)
+    // return this.success(la)
+    if(!think.isEmpty(this.get('orgId'))) {
       return await this.orgInfo()
     }
   }
