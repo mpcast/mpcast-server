@@ -436,11 +436,11 @@ module.exports = class extends BaseRest {
   async newAction () {
     const data = this.post()
     if (think.isEmpty(data.title)) {
-      return this.fail('主题为空')
+      return this.fail('主题不能为空')
     }
     const slugName = slug(data.title, {tone: false, separateNumbers: false})
     if (think.isEmpty(slugName)) {
-      return this.fail('最爱主题创建失败，请检查文字')
+      return this.fail('最爱主题创建失败，请检查内容')
     }
     data.name = slugName
 
