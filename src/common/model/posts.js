@@ -83,15 +83,15 @@ module.exports = class extends Base {
   }
 
   /**
-   * 获取推荐内容
+   * 按 id 批量查找内容
    * @param stickys
    * @returns {Promise.<*>}
    */
-  async getItems (metaItems) {
+  async getItems (items) {
     const list = await this.where({
-      id: ['IN', metaItems]
+      id: ['IN', items]
       // 按 IN 条件的顺序查询出结果
-    }).order(`INSTR (',${metaItems},', CONCAT(',',id,','))`)
+    }).order(`INSTR (',${items},', CONCAT(',',id,','))`).select()
     return list
   }
 
@@ -161,7 +161,7 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%'`).order('sort ASC, modified ASC').page(page, pagesize).setRelation(true).countSelect()
+    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%'`).order('modified DESC').page(page, pagesize).setRelation(true).countSelect()
     let postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)

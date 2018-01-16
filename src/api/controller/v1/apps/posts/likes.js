@@ -72,12 +72,13 @@ module.exports = class extends BaseRest {
     // 日期是要检查 的
     if (!think.isEmpty(date)) {
       // 验证日期的正确性
-      const d = getMonthFormatted(new Date(date).getMonth())
+      const d = new Date(date).getFullYear()
+      // const d = getMonthFormatted(new Date(date).getMonth())
       if (d === 'NaN') {
         return this.fail('日期格式错误')
       }
     } else {
-      date = getDate()
+      date = new Date().getFullYear()
     }
     const postMeta = this.model('postmeta', {appId: this.appId})
     // const userMeta = this.model('usermeta')

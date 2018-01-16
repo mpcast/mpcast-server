@@ -20,7 +20,6 @@ module.exports = class extends Base {
           break
       }
     }
-
   }
 
   async save (post_id, meta) {

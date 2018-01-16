@@ -67,12 +67,10 @@ module.exports = class extends BaseRest {
       }
       // 3 添加内容与 term 分类之间的关联
       // term_taxonomy_id
-      const defaultTerm = this.options.default.term
+      // const defaultTerm = this.options.default.term
+      // 如果这里也更新 就会删除分类的关联，所以是错误的
       let categories = []
-      if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
-        categories = categories.concat(defaultTerm)
-      } else {
-        // 处理提交过来的分类信息，可能是单分类 id 也可能是数组, 分类 id 为 term_taxonomy_id
+      if (!Object.is(data.categories, undefined) && !think.isEmpty(data.categories)) {
         categories = categories.concat(JSON.parse(data.categories))
       }
 

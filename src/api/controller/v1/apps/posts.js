@@ -1,6 +1,7 @@
 /* eslint-disable no-undef,no-return-await,default-case,max-depth,no-warning-comments,comma-spacing */
 const BaseRest = require('./Base')
 const slug = require('limax')
+const tc = require('text-censor')
 
 let fields = [
   'id',
@@ -438,9 +439,13 @@ module.exports = class extends BaseRest {
     if (think.isEmpty(data.title)) {
       return this.fail('主题不能为空')
     }
+    data.title = tc.filter(data.title)
     const slugName = slug(data.title, {tone: false, separateNumbers: false})
     if (think.isEmpty(slugName)) {
-      return this.fail('最爱主题创建失败，请检查内容')
+      return this.fail('创建失败，请检查主题内容')
+    }
+    if (!think.isEmpty(data.content)) {
+      data.content = tc.filter(data.content)
     }
     data.name = slugName
 
@@ -470,8 +475,8 @@ module.exports = class extends BaseRest {
     }
     // 3 添加内容与 term 分类之间的关联
     // term_taxonomy_id
-    const defaultTerm = this.options.default.term
-    // console.log(JSON.toString(defaultTerm))
+    const defaultTerm = Number(this.options.default.term)
+
     let categories = []
     if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
      categories = categories.concat(defaultTerm)
@@ -506,12 +511,13 @@ module.exports = class extends BaseRest {
     // 日期是要检查 的
     if (!think.isEmpty(date)) {
       // 验证日期的正确性
-      const d = getMonthFormatted(new Date(date).getMonth())
+      const d = new Date(date).getFullYear()
+      // const d = getMonthFormatted(new Date(date).getMonth())
       if (d === 'NaN') {
         return this.fail('日期格式错误')
       }
     } else {
-      date = getDate()
+      date = new Date().getFullYear()
     }
     const postMeta = this.model('postmeta', {appId: this.appId})
 
@@ -519,6 +525,7 @@ module.exports = class extends BaseRest {
       post_id: id,
       meta_key: '_liked'
     }).find()
+
     let likeCount = 0
     if (!think.isEmpty(result)) {
       if (!think.isEmpty(result.meta_value)) {

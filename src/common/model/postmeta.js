@@ -34,6 +34,22 @@ module.exports = class extends Base {
 
   }
 
+  /**
+   * 根据 id 批量获取附件内容
+   * @param ids
+   * @returns {Promise<any>}
+   */
+  async getAttachments (ids) {
+    let query = {}
+    query = think.extend({'meta_key': '_attachment_file'}, query)
+    const list = await this.where({
+      post_id: ['IN', ids],
+      'meta_key': '_attachment_file'
+    }).select()
+    // _formatMeta(list)
+    return list
+  }
+
   async save (post_id, meta) {
     for (const key of Object.keys(meta)) {
       await this.thenUpdate({
