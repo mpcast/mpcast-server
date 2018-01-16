@@ -1,7 +1,6 @@
 /* eslint-disable no-undef,no-return-await,default-case,max-depth,no-warning-comments,comma-spacing */
 const BaseRest = require('./Base')
 const slug = require('limax')
-const tc = require('text-censor')
 
 let fields = [
   'id',
@@ -439,13 +438,13 @@ module.exports = class extends BaseRest {
     if (think.isEmpty(data.title)) {
       return this.fail('主题不能为空')
     }
-    data.title = tc.filter(data.title)
+    data.title = think.tc.filter(data.title)
     const slugName = slug(data.title, {tone: false, separateNumbers: false})
     if (think.isEmpty(slugName)) {
       return this.fail('创建失败，请检查主题内容')
     }
     if (!think.isEmpty(data.content)) {
-      data.content = tc.filter(data.content)
+      data.content = think.tc.filter(data.content)
     }
     data.name = slugName
 
