@@ -214,4 +214,60 @@ module.exports = class extends Base {
 
     return data
   }
+
+
+  /**
+   * 查询分类下作者相关的内容
+   *
+   * @param category
+   * @param author
+   * @param page
+   * @param pagesize
+   * @returns {Promise<Object>}
+   */
+  async findByAuthorPost (category, author, page = 1, pagesize) {
+    const fileds = [
+      'p.id',
+      'p.name',
+      'p.title',
+      'p.content',
+      'p.author',
+      'p.parent',
+      'p.modified'
+    ]
+    const data = await this.model('terms', {appId: this.appId}).alias('t').join({
+      term_taxonomy: {
+        join: 'inner',
+        as: 'tt',
+        on: ['t.id', 'tt.term_id']
+      },
+      term_relationships: {
+        join: 'inner',
+        as: 'tr',
+        on: ['tr.term_taxonomy_id', 'tt.id'],
+      },
+      posts: {
+        join: 'inner',
+        as: 'p',
+        on: ['p.id', 'tr.object_id']
+      }
+    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%' OR t.id = '${category}' AND author = '${author}'`).order('modified DESC').page(page, pagesize).setRelation(true).countSelect()
+    let postIds = []
+    data.data.forEach((item) => {
+      postIds.push(item.id)
+    })
+
+    if (!think.isEmpty(postIds)) {
+      // 处理 Meta 信息
+      const metaModel = this.model('postmeta')
+      let metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+        post_id: ['IN', postIds]
+      }).select()
+
+      data.data.forEach((item, i) => {
+        item.metas = think._.filter(metaData, {post_id: item.id})
+      })
+    }
+    return data
+  }
 }

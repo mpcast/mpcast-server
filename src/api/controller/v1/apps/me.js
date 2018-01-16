@@ -190,4 +190,19 @@ module.exports = class extends Base {
     // user: userInfo.user_login,
     // return this.success({user: userInfo.user_login, token: token});
   }
+
+  /**
+   * 按类别查找用户发布的内容
+   * @returns {Promise<void>}
+   */
+  async postsAction () {
+    const category = this.get('category')
+    if (think.isEmpty(category)) {
+      return this.fail('分类不能为空')
+    }
+    const curUser = this.ctx.state.user
+    const postsApi = this.model('posts', {appId: this.appId})
+    const list = await postsApi.findByAuthorPost(category, curUser.id, this.get('page'), this.get('pageSize'))
+    return this.success(list)
+  }
 }

@@ -10,7 +10,7 @@ module.exports = class extends Base {
   }
 
   async indexAction () {
-    const appid = 'S11SeYT2W'
+    // const appid = 'S11SeYT2W'
 
     // 获取用户信息
     if (this.isGet) {

@@ -496,10 +496,15 @@ module.exports = class extends BaseRest {
       // 保存关联对象的 meta 信息
       await metaModel.related(data.relateTo, postId, data.relateStatus)
     }
+    const isDefaultPost = think._.findLast(categories, (value) => {
+      return defaultTerm === value
+    })
 
-    // 6 添加 Love(like) 信息
-    await this.newLike(postId)
-
+    // console.log(isDefaultPost + 'x0009sad9fasifasidfpoiasp')
+    if (isDefaultPost) {
+      // 6 添加 Love(like) 信息
+      await this.newLike(postId)
+    }
     const newPost = await this.getPost(postId)
     return this.success(newPost)
   }
@@ -697,7 +702,6 @@ module.exports = class extends BaseRest {
         }
       }
     }
-    // console.log(JSON.toString(likes))
 
     post.like_count = totalCount
     post.i_like = iLike
