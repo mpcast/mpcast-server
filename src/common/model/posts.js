@@ -32,8 +32,8 @@ module.exports = class extends Base {
    * @returns {Promise.<*>}
    */
   async addMeta (post_id, meta_key, meta_value, unique = false) {
-    let _metaModel = this.model('postmeta', {appId: this.appId})
-    let _id = await _metaModel.add({
+    const _metaModel = this.model('postmeta', {appId: this.appId})
+    const _id = await _metaModel.add({
       post_id: post_id,
       meta_key: meta_key,
       meta_value: JSON.stringify(meta_value)
@@ -56,17 +56,62 @@ module.exports = class extends Base {
 
   /**
    * 按标题查找相似的内容
-   *
+   * 只查询 最爱 (loves) 分类下的，暂定。
    * @param title
    * @param page
    * @returns {Promise<Object>}
    */
-  async findByTitle (title, page = 1) {
-    const list = await this.where({
-      'title': ['like', `%${title}%`],
-      'type': 'post_format'
-    }).page(page, 20).countSelect()
-    return list
+  async findByTitle (title, page = 1, pagesize = 6) {
+    // const list = await this.where({
+    //   'title': ['like', `%${title}%`],
+    //   'type': 'post_format'
+    // }).page(page, pagesize).countSelect()
+    // return list
+
+    const fileds = [
+      'p.id',
+      'p.name',
+      'p.title',
+      'p.content',
+      'p.author',
+      'p.modified'
+    ]
+    const data = await this.model('terms', {appId: this.appId}).alias('t').join({
+      term_taxonomy: {
+        join: 'inner',
+        as: 'tt',
+        on: ['t.id', 'tt.term_id']
+      },
+      term_relationships: {
+        join: 'inner',
+        as: 'tr',
+        on: ['tr.term_taxonomy_id', 'tt.id'],
+      },
+      posts: {
+        join: 'inner',
+        as: 'p',
+        on: ['p.id', 'tr.object_id']
+      }
+    }).field(fileds).where(`t.slug = 'loves' AND p.title LIKE '%${title}%'`)
+      .page(page, pagesize)
+      .setRelation(true).countSelect()
+    const postIds = []
+    data.data.forEach((item) => {
+      postIds.push(item.id)
+    })
+
+    if (!think.isEmpty(postIds)) {
+      // 处理 Meta 信息
+      const metaModel = this.model('postmeta')
+      const metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+        post_id: ['IN', postIds]
+      }).select()
+
+      data.data.forEach((item, i) => {
+        item.metas = think._.filter(metaData, {post_id: item.id})
+      })
+    }
+    return data
   }
 
   /**
@@ -125,8 +170,11 @@ module.exports = class extends Base {
         as: 'tr',
         on: ['tr.term_id', 'tt.term_taxonomy_id']
       }
-    }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent').where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`).order('p.id DESC').page(page, pagesize).countSelect()
-
+    }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent')
+      .where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`)
+      .order('p.id DESC')
+      .page(page, pagesize)
+      .countSelect()
 
     return data
   }
@@ -163,8 +211,12 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%'`).order('modified DESC').page(page, pagesize).setRelation(true).countSelect()
-    let postIds = []
+    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%'`)
+      .order('modified DESC')
+      .page(page, pagesize)
+      .setRelation(true).countSelect()
+
+    const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)
     })
@@ -172,7 +224,7 @@ module.exports = class extends Base {
     if (!think.isEmpty(postIds)) {
       // 处理 Meta 信息
       const metaModel = this.model('postmeta')
-      let metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+      const metaData = await metaModel.field('post_id, meta_key, meta_value').where({
         post_id: ['IN', postIds]
       }).select()
 
@@ -189,26 +241,26 @@ module.exports = class extends Base {
    * @returns {Promise<any>}
    */
   async findByParam (category, page = 1, pagesize) {
-    let query = ''
-    query = `p.status not in ('trash')`
+    // let query = ''
+    // query = `p.status not in ('trash')`
     // SELECT p.id, p.title, p.content FROM picker_S11SeYT2W_posts as p LEFT JOIN picker_S11SeYT2W_term_relationships AS tt ON p.id=tt.object_id
     // LEFT JOIN picker_S11SeYT2W_term_taxonomy as tr on tt.term_taxonomy_id = tr.term_id where tr.term_id IN(1, 3, 4) and tr.taxonomy = 'category' and p.status = 'publish' order by id desc;
     // SELECT * FROM think_user AS a LEFT JOIN `think_cate` AS c ON a.`id`=c.`id` LEFT JOIN `think_group_tag` AS d ON a.`id`=d.`group_id`
-    const data = await this.alias('p').join({
-      term_relationships: {
-        join: 'left', // 有 left,right,inner 3 个值
-        as: 'tt',
-        on: ['p.id', 'tt.object_id']
-      },
-      term_taxonomy: {
-        join: 'left',
-        as: 'tr',
-        on: ['tr.term_id', 'tt.term_taxonomy_id']
-      }
-    }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent').where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`).order('p.id DESC').page(page, pagesize).countSelect()
-
-
-    return data
+    // const data = await this.alias('p').join({
+    //   term_relationships: {
+    //     join: 'left', // 有 left,right,inner 3 个值
+    //     as: 'tt',
+    //     on: ['p.id', 'tt.object_id']
+    //   },
+    //   term_taxonomy: {
+    //     join: 'left',
+    //     as: 'tr',
+    //     on: ['tr.term_id', 'tt.term_taxonomy_id']
+    //   }
+    // }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent').where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`).order('p.id DESC').page(page, pagesize).countSelect()
+    //
+    //
+    // return data
   }
 
 
@@ -260,7 +312,7 @@ module.exports = class extends Base {
     if (!think.isEmpty(postIds)) {
       // 处理 Meta 信息
       const metaModel = this.model('postmeta')
-      let metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+      const metaData = await metaModel.field('post_id, meta_key, meta_value').where({
         post_id: ['IN', postIds]
       }).select()
 

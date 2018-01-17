@@ -258,7 +258,7 @@ module.exports = class extends BaseRest {
   async searchAction () {
     const title = this.get('param')
     const postModel = this.model('posts', {appId: this.appId})
-    const list = await postModel.findByTitle(title, this.get('page'))
+    const list = await postModel.findByTitle(title, this.get('page'), this.get('pagesize'))
     const metaModel = this.model('postmeta', {appId: this.appId})
     _formatMeta(list.data)
 
@@ -267,6 +267,8 @@ module.exports = class extends BaseRest {
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+      } else {
+        item.featured_image = this.getRandomCover()
       }
     }
     return this.success(list)
