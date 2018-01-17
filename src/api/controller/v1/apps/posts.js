@@ -361,6 +361,53 @@ module.exports = class extends BaseRest {
     return this.success(newPost)
   }
 
+  async newLike (postId) {
+    const userId = this.ctx.state.user.id
+    const id = postId
+    let date = this.post('love_date')
+    // 日期是要检查 的
+    if (!think.isEmpty(date)) {
+      // 验证日期的正确性
+      const d = new Date(date).getFullYear()
+      // const d = getMonthFormatted(new Date(date).getMonth())
+      if (d === 'NaN') {
+        return this.fail('日期格式错误')
+      }
+    } else {
+      date = new Date().getFullYear()
+    }
+    const postMeta = this.model('postmeta', {appId: this.appId})
+
+    const result = await postMeta.where({
+      post_id: id,
+      meta_key: '_liked'
+    }).find()
+
+    let likeCount = 0
+    if (!think.isEmpty(result)) {
+      if (!think.isEmpty(result.meta_value)) {
+        likeCount = JSON.parse(result.meta_value).length
+        const iLike = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
+        if (!iLike) {
+          await postMeta.newLike(userId, id, this.ip, date)
+          likeCount++
+        } else {
+          await postMeta.updateLikeDate(userId, id, date)
+        }
+      }
+    } else {
+      // 添加
+      const res = await postMeta.add({
+        post_id: id,
+        meta_key: '_liked',
+        meta_value: ['exp', `JSON_ARRAY(JSON_OBJECT('id', '${userId}', 'ip', '${_ip2int(this.ip)}', 'date', '${date}', 'modified', '${new Date().getTime()}'))`]
+      })
+      if (res > 0) {
+        likeCount++
+      }
+    }
+    await this.model('users').newLike(userId, this.appId, id, date)
+  }
   async getPost (post_id) {
     let fields = [
       'id',

@@ -164,8 +164,6 @@ module.exports = class extends BaseRest {
       // if (!Object.is(item.meta['_featured_image']))
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-      } else {
-        item.featured_image = this.getRandomCover()
       }
 
       // 获取内容的分类信息
