@@ -19,9 +19,9 @@ const fields = [
 
 module.exports = class extends BaseRest {
   async indexAction () {
-    const data = await this.pageAll()
+    // const data = await this.pageAll()
     // 格式旧数据用的
-    // const data = await this.getAllFromPage()
+    const data = await this.getAllFromPage()
     return this.success(data)
   }
   /**
