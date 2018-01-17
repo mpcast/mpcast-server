@@ -134,7 +134,9 @@ module.exports = class extends Base {
   /**
    * 按分类 name 或 slug 查询内容
    * @param category
-   * @returns {Promise<any>}
+   * @param page
+   * @param pagesize
+   * @returns {Promise<Object>}
    */
   async findByCategory (category, page = 1, pagesize) {
     const fileds = [
@@ -189,12 +191,6 @@ module.exports = class extends Base {
   async findByParam (category, page = 1, pagesize) {
     let query = ''
     query = `p.status not in ('trash')`
-    // if (think.isEmpty(status)) {
-    //   query = `p.status not in ('trash')`
-    // } else {
-    //   query = `p.status = '${status}'`
-    // }
-
     // SELECT p.id, p.title, p.content FROM picker_S11SeYT2W_posts as p LEFT JOIN picker_S11SeYT2W_term_relationships AS tt ON p.id=tt.object_id
     // LEFT JOIN picker_S11SeYT2W_term_taxonomy as tr on tt.term_taxonomy_id = tr.term_id where tr.term_id IN(1, 3, 4) and tr.taxonomy = 'category' and p.status = 'publish' order by id desc;
     // SELECT * FROM think_user AS a LEFT JOIN `think_cate` AS c ON a.`id`=c.`id` LEFT JOIN `think_group_tag` AS d ON a.`id`=d.`group_id`
@@ -251,8 +247,12 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%' OR t.id = '${category}' AND author = '${author}'`).order('modified DESC').page(page, pagesize).setRelation(true).countSelect()
-    let postIds = []
+    }).field(fileds)
+      .where(`t.slug = '${category}' OR t.name LIKE '%${category}%' OR t.id = '${category}' AND author = '${author}'`)
+      .order('modified DESC')
+      .page(page, pagesize).setRelation(true).countSelect()
+
+    const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)
     })

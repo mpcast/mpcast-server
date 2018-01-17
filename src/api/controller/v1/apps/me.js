@@ -202,7 +202,7 @@ module.exports = class extends Base {
     }
     const curUser = this.ctx.state.user
     const postsApi = this.model('posts', {appId: this.appId})
-    const list = await postsApi.findByAuthorPost(category, curUser.id, this.get('page'), this.get('pageSize'))
+    const list = await postsApi.findByAuthorPost(category, curUser.id, this.get('page'), this.get('pagesize'))
     return this.success(list)
   }
 }

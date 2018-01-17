@@ -108,11 +108,15 @@ module.exports = class extends BaseRest {
     ];
     fields = unique(fields);
 
-    let query = {}
+    const query = {}
     query.id = post_id
     // query = {status: ['NOT IN', 'trash'], id: post_id}
 
-    const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), 10).countSelect()
+    const list = await this.model('posts', {appId: this.appId})
+      .where(query)
+      .field(fields.join(","))
+      .order('sort ASC')
+      .page(this.get('page'), 10).countSelect()
 
     // 处理播放列表音频 Meta 信息
     _formatMeta(list.data)
@@ -121,11 +125,13 @@ module.exports = class extends BaseRest {
     const metaModel = this.model('postmeta', {appId: this.appId})
     for (const item of list.data) {
       item.url = ''
+      /*
       // 如果有音频
       if (!Object.is(item.meta._audio_id, undefined)) {
         // 音频播放地址
         item.url = await metaModel.getAttachment('file', item.meta._audio_id)
       }
+      */
       const userModel = this.model('users');
 
       // 如果有作者信息
@@ -146,9 +152,9 @@ module.exports = class extends BaseRest {
         item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
       }
       // 作者简历
-      if (!Object.is(item.author.meta.resume, undefined)) {
-        item.author.resume = item.author.meta.resume
-      }
+      // if (!Object.is(item.author.meta.resume, undefined)) {
+      //   item.author.resume = item.author.meta.resume
+      // }
 
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
@@ -163,12 +169,8 @@ module.exports = class extends BaseRest {
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       // if (!Object.is(item.meta['_featured_image']))
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail = {
-        //   id: item.meta['_thumbnail_id']
-        // }
         // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
       }
 
       // 获取内容的分类信息
@@ -176,9 +178,9 @@ module.exports = class extends BaseRest {
       // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
-    await this.dealTerms(list)
+    // await this.dealTerms(list)
     // 处理标签信息
-    await this.dealTags(list)
+    // await this.dealTags(list)
 
     await this.dealLikes(list.data[0])
 

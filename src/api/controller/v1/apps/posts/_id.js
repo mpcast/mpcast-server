@@ -107,13 +107,17 @@ module.exports = class extends BaseRest {
     ];
     fields = unique(fields);
 
-    let query = {}
+    const query = {}
     query.id = post_id
     // query = {status: ['NOT IN', 'trash'], id: post_id}
+    const list = await this.model('posts', {appId: this.appId})
+      .where(query)
+      .field(fields.join(","))
+      .order('sort ASC')
+      .page(this.get('page'), this.get('pagesize') || 10)
+      .countSelect()
 
-    const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').page(this.get('page'), 10).countSelect()
-
-    // 处理播放列表音频 Meta 信息
+    // Meta 信息
     _formatMeta(list.data)
 
     // 根据 Meta 信息中的音频附件 id 查询出音频地址
@@ -127,33 +131,24 @@ module.exports = class extends BaseRest {
       }
       const userModel = this.model('users');
 
-      // 如果有作者信息
-      // if (!Object.is(item.meta._author_id, undefined)) {
-      //   const author = await userModel.where({id: item.meta._author_id}).find()
-      //   _formatOneMeta(author)
-      //   item.authorInfo = author
-      // 查询 出对应的作者信息
-      // } else {
-      // const author = await userModel.where({id: item.author}).find()
       const user = await userModel.getById(item.author)
-      // console.log(JSON.stringify(author))
       _formatOneMeta(user)
       item.author = user
-      // }
-      // 取得头像地址
-      // if (!Object.is(item.author.meta.avatar, undefined)) {
-      //   item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
-      // }
+
+      // 获取头像地址
       if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
         user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
         // user.type = 'wechat'
       } else {
         user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
       }
+
       // 作者简历
       if (!Object.is(item.author.meta.resume, undefined)) {
         item.author.resume = item.author.meta.resume
       }
+      Reflect.deleteProperty(item.author, 'liked')
+      Reflect.deleteProperty(item.author, 'meta')
 
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
@@ -168,17 +163,13 @@ module.exports = class extends BaseRest {
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       // if (!Object.is(item.meta['_featured_image']))
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail = {
-        //   id: item.meta['_thumbnail_id']
-        // }
-        // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
+      } else {
+        item.featured_image = this.getRandomCover()
       }
 
       // 获取内容的分类信息
       // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-      // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
     await this.dealTerms(list)

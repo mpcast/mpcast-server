@@ -66,6 +66,19 @@ module.exports = class extends think.Controller {
     return '';
   }
 
+  /**
+   * 获取系统配置中的随机 cover
+   * @returns {*}
+   */
+  getRandomCover() {
+    if (think._.has(this.options.default, 'covers')) {
+      const defaultCovers = this.options.default.covers
+      return defaultCovers[Math.floor(Math.random() * defaultCovers.length)]
+    } else {
+      // 可以设置一个系统内置的图
+      return ''
+    }
+  }
   __call() {
     return this.fail()
   }
