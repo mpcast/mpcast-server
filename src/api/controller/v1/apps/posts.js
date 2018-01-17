@@ -223,23 +223,8 @@ module.exports = class extends BaseRest {
       if (think._.has(item.author, 'liked')) {
         Reflect.deleteProperty(item.author, 'liked')
       }
-      // await this.dealLikes(item)
-      // console.log(JSON.stringify(this.ctx.state))
-      // const userId = this.ctx.state.user.id
       item.like_count = await metaModel.getLikedCount(item.id)
 
-      // 获取当前用户是否喜欢
-      // const iLike = await metaModel.getLikeStatus(userId, item.id)
-      // item.i_like = iLike.contain > 0
-      // item.likes_enabled = true
-      // item.sharing_enabled = true
-
-      // _formatOneMeta(item.author)
-      // if (item.author.hasOwnProperty('meta')) {
-      //   if (item.author.meta.hasOwnProperty('avatar')) {
-      //     item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
-      //   }
-      // }
       const repliesCount = await this.model('comments', {appId: this.appId}).where({'comment_post_id': item.id}).count()
       // const user = this.ctx.state.user
       // item.author = user
@@ -255,6 +240,8 @@ module.exports = class extends BaseRest {
         // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
         // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
+      } else {
+        item.featured_image = this.getRandomCover()
       }
 
       if (think._.has(item, 'meta')) {
