@@ -670,6 +670,31 @@ cluster-key-slot@^1.0.6:
   version "1.0.8"
   resolved "http://registry.npm.taobao.org/cluster-key-slot/download/cluster-key-slot-1.0.8.tgz#7654556085a65330932a2e8b5976f8e2d0b3e414"
 
+co-from-stream@0.0.0:
+  version "0.0.0"
+  resolved "http://registry.npm.taobao.org/co-from-stream/download/co-from-stream-0.0.0.tgz#1a5cd8ced77263946094fa39f2499a63297bcaf9"
+  dependencies:
+    co-read "0.0.1"
+
+co-fs@^1.2.0:
+  version "1.2.0"
+  resolved "http://registry.npm.taobao.org/co-fs/download/co-fs-1.2.0.tgz#a6df045ce58c04eed45586ff4385032813aba64e"
+  dependencies:
+    co-from-stream "0.0.0"
+    thunkify "0.0.1"
+
+co-read@0.0.1:
+  version "0.0.1"
+  resolved "http://registry.npm.taobao.org/co-read/download/co-read-0.0.1.tgz#f81b3eb8a86675fec51e3d883a7f564e873c9389"
+
+co-wechat-api@^2.7.2:
+  version "2.7.2"
+  resolved "http://registry.npm.taobao.org/co-wechat-api/download/co-wechat-api-2.7.2.tgz#050c680c053653e18cf8c2bf3a6e0d146aceddd6"
+  dependencies:
+    co-fs "^1.2.0"
+    formstream ">=0.0.8"
+    httpx "^2.0.0"
+
 co@^4.6.0:
   version "4.6.0"
   resolved "http://registry.npm.taobao.org/co/download/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -1224,7 +1249,7 @@ formidable@^1.1.1:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/formidable/download/formidable-1.1.1.tgz#96b8886f7c3c3508b932d6bd70c4d3a88f35f1a9"
 
-formstream@1.1.0:
+formstream@1.1.0, formstream@>=0.0.8:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/formstream/download/formstream-1.1.0.tgz#51f3970f26136eb0ad44304de4cebb50207b4479"
   dependencies:
@@ -1443,7 +1468,7 @@ http-signature@~1.1.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-httpx@^2.1.1, httpx@^2.1.2:
+httpx@^2.0.0, httpx@^2.1.1, httpx@^2.1.2:
   version "2.1.2"
   resolved "http://registry.npm.taobao.org/httpx/download/httpx-2.1.2.tgz#59aec158ad68df0aad368a729b25f22a8dbfb114"
   dependencies:
@@ -3376,6 +3401,10 @@ thinkjs@^3.0.0:
 through@^2.3.6, through@~2.3, through@~2.3.4:
   version "2.3.8"
   resolved "http://registry.npm.taobao.org/through/download/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
+
+thunkify@0.0.1:
+  version "0.0.1"
+  resolved "http://registry.npm.taobao.org/thunkify/download/thunkify-0.0.1.tgz#bd5d36b1069b4078e5dcbac8fab45359bea6183d"
 
 tmp@^0.0.33:
   version "0.0.33"

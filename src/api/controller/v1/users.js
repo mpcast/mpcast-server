@@ -11,10 +11,10 @@ module.exports = class extends Base {
 
   async indexAction () {
     const userId = this.get('id')
-    // const appid = this.get('appId')
+    const appid = this.get('appId')
     const userMeta = this.model('usermeta')
     let type = this.get('type')
-    const appid = 'S11SeYT2W'
+    // const appid = 'S11SeYT2W'
     // 根据 id 获取单用户
     if (!think.isEmpty(userId)) {
       const user = await this.model('users').where({id: userId}).find()

@@ -11,6 +11,7 @@
   "dependencies": {
     "@koa/cors": "2",
     "aliyun-dysms-sdk": "^1.0.0",
+    "co-wechat-api": "^2.7.2",
     "crypto": "^1.0.1",
     "httpx": "^2.1.2",
     "jsmediatags": "^3.8.1",

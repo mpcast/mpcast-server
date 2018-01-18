@@ -355,98 +355,6 @@ module.exports = class extends BaseRest {
     return list
   }
 
-  /**
-   * 获取分类信息
-   * /api/category 获取全部栏目（树结构）
-   * /api/category/1 获取栏目id为1的栏目信息
-   * @returns {Promise.<*>}
-   */
-  async get1Action () {
-    const id = this.get('id')
-    const type = this.get('type')
-    const status = this.get('status')
-    let query = {}
-    let fields = [
-      'id',
-      'author',
-      'status',
-      'type',
-      'title',
-      'name',
-      'content',
-      'excerpt',
-      'date',
-      'modified',
-      'parent'
-    ];
-    fields = unique(fields);
-
-    if (!think.isEmpty(id)) {
-      query.id = id
-    }
-    if (!think.isEmpty(type)) {
-      query.type = type
-    }
-    fields.push('content')
-    // 查询单条数据
-    if (!think.isEmpty(id)) {
-      // query = {status: ['NOT IN', 'trash'], _complex: {id: id, parent: id, _logic: 'OR'}}
-      query = {status: ['NOT IN', 'trash'], id: id}
-      return await this.getPodcast(query, fields)
-    } else {
-      const parent = this.get('parent')
-      if (!think.isEmpty(parent)) {
-        query.parent = parent
-      }
-      query.status = ['NOT IN', 'trash']
-      // let queryType = think.isEmpty(status) ? 'publish' : status
-      // let queryType = think.isEmpty(status) ? '' : status
-      if (!think.isEmpty(status)) {
-        if (status === 'my') {
-          // query.status = ['NOT IN', 'trash']
-          query.author = this.ctx.state.user.id
-        }
-        if (status === 'drafts') {
-          query.status = ['like', '%draft%']
-        } else {
-          query.status = status
-        }
-      }
-      return await this.getPodcastList(query, fields)
-
-    }
-    /*
-    if (!think.isEmpty(type)) {
-      query.type = type;
-      switch (query.type) {
-        case 'podcast':
-          break;
-        case "article":
-          break;
-        case "resume":
-          fields.push('content_json')
-          // fields.push('content')
-          break;
-        case "snippets":
-          break;
-        case "pages":
-          break;
-      }
-    }*/
-    // 条件查询
-    // let list = await this.modelInstance.where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), 10).countSelect()
-    // 处理分类
-    // let _taxonomy = this.model('taxonomy', {appId: this.appId})
-    // for (let item of list.data) {
-    //   item.terms = await _taxonomy.getTermsByObject(item.id)
-    // }
-    // 处理内容层级
-    // let treeList = await arr_to_tree(list.data, 0);
-    // list.data = treeList;
-    //
-    // return this.success(list)
-  }
-
   async getPodcastList (query, fields) {
     const list = await this.modelInstance.where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
     // 处理播放列表音频 Meta 信息
@@ -596,11 +504,40 @@ module.exports = class extends BaseRest {
       await metaModel.related(data.relateTo, postId, data.relateStatus)
     }
 
-    console.log('添加最爱的。。。。。。。。。。。。')
     // 6 添加 Love(like) 信息
     await this.newLike(postId)
 
     const newPost = await this.getPost(postId)
+
+    // 下发回忆通知
+    // 0bEMgmkRis7a09BsGreIgj-paRSca9fN-pvMz5WpmH8
+    // 项目名称
+    // {{keyword1.DATA}}
+    // 回复者
+    // {{keyword2.DATA}}
+    // 留言内容
+    // {{keyword3.DATA}}
+    await this.wechatService.API
+      .sendMiniProgramTemplate(
+        'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
+        'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
+        `/page/love?id=${data.parent}`,
+        data.formId,
+        {
+          keyword1: {
+            value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
+            color: '#175177'
+          },
+          keyword2: {
+            value: data.content
+          },
+          keyword3: {
+            value: '点击进入小程序查看'
+          }
+        })
+    // 下发主题通知
+    // 0bEMgmkRis7a09BsGreIgj-paRSca9fN-pvMz5WpmH8
+    // oTUP60A_0LCR7hYH0EQ7kEaakLCg
     return this.success(newPost)
   }
 

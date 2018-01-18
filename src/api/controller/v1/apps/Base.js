@@ -39,6 +39,12 @@ module.exports = class extends think.Controller {
       this.cachePrefix = 'picker_' + this.appId + '_'
       this.modelInstance = this.model(this.resource, {appId: this.appId})
       this.options = await this.model('options', {appId: this.appId}).get()
+      this.wechatConfig = this.options.wechat
+      if (!think.isEmpty(this.wechatConfig)) {
+        this.wechatService = await think.service('wechat', 'common', this.wechatConfig.appid, this.wechatConfig.appsecret)
+      } else {
+        return this.fail('Wechat service init error.')
+      }
       return true
     }
     return false

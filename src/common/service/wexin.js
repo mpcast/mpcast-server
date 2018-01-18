@@ -1,7 +1,7 @@
 const httpx = require('httpx')
 const querystring = require('querystring')
 const WXBizDataCrypt = require('./lib/WXBizDataCrypt')
-const API = require('./lib/WechatApi')
+const WechatAPI = require('./lib/WechatApi')
 
 /**
  * 验证 session key
@@ -15,40 +15,35 @@ class AccessSessionKey {
    * 检查 AccessSesiionKey 是否有效，检查规则为当前时间和过期时间进行对比
    * @returns {boolean}
    */
-  // isValid () {
-  //   return !!this.data.session_key && Date.now < this.data.create_at + this.data.expires_in * 1000
-  // }
+  isValid () {
+    return !!this.data.session_key && Date.now < this.data.create_at + this.data.expires_in * 1000
+  }
 }
 module.exports = class extends think.Service {
   constructor (appid, appsecret) {
     super()
     this.appid = appid
     this.appsecret = appsecret
-    this.keyPrefix = 'session_'
 
     // Session Key 主要处理小程序相关业务
-    this.getSessionKey = async (key) => {
-      const sessionKey = await think.cache(key)
-      return sessionKey
+    this.getSessionKey = async (openid) => {
+      await think.cache(`session_${openid}`)
     }
-    this.saveSessionKey = async (key, value) => {
-      await think.cache(key, value)
+    this.saveSessionKey = async (openid, sessionkey) => {
+        await think.cache(`session_${openid}`, sessionkey)
     }
-    // this.defaults = {}
+    this.defaults = {}
 
     // 处理 微信公众号相关的业务 api
-    this.process = new API(appid, appsecret,
+    this.API = new WechatAPI(appid, appsecret,
       async () => {
-        const accessSessionKey = await think.cache(appid)
+        const accessSessionKey = await think.cache(`token_${appid}`)
         return accessSessionKey
       }, async (token) => {
-        await think.cache(appid, token)
+        await think.cache(`token_${appid}`, token)
       })
   }
 
-  async sendTemplate () {
-    await this.process.sendMiniProgramTemplate()
-  }
   /*!
    * urllib的封装
    *
@@ -94,7 +89,7 @@ module.exports = class extends think.Service {
   async processSessionKey (data) {
     data.create_at = Date.now();
     // 存储token
-    await this.saveSessionKey(`${this.keyPrefix}${data.openid}`, data);
+    await this.saveSessionKey(data.openid, data);
     return new AccessSessionKey(data);
   }
 
@@ -145,19 +140,31 @@ module.exports = class extends think.Service {
    * 获取 小程序授权的用户信息
    * @param encrypted_data
    * @param iv
-   * @param key
+   * @param openid
    * @returns {Promise<void>}
    */
-  async getUserInfo (encrypted_data, iv, key) {
-    const data = await this.getSessionKey(key)
+  async getUserInfo (encrypted_data, iv, openid) {
+    const data = await this.getSessionKey(openid)
     if (!data) {
-      const error = new Error('No SessionKey for ' + key + ', please authorize first.')
+      let error = new Error('No SessionKey for ' + openid + ', please authorize first.')
       error.name = 'NoSessionKeyError'
       throw error
     }
+    // const session_info = await this.getKey(code)
     const crypt = new WXBizDataCrypt(this.appid, data.session_key)
     const info = crypt.decryptData(encrypted_data, iv)
     return info
+  }
+
+  async verifyWxApp(encrypted_data, iv, code) {
+    const userInfo = await this.getUserInfo(encrypted_data, iv, code)
+    // if (Object.is(userInfo.openid, undefined)) {
+    //
+    // }
+  }
+
+  async createToken(request) {
+    // let approach =
   }
 
   // https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send

@@ -347,6 +347,33 @@ module.exports = class extends BaseRest {
       await this.newLike(postId)
     }
     const newPost = await this.getPost(postId)
+
+    // 下发回忆通知
+    // 0bEMgmkRis7a09BsGreIgj-paRSca9fN-pvMz5WpmH8
+    // 项目名称
+    // {{keyword1.DATA}}
+    // 回复者
+    // {{keyword2.DATA}}
+    // 留言内容
+    // {{keyword3.DATA}}
+    await this.wechatService.process
+      .sendMiniProgramTemplate(
+        'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
+        'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
+        `/page/love?id=${data.parent}`,
+        data.formId,
+        {
+          keyword1: {
+            value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
+            color: '#175177'
+          },
+          keyword2: {
+            value: data.content
+          },
+          keyword3: {
+            value: '点击进入小程序查看'
+          }
+        })
     return this.success(newPost)
   }
 
