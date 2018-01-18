@@ -363,7 +363,7 @@ module.exports = class extends BaseRest {
     // {{keyword3.DATA}}
     await this.wechatService.process
       .sendMiniProgramTemplate(
-        'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
+        'oTUP60LImdhyvE3VpMEmYSTiefu0',
         'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
         `/page/love?id=${data.parent}`,
         `${this.formId}`,
