@@ -276,6 +276,11 @@ module.exports = class extends BaseRest {
 
   async newAction () {
     const data = this.post()
+    console.log(JSON.stringify(data))
+
+    if (think._.has(data, 'formId')) {
+      this.formId = data.formId
+    }
     if (think.isEmpty(data.title)) {
       return this.fail('主题不能为空')
     }
@@ -361,7 +366,7 @@ module.exports = class extends BaseRest {
         'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
         'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
         `/page/love?id=${data.parent}`,
-        data.formId,
+        `${this.formId}`,
         {
           keyword1: {
             value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
