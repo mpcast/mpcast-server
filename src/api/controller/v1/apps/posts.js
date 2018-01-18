@@ -361,24 +361,24 @@ module.exports = class extends BaseRest {
     // {{keyword2.DATA}}
     // 留言内容
     // {{keyword3.DATA}}
-    await this.wechatService.process
-      .sendMiniProgramTemplate(
-        'oTUP60LImdhyvE3VpMEmYSTiefu0',
-        'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
-        `/page/love?id=${data.parent}`,
-        `${this.formId}`,
-        {
-          keyword1: {
-            value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
-            color: '#175177'
-          },
-          keyword2: {
-            value: data.content
-          },
-          keyword3: {
-            value: '点击进入小程序查看'
-          }
-        })
+    // await this.wechatService.process
+    //   .sendMiniProgramTemplate(
+    //     'oTUP60LImdhyvE3VpMEmYSTiefu0',
+    //     'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
+    //     `/page/love?id=${data.parent}`,
+    //     `${this.formId}`,
+    //     {
+    //       keyword1: {
+    //         value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
+    //         color: '#175177'
+    //       },
+    //       keyword2: {
+    //         value: data.content
+    //       },
+    //       keyword3: {
+    //         value: '点击进入小程序查看'
+    //       }
+    //     })
     return this.success(newPost)
   }
 
