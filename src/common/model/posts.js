@@ -193,7 +193,8 @@ module.exports = class extends Base {
       'p.title',
       'p.content',
       'p.author',
-      'p.modified'
+      'p.modified',
+      'p.parent'
     ]
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {

@@ -276,8 +276,6 @@ module.exports = class extends BaseRest {
 
   async newAction () {
     const data = this.post()
-    console.log(JSON.stringify(data))
-
     if (think._.has(data, 'formId')) {
       this.formId = data.formId
     }
