@@ -184,9 +184,10 @@ module.exports = class extends Base {
    * @param category
    * @param page
    * @param pagesize
+   * @param status
    * @returns {Promise<Object>}
    */
-  async findByCategory (category, page = 1, pagesize) {
+  async findByCategory (category, page = 1, pagesize, status = 'trash') {
     const fileds = [
       'p.id',
       'p.name',
@@ -194,7 +195,8 @@ module.exports = class extends Base {
       'p.content',
       'p.author',
       'p.modified',
-      'p.parent'
+      'p.parent',
+      'p.status'
     ]
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
@@ -212,7 +214,7 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`t.slug = '${category}' OR t.name LIKE '%${category}%'`)
+    }).field(fileds).where(`(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status NOT IN ('${status}')`)
       .order('modified DESC')
       .page(page, pagesize)
       .setRelation(true).countSelect()
@@ -234,34 +236,6 @@ module.exports = class extends Base {
       })
     }
     return data
-  }
-
-  /**
-   * 按分类 name 或 slug 查询内容
-   * @param category
-   * @returns {Promise<any>}
-   */
-  async findByParam (category, page = 1, pagesize) {
-    // let query = ''
-    // query = `p.status not in ('trash')`
-    // SELECT p.id, p.title, p.content FROM picker_S11SeYT2W_posts as p LEFT JOIN picker_S11SeYT2W_term_relationships AS tt ON p.id=tt.object_id
-    // LEFT JOIN picker_S11SeYT2W_term_taxonomy as tr on tt.term_taxonomy_id = tr.term_id where tr.term_id IN(1, 3, 4) and tr.taxonomy = 'category' and p.status = 'publish' order by id desc;
-    // SELECT * FROM think_user AS a LEFT JOIN `think_cate` AS c ON a.`id`=c.`id` LEFT JOIN `think_group_tag` AS d ON a.`id`=d.`group_id`
-    // const data = await this.alias('p').join({
-    //   term_relationships: {
-    //     join: 'left', // 有 left,right,inner 3 个值
-    //     as: 'tt',
-    //     on: ['p.id', 'tt.object_id']
-    //   },
-    //   term_taxonomy: {
-    //     join: 'left',
-    //     as: 'tr',
-    //     on: ['tr.term_id', 'tt.term_taxonomy_id']
-    //   }
-    // }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent').where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`).order('p.id DESC').page(page, pagesize).countSelect()
-    //
-    //
-    // return data
   }
 
 
@@ -323,4 +297,8 @@ module.exports = class extends Base {
     }
     return data
   }
+
+  async deletePost (id) {
+  }
+
 }

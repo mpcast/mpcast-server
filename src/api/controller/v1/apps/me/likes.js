@@ -39,7 +39,7 @@ module.exports = class extends BaseRest {
         }
       }
 
-      for (let groupItem of data.meta_value) {
+      for (let groupItem of think._.reverse(data.meta_value)) {
         for (const item of list) {
           if (!Object.is(item.meta, undefined) && !Object.is(item.meta._liked, undefined)) {
             item.like_count = item.meta._liked.length
@@ -51,10 +51,12 @@ module.exports = class extends BaseRest {
           }
         }
       }
-      const groupedItems = think._(data.meta_value)
+      let groupedItems = think._(data.meta_value)
         // .sortBy(group => data.meta_value.indexOf(group[0]))
         .groupBy(item => item.date)
         .value()
+      // groupedItems = think._.reverse(groupedItems)
+      // think._.reverse(groupedItems)
       // let myData = think._.groupBy(data.meta_value, 'date').sortBy(group => data.meta_value.indexOf(group[0]))
       return this.success(groupedItems)
       // return this.success({found: data.meta_value.length, likes: data.meta_value})

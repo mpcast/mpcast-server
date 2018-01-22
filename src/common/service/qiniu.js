@@ -1,4 +1,4 @@
-/* eslint-disable func-style,no-return-await */
+/* eslint-disable func-style,no-return-await,no-undef */
 const qiniu = require('qiniu');
 module.exports = class extends think.Service {
   /**
@@ -50,12 +50,12 @@ module.exports = class extends think.Service {
         }
 
         if (respInfo.statusCode === 200) {
-          console.log(respBody);
+          // console.log(respBody);
           deferred.resolve(respBody);
 
         } else {
-          console.log(respInfo.statusCode);
-          console.log(respBody);
+          // console.log(respInfo.statusCode);
+          // console.log(respBody);
           deferred.resolve(false);
         }
       });
@@ -172,8 +172,7 @@ module.exports = class extends think.Service {
     const mac = new qiniu.auth.digest.Mac(option.ak, option.sk);
     const config = new qiniu.conf.Config();
     const bucketManager = new qiniu.rs.BucketManager(mac, config);
-    // TODO: 待处理 https 访问配置,空间访问域名
-    const http_ = think.config("http_") == 1 ? "http" : "https";
+    const http_ = think.config("http_") === 1 ? "http" : "https";
     const publicBucketDomain = `${http_}://${option.domain}`;
 
     // 公开空间访问链接

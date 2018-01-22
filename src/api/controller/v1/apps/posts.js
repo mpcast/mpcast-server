@@ -24,6 +24,7 @@ module.exports = class extends BaseRest {
     const data = await this.getAllFromPage()
     return this.success(data)
   }
+
   /**
    * 统一处理查询参数
    * @returns {Promise<{}>}
@@ -50,6 +51,7 @@ module.exports = class extends BaseRest {
 
     return query
   }
+
   /**
    * 分页查询全部内容
    * @returns {Promise<Array>}
@@ -118,7 +120,7 @@ module.exports = class extends BaseRest {
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
       } else {
-          item.featured_image = this.getRandomCover()
+        item.featured_image = this.getRandomCover()
       }
 
       // 清理 post 的 meta 数据
@@ -233,12 +235,15 @@ module.exports = class extends BaseRest {
       item.replies_count = repliesCount
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       // if (!Object.is(item.meta['_featured_image']))
-      if (!Object.is(item.meta._thumbnail_id, undefined)) {
+      if (!Object.is(item.meta._thumbnail_id, undefined) && !think.isEmpty(item.meta._thumbnail_id)) {
         // item.thumbnail = {
         //   id: item.meta['_thumbnail_id']
         // }
         // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+        if (think.isEmpty(item.featured_image)) {
+          item.featured_image = this.getRandomCover()
+        }
         // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
       } else {
         item.featured_image = this.getRandomCover()
@@ -359,24 +364,24 @@ module.exports = class extends BaseRest {
     // {{keyword2.DATA}}
     // 留言内容
     // {{keyword3.DATA}}
-    // await this.wechatService.process
-    //   .sendMiniProgramTemplate(
-    //     'oTUP60LImdhyvE3VpMEmYSTiefu0',
-    //     'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
-    //     `/page/love?id=${data.parent}`,
-    //     `${this.formId}`,
-    //     {
-    //       keyword1: {
-    //         value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
-    //         color: '#175177'
-    //       },
-    //       keyword2: {
-    //         value: data.content
-    //       },
-    //       keyword3: {
-    //         value: '点击进入小程序查看'
-    //       }
-    //     })
+    await this.wechatService.process
+      .sendMiniProgramTemplate(
+        'oTUP60LImdhyvE3VpMEmYSTiefu0',
+        'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
+        `/page/love?id=${data.parent}`,
+        `${this.formId}`,
+        {
+          keyword1: {
+            value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
+            color: '#175177'
+          },
+          keyword2: {
+            value: data.content
+          },
+          keyword3: {
+            value: '点击进入小程序查看'
+          }
+        })
     return this.success(newPost)
   }
 
@@ -427,6 +432,7 @@ module.exports = class extends BaseRest {
     }
     await this.model('users').newLike(userId, this.appId, id, date)
   }
+
   async getPost (post_id) {
     let fields = [
       'id',

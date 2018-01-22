@@ -30,9 +30,24 @@ module.exports = class extends BaseRest {
     const basename = path.basename(filePath) + extname;
 
 
-    // if (oneOf(file.type, ['audio/mpeg', 'audio/mp3'])) {
-    //   return this.success(file.originalFilename)
-    // }
+    // Promise 获取文件的 hash 值，采用 七牛 etag 工具
+    const hash = () => {
+      const deferred = think.defer();
+      think.etag(filePath, (value) => {
+        deferred.resolve(value);
+      })
+      return deferred.promise;
+    }
+
+    const hashValue = await hash()
+    if (think.isEmpty(hashValue)) {
+      return this.fail('文件上传失败，请重试')
+    }
+    // 文件排重，查询附件文件是否存在
+    const attachment = await postModel.field(['id', 'guid as url']).where({name: hashValue}).find()
+    if (!think.isEmpty(attachment)) {
+      return this.success(attachment)
+    }
     // 执行文件上传逻辑
     if (config.type === 'qiniu') {
       const service = this.service('qiniu')
@@ -65,7 +80,7 @@ module.exports = class extends BaseRest {
             await mp3Duration(filePath, async (err, duration) => {
               if (err) throw err
               Promise.all([
-                await postModel.addMeta(_post_id, '_attachment_metadata', {"duration": duration}),
+                await postModel.addMeta(_post_id, '_attachment_metadata', {'duration': duration, 'size': file.size}),
                 await postModel.addMeta(_post_id, '_attachment_file', fileUrl)
               ])
               // return duration
@@ -93,6 +108,7 @@ module.exports = class extends BaseRest {
         }
         if (oneOf(file.type, ['image/jpg', 'image/jpeg', 'image/png'])) {
           try {
+            await postModel.addMeta(_post_id, '_attachment_metadata', {'mime': file.type, 'size': file.size})
             // await this.sharpMetadata(file.path)
             await postModel.addMeta(_post_id, '_attachment_file', fileUrl)
             return this.success(retData)
@@ -114,6 +130,7 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async uploadAction () {
+
     const _postModel = this.model('posts', {orgId: this.orgId})
 
     const file = think.extend({}, this.file('file'));
@@ -121,6 +138,7 @@ module.exports = class extends BaseRest {
     // console.log(JSON.stringify(file))
     // console.log(this.options)
     const filepath = file.path;
+
     const basename = path.basename(filepath);
 
     const ret = {'status': 1, 'info': '上传成功', 'data': ""}
@@ -133,7 +151,7 @@ module.exports = class extends BaseRest {
       const qiniu = think.service("qiniu");
 // eslint-disable-next-line new-cap
       const instance = new qiniu();
-      const uppic = await instance.upload(filepath, basename, this.aid);
+      const uppic = await instance.upload(filepath, basename);
 
       if (!think.isEmpty(uppic)) {
 

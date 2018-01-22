@@ -700,6 +700,35 @@ module.exports = class extends BaseRest {
   }
 
   /**
+   * 删除分类
+   * @returns {Promise.<*>}
+   */
+  async deleteAction () {
+    const postId = this.get('id')
+    const currentUserId = this.ctx.state.user.id
+
+    if (think.isEmpty(postId)) {
+      return this.fail('提交的参数错误')
+    }
+    const postsModel = this.model('posts', {appId: this.appId})
+    const data = await postsModel.where({id: postId}).find()
+    if (think.isEmpty(data)) {
+      return this.fail('内容不存在!')
+    }
+    // if (data.author !== currentUserId) {
+    //   return this.fail('没有此内容的操作权限!')
+    // }
+    try {
+      await this.model('posts', {appId: this.appId})
+        .where({id: postId, author: currentUserId})
+        .update({status: 'trash'})
+      return this.success('删除成功')
+    } catch (e) {
+      return this.fail('删除失败')
+    }
+  }
+
+  /**
    * update resource
    * @return {Promise} []
    */
