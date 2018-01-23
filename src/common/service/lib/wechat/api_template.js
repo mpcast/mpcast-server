@@ -1,4 +1,4 @@
-const { postJSON } = require('./util');
+const {postJSON} = require('./util');
 
 /**
  * 设置所属行业
@@ -13,7 +13,7 @@ const { postJSON } = require('./util');
  * @param {Object} industryIds 公众号模板消息所属行业编号
  */
 exports.setIndustry = async function (industryIds) {
-  const { accessToken } = await this.ensureAccessToken();
+  const {accessToken} = await this.ensureAccessToken();
   const apiUrl = this.prefix + 'template/api_set_industry?access_token=' + accessToken;
   return this.request(apiUrl, postJSON(industryIds));
 };
@@ -28,7 +28,7 @@ exports.setIndustry = async function (industryIds) {
  * @param {String} templateIdShort 模板库中模板的编号，有“TM**”和“OPENTMTM**”等形式
  */
 exports.addTemplate = async function (templateIdShort) {
-  const { accessToken } = await this.ensureAccessToken();
+  const {accessToken} = await this.ensureAccessToken();
   const apiUrl = this.prefix + 'template/api_add_template?access_token=' + accessToken;
   const templateId = {
     template_id_short: templateIdShort
@@ -60,7 +60,7 @@ exports.addTemplate = async function (templateIdShort) {
  * @param {Object} miniprogram 跳转小程序所需数据 {appid, pagepath}
  */
 exports.sendTemplate = async function (openid, templateId, url, topColor, data, miniprogram) {
-  const { accessToken } = await this.ensureAccessToken();
+  const {accessToken} = await this.ensureAccessToken();
   const apiUrl = this.prefix + 'message/template/send?access_token=' + accessToken;
   const template = {
     touser: openid,
@@ -100,7 +100,7 @@ exports.sendTemplate = async function (openid, templateId, url, topColor, data, 
  * @param {String} color 字体颜色
  */
 exports.sendTemplateForMiniProgram = async function (openid, templateId, url, appid, pagepath, data, color) {
-  const { accessToken } = await this.ensureAccessToken();
+  const {accessToken} = await this.ensureAccessToken();
   const apiUrl = this.prefix + 'message/template/send?access_token=' + accessToken;
   const template = {
     touser: openid,
@@ -116,8 +116,8 @@ exports.sendTemplateForMiniProgram = async function (openid, templateId, url, ap
   return this.request(apiUrl, postJSON(template));
 };
 
-exports.sendMiniProgramTemplate = async function (openid, templateId, page, formId, data){
-  const { accessToken } = await this.ensureAccessToken();
+exports.sendMiniProgramTemplate = async function (openid, templateId, page, formId, data) {
+  const {accessToken} = await this.ensureAccessToken();
   const apiUrl = this.prefix + 'message/wxopen/template/send?access_token=' + accessToken;
   // 项目名称
   // {{keyword1.DATA}}

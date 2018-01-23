@@ -30,6 +30,8 @@ module.exports = class extends Base {
     } else {
       user.likes = 0
     }
+    user.recalls = 0
+    user.stories = 0
     Reflect.deleteProperty(user, 'meta')
     return this.success(user)
   }

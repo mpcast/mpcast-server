@@ -12,6 +12,8 @@ module.exports = class extends BaseRest {
     const data = await userMeta.where(`meta_key = 'picker_${this.appId}_liked_posts' and user_id = ${userId}`).find()
     if (!think.isEmpty((data))) {
       data.meta_value = JSON.parse(data.meta_value)
+      // 按添加时间排序
+      data.meta_value = think._.orderBy(data.meta_value, ['modified'], ['desc'])
       const items = []
       for (const item of data.meta_value) {
         items.push(item.post_id)
@@ -38,8 +40,7 @@ module.exports = class extends BaseRest {
           }
         }
       }
-
-      for (let groupItem of think._.reverse(data.meta_value)) {
+      for (let groupItem of data.meta_value) {
         for (const item of list) {
           if (!Object.is(item.meta, undefined) && !Object.is(item.meta._liked, undefined)) {
             item.like_count = item.meta._liked.length
@@ -52,7 +53,7 @@ module.exports = class extends BaseRest {
         }
       }
       let groupedItems = think._(data.meta_value)
-        // .sortBy(group => data.meta_value.indexOf(group[0]))
+      // .sortBy(group => data.meta_value.indexOf(group[0]))
         .groupBy(item => item.date)
         .value()
       // groupedItems = think._.reverse(groupedItems)

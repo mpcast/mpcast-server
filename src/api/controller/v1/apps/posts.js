@@ -221,7 +221,6 @@ module.exports = class extends BaseRest {
         }
         Reflect.deleteProperty(item.author, 'meta')
       }
-
       if (think._.has(item.author, 'liked')) {
         Reflect.deleteProperty(item.author, 'liked')
       }

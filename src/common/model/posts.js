@@ -248,7 +248,7 @@ module.exports = class extends Base {
    * @param pagesize
    * @returns {Promise<Object>}
    */
-  async findByAuthorPost (category, author, page = 1, pagesize) {
+  async findByAuthorPost (category, author, page = 1, pagesize, status = 'trash') {
     const fileds = [
       'p.id',
       'p.name',
@@ -256,7 +256,8 @@ module.exports = class extends Base {
       'p.content',
       'p.author',
       'p.parent',
-      'p.modified'
+      'p.modified',
+      'p.status'
     ]
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
@@ -275,7 +276,7 @@ module.exports = class extends Base {
         on: ['p.id', 'tr.object_id']
       }
     }).field(fileds)
-      .where(`t.slug = '${category}' OR t.name LIKE '%${category}%' OR t.id = '${category}' AND author = '${author}'`)
+      .where(`t.slug = '${category}' OR t.name LIKE '%${category}%' OR t.id = '${category}' AND author = '${author}'  AND p.status NOT IN ('${status}')`)
       .order('modified DESC')
       .page(page, pagesize).setRelation(true).countSelect()
 
