@@ -7,6 +7,8 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async indexAction () {
+    // return this.success('lalala ----')
+    // console.log('v2 .....')
     const userMeta = this.model('usermeta')
     const userId = this.ctx.state.user.id
     const data = await userMeta.where(`meta_key = 'picker_${this.appId}_liked_posts' and user_id = ${userId}`).find()
@@ -38,6 +40,7 @@ module.exports = class extends BaseRest {
           if (item.meta._thumbnail_id === imgItem.post_id) {
             item.featured_image = JSON.parse(imgItem.meta_value)
           }
+          // item.modified = think.moment
         }
       }
       for (let groupItem of data.meta_value) {
@@ -52,17 +55,21 @@ module.exports = class extends BaseRest {
           }
         }
       }
+      // 这段代码处理分组数据
       let groupedItems = think._(data.meta_value)
       // .sortBy(group => data.meta_value.indexOf(group[0]))
         .groupBy(item => item.date)
+        .map((items, year) => {
+          return {
+            year: year,
+            likes: items
+          }
+        })
+        .reverse()
         .value()
-
-      // var newkey = Object.keys(obj).sort().reverse();
-      // groupedItems = think._.reverse(groupedItems)
-      // think._.reverse(groupedItems)
-      // let myData = think._.groupBy(data.meta_value, 'date').sortBy(group => data.meta_value.indexOf(group[0]))
-      return this.success(groupedItems)
-      // return this.success({found: data.meta_value.length, likes: data.meta_value})
+      // return this.success(groupedItems)
+      // ~END
+      return this.success(data.meta_value)
     } else {
       return this.success([])
     }
