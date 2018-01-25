@@ -161,7 +161,6 @@ module.exports = class extends BaseRest {
     if (this.isPost) {
       const action = this.get('action')
       if (action === 'delete') {
-
         await postMeta.unLike(userId, this.id)
         await this.model('users').unLike(userId, this.appId, this.id)
         const likeCount = await postMeta.getLikedCount(this.id)

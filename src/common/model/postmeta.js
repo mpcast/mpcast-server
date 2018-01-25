@@ -201,14 +201,11 @@ module.exports = class extends Base {
     const data = await this.field(`JSON_LENGTH(meta_value) AS like_count, JSON_CONTAINS(meta_value, '[{"id": "${user_id}"}]') AS contain`).where(`meta_key = '_liked' and post_id = ${post_id}`).find()
     if (!think.isEmpty(data)) {
       if (!Object.is(data.contain, undefined)) {
-        // console.log('-------------------')
-        // console.log(JSON.stringify(data))
         // return true
         return data
       }
     }
     return {'like_count': 0, 'contain': 0}
-    // console.log('-----------xxxxx')
     // if (!think.isEmpty(data)) {
     //   console.log(JSON.stringify(data))
     // } else {

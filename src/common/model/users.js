@@ -471,11 +471,10 @@ async updateWechatUser (data) {
    * @returns {Promise<number>}
    */
   async unLike (user_id, app_id, post_id) {
-    console.log(user_id + ':' + app_id + ':' + post_id)
-    // const res = await this.where(`user_id = '${user_id}' AND meta_key = 'picker_${app_id}_liked_posts' AND JSON_SEARCH(meta_value, 'one', ${post_id}) IS NOT NULL`).update({
-    //     'meta_value': ['exp', `JSON_REMOVE(meta_value, SUBSTRING_INDEX(REPLACE(JSON_SEARCH(meta_value, 'one', '${post_id}', NULL, '$**.post_id'), '"', ''), '.', 1))`]
-    //   }
-    // )
-    // return res
+    const res = await this.model('usermeta').where(`user_id = '${user_id}' AND meta_key = 'picker_${app_id}_liked_posts' AND JSON_SEARCH(meta_value, 'one', ${post_id}) IS NOT NULL`).update({
+        'meta_value': ['exp', `JSON_REMOVE(meta_value, SUBSTRING_INDEX(REPLACE(JSON_SEARCH(meta_value, 'one', '${post_id}', NULL, '$**.post_id'), '"', ''), '.', 1))`]
+      }
+    )
+    return res
   }
 }
