@@ -7,8 +7,6 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async indexAction () {
-    // return this.success('lalala ----')
-    // console.log('v2 .....')
     const userMeta = this.model('usermeta')
     const userId = this.ctx.state.user.id
     const data = await userMeta.where(`meta_key = 'picker_${this.appId}_liked_posts' and user_id = ${userId}`).find()
@@ -55,18 +53,17 @@ module.exports = class extends BaseRest {
           }
         }
       }
-      // 这段代码处理分组数据
-      let groupedItems = think._(data.meta_value)
-      // .sortBy(group => data.meta_value.indexOf(group[0]))
-        .groupBy(item => item.date)
-        .map((items, year) => {
-          return {
-            year: year,
-            likes: items
-          }
-        })
-        .reverse()
-        .value()
+      // 这段代码处理分组数据 (已交由小程序端处理 v 0.2.3.3 版本开始)
+      // let groupedItems = think._(data.meta_value)
+      //   .groupBy(item => item.date)
+      //   .map((items, year) => {
+      //     return {
+      //       year: year,
+      //       likes: items
+      //     }
+      //   })
+      //   .reverse()
+      //   .value()
       // return this.success(groupedItems)
       // ~END
       return this.success(data.meta_value)
