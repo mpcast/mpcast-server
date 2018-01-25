@@ -158,6 +158,7 @@ module.exports = class extends BaseRest {
    */
   async getAllFromPage () {
     const query = {}
+    const rand = this.get('rand')
     const title = this.get('title')
     const author = this.get('author')
     if (!think.isEmpty(author)) {
@@ -174,7 +175,7 @@ module.exports = class extends BaseRest {
     let list = []
     const category = this.get('category')
     if (!think.isEmpty(category)) {
-      list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), 12)
+      list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), 12, this.get('rand'))
 
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
