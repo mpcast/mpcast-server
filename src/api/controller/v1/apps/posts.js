@@ -267,13 +267,18 @@ module.exports = class extends BaseRest {
     const metaModel = this.model('postmeta', {appId: this.appId})
     _formatMeta(list.data)
 
-    for (const item of list.data) {
+    for (let item of list.data) {
       item.url = ''
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
       } else {
         item.featured_image = this.getRandomCover()
+      }
+
+      // like_count
+      if (!Object.is(item.meta._liked, undefined)) {
+        item.like_count = item.meta._liked.length
       }
     }
     return this.success(list)
