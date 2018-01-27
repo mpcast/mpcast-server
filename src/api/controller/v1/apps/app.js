@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 
 module.exports = class extends BaseRest {
   async indexAction () {
-    console.log(this.ctx.header)
+    // console.log(this.ctx.header)
     // const appsModel = this.model('apps')
     // const app = await appsModel.get(this.appId)
     // this.app.default = this.options.default

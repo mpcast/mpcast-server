@@ -193,7 +193,7 @@ module.exports = class extends BaseRest {
     //   }
     //   await metaModel.save(this.id, data.meta)
     // }
-    for (const item of list.data) {
+    for (let item of list.data) {
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
         // think._.reverse(item.items
@@ -208,6 +208,10 @@ module.exports = class extends BaseRest {
         // 音频播放地址
         item.url = await metaModel.getAttachment('file', item.meta._audio_id)
       }
+
+      // if (!Object.is(item.meta._style, undefined)) {
+      //   item.style =
+      // }
 
       const userModel = this.model('users');
 
@@ -249,9 +253,9 @@ module.exports = class extends BaseRest {
         item.featured_image = this.getRandomCover()
       }
 
-      if (think._.has(item, 'meta')) {
-        Reflect.deleteProperty(item, 'meta')
-      }
+      // if (think._.has(item, 'meta')) {
+      //   Reflect.deleteProperty(item, 'meta')
+      // }
     }
     return list
   }
