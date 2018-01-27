@@ -99,6 +99,54 @@ module.exports = class extends Base {
   }
 
   /**
+   * 统计点赞的人数
+   *
+   * @param post_id
+   * @returns {Promise.<number|*>}
+   */
+  async getThumbsCount (post_id) {
+    const total = await this.field('JSON_LENGTH(meta_value) as thumbs_count').where({
+      post_id: post_id,
+      meta_key: '_thumbs'
+    }).find()
+    if (!think.isEmpty(total)) {
+      return total.thumbs_count
+    } else {
+      return 0
+    }
+  }
+  /**
+   * 点赞
+   * @param user_id
+   * @param post_id
+   * @param ip
+   * @param date
+   * @returns {Promise<void>}
+   */
+  async newThumb (user_id, post_id, ip, date) {
+    await this.where({
+      post_id: post_id,
+      meta_key: '_thumbs'
+    }).update({
+      'post_id': post_id,
+      'meta_key': '_thumbs',
+      'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('id', '${user_id}','ip', '${_ip2int(ip)}', 'date', '${date}', 'modified', '${new Date().getTime()}'))`]
+    })
+  }
+  /**
+   * 取赞
+   * @param user_id
+   * @param post_id
+   * @returns {Promise<number>}
+   */
+  async unThumb (user_id, post_id) {
+    const res = await this.where(`post_id = '${post_id}' AND meta_key = '_thumbs' AND JSON_SEARCH(meta_value, 'one', ${user_id}) IS NOT NULL`).update({
+        'meta_value': ['exp', `JSON_REMOVE(meta_value, SUBSTRING_INDEX(REPLACE(JSON_SEARCH(meta_value, 'one', '${user_id}', NULL, '$**.id'), '"', ''), '.', 1))`]
+      }
+    )
+    return res
+  }
+  /**
    * 添加新喜欢的人员
    * @param user_id
    * @param post_id
@@ -206,6 +254,30 @@ module.exports = class extends Base {
       }
     }
     return {'like_count': 0, 'contain': 0}
+    // if (!think.isEmpty(data)) {
+    //   console.log(JSON.stringify(data))
+    // } else {
+    //   console.log('xxxxxxxxxxxx')
+    // }
+    // return !think.isEmpty(data);
+  }
+
+
+  /**
+   * 获取用户是否 thumb a post
+   * @param user_id
+   * @param post_id
+   * @returns {Promise.<{like_count: number, contain: number}>}
+   */
+  async getThumbStatus (user_id, post_id) {
+    const data = await this.field(`JSON_LENGTH(meta_value) AS like_count, JSON_CONTAINS(meta_value, '[{"id": "${user_id}"}]') AS contain`).where(`meta_key = '_thumbs' and post_id = ${post_id}`).find()
+    if (!think.isEmpty(data)) {
+      if (!Object.is(data.contain, undefined)) {
+        // return true
+        return data
+      }
+    }
+    return {'thumbs_count': 0, 'contain': 0}
     // if (!think.isEmpty(data)) {
     //   console.log(JSON.stringify(data))
     // } else {

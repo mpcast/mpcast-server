@@ -26,6 +26,7 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/mine\/(\w+)?/, '/api/v1/apps/posts/:3/mine?appId=:1&id=:2&action=:4', 'get, post'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/new?/, '/api/v1/apps/posts/:3/new?appId=:1&id=:2', 'post'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/likes?/, '/api/v1/apps/posts/likes?appId=:1&id=:2', 'get'],
+
   [/\/v1\/apps\/(\w+)\/me\/likes?/, '/api/v1/apps/me/likes?appId=:1', 'get'],
   // V2 版本
   [/\/v2\/apps\/(\w+)\/me\/likes?/, '/api/v2/apps/me/likes?appId=:1', 'get'],
