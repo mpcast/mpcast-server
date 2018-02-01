@@ -166,7 +166,8 @@ module.exports = class extends BaseRest {
     }
     const status = this.get('status')
     if (think.isEmpty(status) || status === 'all') {
-      query.status = ['NOT IN', 'trash']
+      query.status = 'publish'
+      // query.status = ['NOT IN', 'trash']
     } else {
       query.status = status
     }

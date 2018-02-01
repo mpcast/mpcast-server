@@ -545,16 +545,19 @@ module.exports = class extends BaseRest {
     const userId = this.ctx.state.user.id
     const id = postId
     let date = this.post('love_date')
-    console.log('date ---------------' + date)
     // 日期是要检查 的
     if (!think.isEmpty(date)) {
-      // 验证日期的正确性
-      const d = getMonthFormatted(new Date(date).getMonth())
-      if (d === 'NaN') {
+      const isDate = think._.isDate(new Date(date));
+      if (!isDate) {
         return this.fail('日期格式错误')
       }
+      // 验证日期的正确性
+      // const d = getMonthFormatted(new Date(date).getMonth())
+      // if (d === 'NaN') {
+      //   return this.fail('日期格式错误')
+      // }
     } else {
-      date = getDate()
+      date = new Date()
     }
     const postMeta = this.model('postmeta', {appId: this.appId})
 

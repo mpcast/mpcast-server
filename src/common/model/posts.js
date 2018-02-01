@@ -187,7 +187,7 @@ module.exports = class extends Base {
    * @param status
    * @returns {Promise<Object>}
    */
-  async findByCategory (category, page = 1, pagesize, rand = false, status = 'trash') {
+  async findByCategory (category, page = 1, pagesize, rand = false, status = 'publish') {
     const fileds = [
       'p.id',
       'p.name',
@@ -216,7 +216,7 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status NOT IN ('${status}')`)
+    }).field(fileds).where(`(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`)
       .order(orderBy)
       .page(page, pagesize)
       .setRelation(true).countSelect()
