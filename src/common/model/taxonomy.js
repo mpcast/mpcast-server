@@ -376,9 +376,6 @@ module.exports = class extends Base {
   async relationships (object_id, term_taxonomy_id) {
     const _term_relationships = this.model('term_relationships', {appId: this.appId});
     const res = await _term_relationships.where({object_id: object_id, term_taxonomy_id: term_taxonomy_id}).find()
-
-    console.log('lalala-------xx--x-x')
-    console.log(JSON.stringify(res))
     if (think.isEmpty(res)) {
       await _term_relationships.add({object_id: object_id, term_taxonomy_id: term_taxonomy_id})
     } else {

@@ -176,14 +176,18 @@ module.exports = class extends BaseRest {
     let list = []
     const category = this.get('category')
     if (!think.isEmpty(category)) {
-      list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), 12, this.get('rand'))
+      list = await this.model('posts', {appId: this.appId})
+        .findByCategory(category, this.get('page'), 12, this.get('rand'))
 
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
 
     } else {
-      list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
+      list = await this.model('posts', {appId: this.appId})
+        .where(query).field(fields.join(","))
+        .order('modified DESC')
+        .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
     }
     _formatMeta(list.data)
     const metaModel = this.model('postmeta', {appId: this.appId})
@@ -318,6 +322,31 @@ module.exports = class extends BaseRest {
     const currentTime = new Date().getTime();
     data.date = currentTime
     data.modified = currentTime
+
+    // 3 添加内容与 term 分类之间的关联
+    // term_taxonomy_id
+    const defaultTerm = Number(this.options.default.term)
+
+
+    let categories = []
+    if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
+      categories = categories.concat(defaultTerm)
+    } else {
+      // 处理提交过来的分类信息，可能是单分类 id 也可能是数组, 分类 id 为 term_taxonomy_id
+      categories = categories.concat(JSON.parse(data.categories))
+    }
+    // 4 获取内容的格式类别
+    if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
+      categories = categories.concat(data.format)
+    }
+    if (think._.hasIn(this.options, 'default.publish')) {
+      const defaultPublish = this.options.default.publish
+      // 处理内容默认发布状态
+      const isPublish = think._.intersection(categories, defaultPublish)
+      if (isPublish.length >= 0) {
+        data.status = 'publish'
+      }
+    }
     if (think.isEmpty(data.author)) {
       data.author = this.ctx.state.user.id
     }
@@ -331,21 +360,7 @@ module.exports = class extends BaseRest {
       // 保存 meta 信息
       await metaModel.save(postId, data.meta)
     }
-    // 3 添加内容与 term 分类之间的关联
-    // term_taxonomy_id
-    const defaultTerm = Number(this.options.default.term)
 
-    let categories = []
-    if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
-      categories = categories.concat(defaultTerm)
-    } else {
-      // 处理提交过来的分类信息，可能是单分类 id 也可能是数组, 分类 id 为 term_taxonomy_id
-      categories = categories.concat(JSON.parse(data.categories))
-    }
-    // 4 获取内容的格式类别
-    if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
-      categories = categories.concat(data.format)
-    }
     for (const cate of categories) {
       await this.model('taxonomy', {appId: this.appId}).relationships(postId, cate)
     }
