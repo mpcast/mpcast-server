@@ -1,5 +1,5 @@
 /* eslint-disable no-return-await */
-const BaseRest = require('../Base');
+const BaseRest = require('./Base');
 const jwt = require('jsonwebtoken')
 
 module.exports = class extends BaseRest {
