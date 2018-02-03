@@ -343,7 +343,7 @@ module.exports = class extends BaseRest {
       const defaultPublish = this.options.default.publish
       // 处理内容默认发布状态
       const isPublish = think._.intersection(categories, defaultPublish)
-      if (isPublish.length >= 0) {
+      if (isPublish.length > 0) {
         data.status = 'publish'
       }
     }

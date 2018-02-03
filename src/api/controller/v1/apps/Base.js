@@ -33,6 +33,7 @@ module.exports = class extends think.Controller {
   async dealApp (appId) {
     const appsModel = this.model('apps')
     const app = await appsModel.get(appId)
+
     if (!think.isEmpty(app)) {
       this.app = app
       this.appId = app.id
