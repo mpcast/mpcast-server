@@ -11,6 +11,7 @@ module.exports = [
   // /apps/$app/users/$user_ID/delete
   // [/\/v1\/file?/, '/api/v1/file', 'rest'],
   [/\/v1\/apps\/(\w+)\/taxonomies\/(\w+)\/terms\/slug:(\w+)$/, '/api/v1/apps/taxonomies/_slug?appId=:1&taxonomy=:2&slug=:3', 'get, post'],
+  [/\/v1\/apps\/(\w+)\/users\/(\d+)\/likes?/, '/api/v1/apps/users/likes?appId=:1&id=:2', 'get'],
 
   [/\/v1\/apps\/(\w+)\/users\/(\d+)/, '/api/v1/apps/users/_id?appId=:1&id=:2', 'get, post'],
   [/\/v1\/apps\/(\w+)\/file?/, '/api/v1/apps/file?appId=:1', 'rest'],
@@ -32,7 +33,6 @@ module.exports = [
   // V2 版本
   [/\/v2\/apps\/(\w+)\/me\/likes?/, '/api/v2/apps/me/likes?appId=:1', 'get'],
   [/\/v1\/apps\/(\w+)\/me\/posts?/, '/api/v1/apps/me/posts?appId=:1', 'get'],
-
 
   [/\/v1\/apps\/(\w+)\/users\/login:(\w+)?/, '/api/v1/apps/users/login?appId=:1&user_login=:2', 'get'],
   [/\/v1\/apps\/(\w+)\/(\w+)\/slug:([\w-]+)(?:\/(\w+))?/, '/api/v1/apps/:2/_slug/:4?appId=:1&slug=:3', 'get, post'],

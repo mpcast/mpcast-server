@@ -302,7 +302,7 @@ module.exports = class extends BaseRest {
       return this.fail('主题不能为空')
     }
     data.title = think.tc.filter(data.title)
-    const slugName = slug(data.title, {tone: false, separateNumbers: false})
+    const slugName = slug(data.title, {separateNumbers: false})
     if (think.isEmpty(slugName)) {
       return this.fail('创建失败，请检查主题内容')
     }
