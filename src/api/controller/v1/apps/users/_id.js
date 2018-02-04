@@ -19,11 +19,19 @@ module.exports = class extends Base {
 
       // 根据 id 获取单用户
       if (!think.isEmpty(userId)) {
-        const user = await this.model('users').where({id: userId}).find()
+        const user = await this.model('users').getById(userId)
         _formatOneMeta(user)
-
         if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-          user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+          // user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+          const wechat = user.meta[`picker_${appid}_wechat`]
+          Object.assign(user, {
+            city: wechat.city,
+            gender: wechat.gender,
+            country: wechat.country,
+            province: wechat.province,
+            language: wechat.language,
+            avatar: wechat.avatarUrl
+          })
           // user.type = 'wechat'
         } else {
           user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)

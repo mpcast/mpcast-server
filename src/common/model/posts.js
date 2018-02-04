@@ -240,7 +240,35 @@ module.exports = class extends Base {
     return data
   }
 
+  /**
+   * 按类别统计用户发布的内容数量
+   * @param category
+   * @param author
+   * @param status
+   * @returns {Promise<void>}
+   */
+  async countByAuthorPost(category, author, status = 'trash') {
+    const data = await this.model('terms', {appId: this.appId}).alias('t').join({
+      term_taxonomy: {
+        join: 'inner',
+        as: 'tt',
+        on: ['t.id', 'tt.term_id']
+      },
+      term_relationships: {
+        join: 'inner',
+        as: 'tr',
+        on: ['tr.term_taxonomy_id', 'tt.id'],
+      },
+      posts: {
+        join: 'inner',
+        as: 'p',
+        on: ['p.id', 'tr.object_id']
+      }
+    }).where(`t.id = '${category}' AND author = '${author}'  AND p.status NOT IN ('${status}')`)
+      .count()
 
+    return data
+  }
   /**
    * 查询分类下作者相关的内容
    *

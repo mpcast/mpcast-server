@@ -15,6 +15,7 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/users\/(\d+)/, '/api/v1/apps/users/_id?appId=:1&id=:2', 'get, post'],
   [/\/v1\/apps\/(\w+)\/file?/, '/api/v1/apps/file?appId=:1', 'rest'],
   [/\/v1\/apps\/(\w+)\/auth?(\/\w+)$/, '/api/v1/apps/auth/:2?appId=:1', 'get, post'],
+  [/\/v1\/apps\/(\w+)\/posts\/counts?/, '/api/v1/apps/posts/counts?appId=:1', 'get'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/replies?/, '/api/v1/apps/posts/replies?appId=:1&id=:2', 'get'],
   [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)$/, '/api/v1/apps/:2/_id?appId=:1&id=:3', 'get, post'],
   [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)\/(delete)$/, '/api/v1/apps/:2/_id/:4?appId=:1&id=:3', 'post'],

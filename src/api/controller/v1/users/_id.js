@@ -23,6 +23,7 @@ module.exports = class extends Base {
       if (!think.isEmpty(userId)) {
         const user = await this.model('users').where({id: userId}).find()
         _formatOneMeta(user)
+
         if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
           user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
           // user.type = 'wechat'
