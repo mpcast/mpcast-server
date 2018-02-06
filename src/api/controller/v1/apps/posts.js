@@ -181,7 +181,7 @@ module.exports = class extends BaseRest {
     const category = this.get('category')
     if (!think.isEmpty(category)) {
       list = await this.model('posts', {appId: this.appId})
-        .findByCategory(category, this.get('page'), 12, this.get('rand'))
+        .findByCategory(category, this.get('page'), 12, rand)
 
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
