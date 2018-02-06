@@ -159,7 +159,10 @@ module.exports = class extends BaseRest {
   async getAllFromPage () {
     const query = {}
     const format = this.get('format')
-    const rand = this.get('rand')
+    let rand = this.get('rand')
+    if (!rand) {
+      rand = true
+    }
     const title = this.get('title')
     const author = this.get('author')
     if (!think.isEmpty(author)) {
