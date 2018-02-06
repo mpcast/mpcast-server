@@ -70,8 +70,8 @@ module.exports = class extends Base {
       on: ["term_taxonomy_id", "term_id"]
 
     }).field("object_id").where("tt.taxonomy IN ('" + taxonomies + "') AND tt.term_id IN (" + term_ids + ")").limit(limit).select();
-    let ids = [];
-    for (let obj of objects) {
+    const ids = [];
+    for (const obj of objects) {
       ids.push(obj.object_id);
     }
     return ids;
@@ -243,6 +243,31 @@ module.exports = class extends Base {
     return await think._.flattenDeep(_terms);
   }
 
+  async getFormat (object_id) {
+
+    // 从缓存中提取到所有 term
+    const all_terms = await this.allTerms();
+    // console.log(JSON.stringify(all_terms))
+    const _term_relationships = this.model("term_relationships", {appId: this.appId});
+
+    // 查询内容关联的分类法 id == term_id
+    const taxonomies = await _term_relationships.field('term_taxonomy_id as term_id').where({"object_id": object_id}).select();
+
+    /**
+     * 按 term_id 查询 term
+     * @type {Array}
+     * @private
+     */
+      // const _terms = [];
+    let postFormat = {}
+    taxonomies.forEach((item) => {
+      postFormat = think._.findLast(all_terms, function (o) {
+        return (o.term_id === item.term_id && o.slug.indexOf('post-format') >= 0)
+      });
+    });
+    return postFormat
+  }
+
   /**
    * 获取全部分类
    * @param flag
@@ -306,8 +331,8 @@ module.exports = class extends Base {
       const metaList = await termmetaModel.where({term_id: ['IN', ids]}).select()
       // 处理成组数据
       const metaGroup = think._.groupBy(metaList, 'term_id')
-      for (let key of Object.keys(metaGroup)) {
-        for (let item of _data) {
+      for (const key of Object.keys(metaGroup)) {
+        for (const item of _data) {
           if (item.term_id.toString() === key.toString()) {
             item.metas = metaGroup[key]
           }
@@ -547,4 +572,95 @@ module.exports = class extends Base {
     // 3 删除 分类的类别方法数据
     // 4 解除与类别关联的内容关系
   }
+
+  /**
+   * 获取全部菜单
+   * @returns {Promise<Array>}
+   */
+  async getAllMenu() {
+    const all_terms = await this.allTerms(true);
+    const taxonomies = await this.allTaxonomies(true);
+    const nav_menus = think._.filter(taxonomies, {taxonomy: 'nav_menu'});
+
+    const _terms = [];
+    nav_menus.forEach((item) => {
+      _terms.push(think._.filter(all_terms, {id: item.term_id}))
+    })
+    return think._.flattenDeep(_terms);
+  }
+
+  /**
+   * 获取菜单项信息
+   * @param menu_id
+   * @returns {Promise<Array>}
+   */
+  async getNavMenuItems(menu_id) {
+
+    const _taxonomy = this.model('taxonomy');
+
+    const item_ids = await _taxonomy.getObjectsInTerm(menu_id, 'nav_menu');
+
+    const posts = this.model('posts');
+
+    const navitems = [];
+
+    const itemType = {
+      taxonomy: "taxonomy",
+      post_type: "post_type"
+    };
+
+    const objectType = {
+      page: "page",
+      custom: "custom"
+    };
+
+    if (!think.isEmpty(item_ids)) {
+      const nav_items = await posts.getNavItems(item_ids);
+
+      for (const item of nav_items) {
+        if (!think.isEmpty(item.meta)) {
+          item.path = '';
+          const _meta = item.meta;
+
+          if (think.isEmpty(_meta._menu_item_type)) {
+            return
+          }
+          switch(_meta._menu_item_type) {
+            case itemType.taxonomy:
+              //
+              item.path = _meta._menu_item_object + "/" + _meta._menu_item_object_slug;
+              break;
+            case itemType.post_type:
+              //
+              switch(_meta._menu_item_object) {
+                case objectType.page:
+                  if (!think.isEmpty(_meta._menu_item_url)) {
+                    item.path = _meta._menu_item_url;
+
+                  } else {
+                    item.path = _meta._menu_item_object + "/" + _meta._menu_item_object_id;
+
+                  }
+
+                  break;
+              }
+              break;
+
+            default:
+              //
+              item.path = _meta._menu_item_url;
+              break;
+          }
+
+        }
+
+        // }
+        navitems.push(item)
+      }
+    }
+
+
+    return navitems;
+  }
+
 }

@@ -226,6 +226,9 @@ module.exports = class extends Base {
       postIds.push(item.id)
     })
 
+    // if (format) {
+    //
+    // }
     if (!think.isEmpty(postIds)) {
       // 处理 Meta 信息
       const metaModel = this.model('postmeta')
@@ -237,6 +240,17 @@ module.exports = class extends Base {
         item.metas = think._.filter(metaData, {post_id: item.id})
       })
     }
+
+    // const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    // for (const item of list.data) {
+    //   item.categories = await _taxonomy.findCategoriesByObject(item.id)
+    // }
+    // 处理内容层级
+    // let treeList = await arr_to_tree(list.data, 0);
+    // list.data = await arr_to_tree(list.data, 0);
+
+    // return list
+
     return data
   }
 
@@ -331,5 +345,47 @@ module.exports = class extends Base {
 
   async deletePost (id) {
   }
+  async getNavItems(ids) {
+    // let ret = await think.cache("_nav_items", async() => {
+    let _fields = [];
+    _fields.push('id');
+    // _fields.push('author');
+    _fields.push('status');
+    // _fields.push('type');
+    _fields.push('title');
+    _fields.push('name');
+    // _fields.push('content');
+    // fields.push('excerpt');
+    // _fields.push('date');
+    // _fields.push('modified');
+    // _fields.push('parent');
+    let query = {
+      id: ["IN", ids],
+      status: ["NOT IN", 'trash']
+    }
+    let items = await this.where(query).field(_fields.join(",")).select();
+    let nav_items = [];
 
+    for (let item of items) {
+
+      item.meta = {};
+      if (item.metas.length > 0) {
+        for (let meta of item.metas) {
+          // console.log(meta.meta_key + ":" + meta.meta_value);
+          item.meta[meta.meta_key] = meta.meta_value;
+        }
+      }
+      // Relation. item.metas;
+      Reflect.deleteProperty(item, 'metas')
+
+      nav_items.push(item);
+    }
+
+    // console.log(JSON.stringify(nav_items) + "___333")
+    return nav_items;
+
+    // }, this.cacheOptions);
+
+    // return ret;
+  }
 }

@@ -158,6 +158,7 @@ module.exports = class extends BaseRest {
    */
   async getAllFromPage () {
     const query = {}
+    const format = this.get('format')
     const rand = this.get('rand')
     const title = this.get('title')
     const author = this.get('author')
@@ -261,6 +262,9 @@ module.exports = class extends BaseRest {
       // if (think._.has(item, 'meta')) {
       //   Reflect.deleteProperty(item, 'meta')
       // }
+    }
+    if (format) {
+      list = await this.dealFormat(list)
     }
     return list
   }
@@ -548,7 +552,7 @@ module.exports = class extends BaseRest {
   async dealTerms (list) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     for (const item of list.data) {
-      item.categories = await _taxonomy.findCategoriesByObject(item.id)
+      item.categories = await _taxonomy.getTermsByObject(item.id)
     }
     // 处理内容层级
     // let treeList = await arr_to_tree(list.data, 0);
@@ -557,6 +561,22 @@ module.exports = class extends BaseRest {
     return list
   }
 
+  /**
+   * 处理分类信息，为查询的结果添加分类信息
+   * @param list
+   * @returns {Promise.<*>}
+   */
+  async dealFormat (list) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    for (const item of list.data) {
+      item.format = await _taxonomy.getFormat(item.id)
+    }
+    // 处理内容层级
+    // let treeList = await arr_to_tree(list.data, 0);
+    list.data = await arr_to_tree(list.data, 0);
+
+    return list
+  }
   /**
    * 处理内容标签信息
    * @param list

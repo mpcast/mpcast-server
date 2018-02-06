@@ -41,7 +41,7 @@ module.exports = class extends BaseRest {
         const list = JSON.parse(result.meta_value)
         totalCount = list.length
         for (const u of list) {
-          let user = await userModel.where({id: u.id, user_status: 1}).find()
+          let user = await userModel.where({id: u.id}).find()
           likes.push(user)
         }
       }
