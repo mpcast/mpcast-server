@@ -13,6 +13,7 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/taxonomies\/(\w+)\/terms\/slug:(\w+)$/, '/api/v1/apps/taxonomies/_slug?appId=:1&taxonomy=:2&slug=:3', 'get, post'],
   [/\/v1\/apps\/(\w+)\/users\/(\d+)\/likes?/, '/api/v1/apps/users/likes?appId=:1&id=:2', 'get'],
   [/\/v1\/apps\/(\w+)\/users\/(\d+)\/posts?/, '/api/v1/apps/users/posts?appId=:1&id=:2', 'get'],
+  [/\/v1\/apps\/(\w+)\/menus\/(\d+)?/, '/api/v1/apps/menus?appId=:1&id=:2', 'get'],
 
   [/\/v1\/apps\/(\w+)\/users\/(\d+)/, '/api/v1/apps/users/_id?appId=:1&id=:2', 'get, post'],
   [/\/v1\/apps\/(\w+)\/file?/, '/api/v1/apps/file?appId=:1', 'rest'],
@@ -29,6 +30,7 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/mine\/(\w+)?/, '/api/v1/apps/posts/:3/mine?appId=:1&id=:2&action=:4', 'get, post'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/new?/, '/api/v1/apps/posts/:3/new?appId=:1&id=:2', 'post'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/likes?/, '/api/v1/apps/posts/likes?appId=:1&id=:2', 'get'],
+  [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/views?/, '/api/v1/apps/posts/views?appId=:1&id=:2', 'get'],
 
   [/\/v1\/apps\/(\w+)\/me\/likes?/, '/api/v1/apps/me/likes?appId=:1', 'get'],
   // V2 版本

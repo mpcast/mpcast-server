@@ -1,24 +1,7 @@
-/* eslint-disable no-return-await,no-undef */
+/* eslint-disable no-return-await,no-undef,default-case */
 const Base = require('./base');
 
 module.exports = class extends Base {
-  // get relation () {
-  //   return {
-  //     // children: {
-  //     //   type:think.Model.HAS_MANY,
-  //     //   model: 'posts',
-  //     //   fKey: 'parent'
-  //     // },
-  //     metas: {
-  //       type: think.Model.HAS_MANY,
-  //       model: 'postmeta',
-  //       fKey: 'post_id',
-  //       field: "post_id,meta_key,meta_value"
-  //       // rModel: 'usermeta',
-  //       // fKey: 'users_id'
-  //     }
-  //   };
-  // }
   get relation () {
     return {
       metas: {
@@ -51,6 +34,30 @@ module.exports = class extends Base {
     //       item, think._.find(allTerms, {id: item.term_id})))
     // })
     return categorys
+  }
+
+  /**
+   * 按分类法查询指定数量内容,主要用于 top 查询
+   * @param term_ids
+   * @param taxonomies
+   * @param limit
+   * @returns {Promise.<Array>}
+   */
+  async getAllObjectsInTerms (term_ids, taxonomies = 'category') {
+    const _term_relationships = this.model("term_relationships", {appId: this.appId})
+    let objects
+    objects = await _term_relationships.join({
+      table: "term_taxonomy",
+      join: "inner",
+      as: "tt",
+      on: ["term_taxonomy_id", "term_id"]
+
+    }).field("object_id").where("tt.taxonomy IN ('" + taxonomies + "') AND tt.term_id IN (" + term_ids + ")").select();
+    const ids = [];
+    for (const obj of objects) {
+      ids.push(obj.object_id);
+    }
+    return ids;
   }
 
   /**
@@ -461,6 +468,33 @@ module.exports = class extends Base {
     return data
 
   }
+  /**
+   * 根据 slug 查询所属分类方法的分类信息
+   * @param taxonomy
+   * @param term_slug
+   * @returns {Promise.<void>}
+   */
+  async findTermById (taxonomy, id) {
+    const data = await this.model('term_taxonomy', {appId: this.appId}).alias('tt')
+      .join({
+        terms: {
+          as: 't',
+          on: ['tt.term_id', 't.id']
+        }
+      }).field([
+        't.id as term_id',
+        'tt.id as term_taxonomy_id',
+        't.name',
+        't.slug',
+        'description',
+        'count'
+      ]).where({
+        'tt.taxonomy': taxonomy,
+        't.id': id
+      }).find()
+    return data
+
+  }
 
   /**
    * @deprecated
@@ -573,32 +607,95 @@ module.exports = class extends Base {
     // 4 解除与类别关联的内容关系
   }
 
+  async getMenuById (menuId) {
+    let menus = await this.findTermById('nav_menu', menuId)
+    const items = await this.getNavMenuItems(menus.term_id)
+    menus.items = items
+    return menus
+  }
   /**
    * 获取全部菜单
    * @returns {Promise<Array>}
    */
-  async getAllMenu() {
+  async getAllMenu () {
     const all_terms = await this.allTerms(true);
     const taxonomies = await this.allTaxonomies(true);
     const nav_menus = think._.filter(taxonomies, {taxonomy: 'nav_menu'});
+    // console.log(JSON.stringify(all_terms))
 
     const _terms = [];
     nav_menus.forEach((item) => {
-      _terms.push(think._.filter(all_terms, {id: item.term_id}))
+      _terms.push(think._.filter(all_terms, {term_id: item.term_id}))
     })
     return think._.flattenDeep(_terms);
   }
+
+  /**
+   * 获取分类下的所有内容
+   *
+   * @param term_ids
+   * @param taxonomies
+   * @returns {Promise.<void>}
+   */
+  async getObjectsInTerm (term_ids, taxonomies, page) {
+
+
+    // let ret = await think.cache("_objects_in_term", async() => {
+    // 遍例 taxonomy 查询是否存在
+    let _term_relationships = this.model("term_relationships");
+    let objects;
+
+    if (!page || page === null) {
+      // console.log('page is null')
+      objects = await _term_relationships.join({
+        table: "term_taxonomy",
+        join: "inner",
+        as: "tt",
+        on: ["term_taxonomy_id", "term_id"]
+
+      }).field("object_id").where("tt.taxonomy IN ('" + taxonomies + "') AND tt.term_id IN (" + term_ids + ")").select();
+      let ids = [];
+      for (let obj of objects) {
+        ids.push(obj.object_id);
+      }
+      return ids;
+    }
+
+    objects = await _term_relationships.join({
+      table: "term_taxonomy",
+      join: "inner",
+      as: "tt",
+      on: ["term_taxonomy_id", "term_id"]
+
+    }).field("object_id").where("tt.taxonomy IN ('" + taxonomies + "') AND tt.term_id IN (" + term_ids + ")").order('object_id DESC').page(page, 10).countSelect();
+
+    let ids = [];
+    for (let obj of objects.data) {
+      ids.push(obj.object_id);
+    }
+// eslint-disable-next-line prefer-reflect
+    delete objects.data;
+    objects.ids = ids;
+
+    return objects;
+
+    // }, this.cacheOptions);
+
+    // return objects;
+    // return ret;
+  }
+
 
   /**
    * 获取菜单项信息
    * @param menu_id
    * @returns {Promise<Array>}
    */
-  async getNavMenuItems(menu_id) {
+  async getNavMenuItems (menu_id) {
 
-    const _taxonomy = this.model('taxonomy');
+    const _taxonomy = this.model('taxonomy', {appId: this.appId});
 
-    const item_ids = await _taxonomy.getObjectsInTerm(menu_id, 'nav_menu');
+    const item_ids = await _taxonomy.getAllObjectsInTerms(menu_id, 'nav_menu');
 
     const posts = this.model('posts');
 
@@ -614,51 +711,47 @@ module.exports = class extends Base {
       custom: "custom"
     };
 
-    if (!think.isEmpty(item_ids)) {
-      const nav_items = await posts.getNavItems(item_ids);
-
-      for (const item of nav_items) {
-        if (!think.isEmpty(item.meta)) {
-          item.path = '';
-          const _meta = item.meta;
-
-          if (think.isEmpty(_meta._menu_item_type)) {
-            return
+    if (think.isEmpty(item_ids)) {
+      return []
+    }
+    let nav_items = await posts.getNavItems(item_ids);
+    // _formatOneMeta(item)
+    // _formatMeta(nav_items)
+    // console.log(JSON.stringify(nav_items))
+    for (const item of nav_items) {
+      // console.log(JSON.stringify(item.meta._menu_item) + '-------')
+      if (!think.isEmpty(item.meta._menu_item)) {
+        item.path = '';
+        const _meta = item.meta;
+        if (think.isEmpty(_meta._menu_item)) {
+          return
+        }
+        // if (think.isEmpty(_meta._menu_item_type)) {
+        //   return
+        // }
+        switch (_meta._menu_item.type) {
+          case itemType.taxonomy: {
+            //
+            item.path = _meta._menu_item.object + "/" + _meta._menu_item.object_id;
+            break;
           }
-          switch(_meta._menu_item_type) {
-            case itemType.taxonomy:
-              //
-              item.path = _meta._menu_item_object + "/" + _meta._menu_item_object_slug;
-              break;
-            case itemType.post_type:
-              //
-              switch(_meta._menu_item_object) {
-                case objectType.page:
-                  if (!think.isEmpty(_meta._menu_item_url)) {
-                    item.path = _meta._menu_item_url;
-
-                  } else {
-                    item.path = _meta._menu_item_object + "/" + _meta._menu_item_object_id;
-
-                  }
-
-                  break;
-              }
-              break;
-
-            default:
-              //
-              item.path = _meta._menu_item_url;
-              break;
+          case itemType.post_type: {
+            if (_meta._menu_item.object === objectType.page) {
+              item.path = !think.isEmpty(_meta._menu_item.url) ? _meta._menu_item.url : (_meta._menu_item.object + "/" + _meta._menu_item.object_id)
+            }
+            break;
           }
-
+          default: {
+            item.path = _meta._menu_item.url;
+            break;
+          }
         }
 
-        // }
-        navitems.push(item)
       }
-    }
 
+      // }
+      navitems.push(item)
+    }
 
     return navitems;
   }

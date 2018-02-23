@@ -17,11 +17,12 @@ module.exports = class extends Base {
 
     // 根据 id 获取单用户
     if (!think.isEmpty(userId)) {
-      const user = await this.model('users').where({id: userId}).find()
+      let user = await this.model('users').where({id: userId}).find()
       _formatOneMeta(user)
       if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
         user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
         // user.type = 'wechat'
+        user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
       } else {
         user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
       }
@@ -41,12 +42,14 @@ module.exports = class extends Base {
         })
         const users = await this.model('users').where({id: ['IN', ids]}).page(this.get('page'), 500).countSelect()
         _formatMeta(users.data)
-        for (const user of users.data) {
+        for (let user of users.data) {
           if (!think.isEmpty(user.meta.avatar)) {
             user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
           } else if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
             user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+            user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
             // user.type = 'wechat'
+            Reflect.deleteProperty(user, 'meta')
           }
         }
         return this.success(users)

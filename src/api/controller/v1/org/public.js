@@ -231,7 +231,7 @@ module.exports = class extends BaseRest {
     }
     // return this.success(userInfo)
     // 获取签名盐
-    const token = await jwt.sign({userInfo}, 'S1BNbRp2b', {expiresIn: '3d'})
+    const token = await jwt.sign({...userInfo}, 'S1BNbRp2b', {expiresIn: '3d'})
     // user: userInfo.user_login,
     // let validity_days = 7;
     // let expires = validity_days * 1000 * 60 * 60 * 24;

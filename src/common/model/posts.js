@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const Base = require('./base');
 
 /**
@@ -46,11 +47,11 @@ module.exports = class extends Base {
    * @param stickys
    * @returns {Promise.<*>}
    */
-  async getStickys (stickys, page = 1) {
+  async getStickys (stickys, page = 1, pagesize) {
     const list = await this.where({
       id: ['IN', stickys]
       // 按 IN 条件的顺序查询出结果
-    }).order(`INSTR (',${stickys},', CONCAT(',',id,','))`).page(page, 20).countSelect()
+    }).order(`INSTR (',${stickys},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
     return list
   }
 
@@ -180,14 +181,14 @@ module.exports = class extends Base {
   }
 
   /**
-   * 按分类 name 或 slug 查询内容
+   * 获取最新的内容
    * @param category
    * @param page
    * @param pagesize
    * @param status
    * @returns {Promise<Object>}
    */
-  async findByCategory (category, page = 1, pagesize, rand = false, status = 'publish') {
+  async getNews (page = 1, pagesize, status) {
     const fileds = [
       'p.id',
       'p.name',
@@ -198,8 +199,105 @@ module.exports = class extends Base {
       'p.parent',
       'p.status'
     ]
-    const orderBy = rand ? 'rand()' : 'modified DESC'
+    const data = await this.model('terms', {appId: this.appId}).alias('t').join({
+      term_taxonomy: {
+        join: 'inner',
+        as: 'tt',
+        on: ['t.id', 'tt.term_id']
+      },
+      term_relationships: {
+        join: 'inner',
+        as: 'tr',
+        on: ['tr.term_taxonomy_id', 'tt.id'],
+      },
+      posts: {
+        join: 'inner',
+        as: 'p',
+        on: ['p.id', 'tr.object_id']
+      }
+    }).field(fileds).where(`(tt.taxonomy = 'category') AND p.status = '${status}'`)
+      .order('modified DESC')
+      .page(page, pagesize)
+      .setRelation(true).countSelect()
 
+    const postIds = []
+    data.data.forEach((item) => {
+      postIds.push(item.id)
+    })
+
+    if (!think.isEmpty(postIds)) {
+      // 处理 Meta 信息
+      const metaModel = this.model('postmeta')
+      const metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+        post_id: ['IN', postIds]
+      }).select()
+
+      data.data.forEach((item, i) => {
+        item.metas = think._.filter(metaData, {post_id: item.id})
+      })
+    }
+
+    return data
+  }
+
+  /**
+   * 获取最热的内容
+   * @param page
+   * @param pagesize
+   * @returns {Promise<Object>}
+   */
+  async getPopular (page = 1, pagesize) {
+    const fileds = [
+      'p.id',
+      'p.name',
+      'p.title',
+      'p.content',
+      'p.author',
+      'p.modified',
+      'p.parent',
+      'p.status'
+    ]
+    const data = await this.alias('p').field('id, name, title, content, author, modified, parent, status, JSON_LENGTH(meta_value) as view_count').join({
+      postmeta: {
+        join: 'inner',
+        as: 'pm',
+        on: ['pm.post_id', 'p.id']
+      }
+    }).where(`meta_key = '_post_views'`)
+      .page(page, pagesize)
+      .setRelation(true).countSelect()
+
+    return data
+    // const data = await this.field(`JSON_LENGTH(meta_value) AS views_count`).where(`meta_key = '_thumbs' and post_id = ${post_id}`).find()
+    // if (!think.isEmpty(data)) {
+    //   if (!Object.is(data.contain, undefined)) {
+        // return true
+        // return data
+      // }
+    // }
+    // return {'thumbs_count': 0, 'contain': 0}
+  }
+
+  /**
+   * 按分类 name 或 slug 查询内容
+   * @param category
+   * @param page
+   * @param pagesize
+   * @param status
+   * @returns {Promise<Object>}
+   */
+  async findByCategory (category, page = 1, pagesize, rand, status = 'publish') {
+    const fileds = [
+      'p.id',
+      'p.name',
+      'p.title',
+      'p.content',
+      'p.author',
+      'p.modified',
+      'p.parent',
+      'p.status'
+    ]
+    const orderBy = rand === true ? 'rand()' : 'modified DESC'
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
         join: 'inner',
@@ -226,9 +324,6 @@ module.exports = class extends Base {
       postIds.push(item.id)
     })
 
-    // if (format) {
-    //
-    // }
     if (!think.isEmpty(postIds)) {
       // 处理 Meta 信息
       const metaModel = this.model('postmeta')
@@ -364,22 +459,23 @@ module.exports = class extends Base {
       status: ["NOT IN", 'trash']
     }
     let items = await this.where(query).field(_fields.join(",")).select();
-    let nav_items = [];
-
-    for (let item of items) {
-
-      item.meta = {};
-      if (item.metas.length > 0) {
-        for (let meta of item.metas) {
-          // console.log(meta.meta_key + ":" + meta.meta_value);
-          item.meta[meta.meta_key] = meta.meta_value;
-        }
-      }
-      // Relation. item.metas;
-      Reflect.deleteProperty(item, 'metas')
-
-      nav_items.push(item);
-    }
+    return _formatMeta(items)
+    // let nav_items = [];
+    //
+    // for (let item of items) {
+    //
+    //   item.meta = {};
+    //   if (item.metas.length > 0) {
+    //     for (let meta of item.metas) {
+    //       // console.log(meta.meta_key + ":" + meta.meta_value);
+    //       item.meta[meta.meta_key] = meta.meta_value;
+    //     }
+    //   }
+    //   // Relation. item.metas;
+    //   Reflect.deleteProperty(item, 'metas')
+    //
+    //   nav_items.push(item);
+    // }
 
     // console.log(JSON.stringify(nav_items) + "___333")
     return nav_items;

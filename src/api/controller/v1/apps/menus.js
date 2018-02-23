@@ -6,8 +6,13 @@ module.exports = class extends BaseRest {
    * @return {Promise} []
    */
   async indexAction () {
-    let nav_menus = await this.model('taxonomy').getAllMenu();
-    return this.json(arr_to_tree(nav_menus, 0))
+    const id = this.get('id')
+    if (!think.isEmpty(id)) {
+      let menus = await this.model('taxonomy', {appId: this.appId}).getMenuById(id);
+      return this.success(menus)
+    }
+    let nav_menus = await this.model('taxonomy', {appId: this.appId}).getAllMenu();
+    return this.success(arr_to_tree(nav_menus, 0))
 
     // let menus = await this.model('taxonomy').getNavMenuItems();
     // this.assign('menus', menus);

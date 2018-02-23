@@ -115,6 +115,24 @@ module.exports = class extends Base {
       return 0
     }
   }
+
+  /**
+   * 统计点赞的人数
+   *
+   * @param post_id
+   * @returns {Promise.<number|*>}
+   */
+  async getViewCount (post_id) {
+    const total = await this.field('JSON_LENGTH(meta_value) as thumbs_count').where({
+      post_id: post_id,
+      meta_key: '_post_views'
+    }).find()
+    if (!think.isEmpty(total)) {
+      return total.thumbs_count
+    } else {
+      return 0
+    }
+  }
   /**
    * 点赞
    * @param user_id
@@ -146,6 +164,7 @@ module.exports = class extends Base {
     )
     return res
   }
+
   /**
    * 添加新喜欢的人员
    * @param user_id
@@ -191,6 +210,37 @@ module.exports = class extends Base {
     return res
   }
 
+  /**
+   * 添加新喜欢的人员
+   * @param user_id
+   * @param post_id
+   * @returns {Promise.<void>}
+   */
+  async newViewer (user_id, post_id, ip) {
+    await this.where({
+      post_id: post_id,
+      meta_key: '_post_views'
+    }).update({
+      'post_id': post_id,
+      'meta_key': '_post_views',
+      'meta_value': ['exp', `JSON_ARRAY_APPEND(meta_value, '$', JSON_OBJECT('id', '${user_id}','ip', '${_ip2int(ip)}', 'date', '${new Date().getTime()}'))`]
+    })
+  }
+  /**
+   * 更新 Like 日期
+   * @param userId
+   * @param postId
+   * @param date
+   * @returns {Promise<number>}
+   */
+  async updateViewDate (userId, postId, ip) {
+    // CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '3', NULL , '$**.id')
+    // 这个是为了处理 JSON 返回的值 $[0] 这样的，来处理对应的 json array 下的 json object Key value
+    const res = await this.where(`post_id = '${postId}' AND meta_key = '_post_views' AND JSON_SEARCH(meta_value, 'one', ${userId}) IS NOT NULL`).update({
+      'meta_value': ['exp', `JSON_REPLACE(meta_value, CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '${userId}', NULL , '$**.id'), '"', ''), '.', 1),'.date'), '${new Date().getTime()}')`]
+    })
+    return res
+  }
   /**
    * 删除关联的 item 项目
    * @param postId

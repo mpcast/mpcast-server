@@ -17,7 +17,7 @@ module.exports = class extends Base {
     // const appid = 'S11SeYT2W'
     // 根据 id 获取单用户
     if (!think.isEmpty(userId)) {
-      const user = await this.model('users').where({id: userId}).find()
+      let user = await this.model('users').where({id: userId}).find()
       _formatOneMeta(user)
       if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
         user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl

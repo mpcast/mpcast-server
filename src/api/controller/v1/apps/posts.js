@@ -18,117 +18,11 @@ const fields = [
 ]
 
 module.exports = class extends BaseRest {
+  // GET API
   async indexAction () {
-    // const data = await this.pageAll()
-    // 格式旧数据用的
-    const data = await this.getAllFromPage()
+    // 格式化查询出来的内容
+    const data = await this.getAll()
     return this.success(data)
-  }
-
-  /**
-   * 统一处理查询参数
-   * @returns {Promise<{}>}
-   * @private
-   */
-  async _parseQuery () {
-    const query = {}
-    const title = this.get('title')
-    if (!think.isEmpty(title)) {
-      query.title = title
-    }
-    const author = this.get('author')
-    if (!think.isEmpty(author)) {
-      query.author = author
-    }
-    const status = this.get('status')
-    if (think.isEmpty(status) || status === 'all') {
-      query.status = ['NOT IN', 'trash']
-    } else {
-      query.status = status
-    }
-    query.parent = !think.isEmpty(this.get('parent')) ? this.get('parent') : 0
-    query.type = !think.isEmpty(this.get('type')) ? this.get('type') : 'post_format'
-
-    return query
-  }
-
-  /**
-   * 分页查询全部内容
-   * @returns {Promise<Array>}
-   */
-  async pageAll () {
-    // 获取处理过的查询条件
-    let query = await this._parseQuery()
-    let list = []
-
-    // 分类条件查询
-    if (!think.isEmpty(this.get('category'))) {
-      list = await this.getByCategory(this.get('category'))
-    }
-    // 置顶内容
-    if (this.get('sticky') === 'true') {
-      list = await this.getStickys()
-    }
-
-    // 默认条件下的分页内容
-    list = await this.model('posts', {appId: this.appId})
-      .where(query)
-      .field(fields.join(","))
-      .order('modified DESC')
-      .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 12)
-      .countSelect()
-
-    // 格式化全部 meta 数据
-    _formatMeta(list.data)
-    const metaModel = this.model('postmeta', {appId: this.appId})
-
-    // 处理 meta 数据
-    for (const item of list.data) {
-      if (!Object.is(item.meta._items, undefined)) {
-        item.items = item.meta._items
-      }
-      item.url = ''
-      // 如果有音频
-      /*
-      if (!Object.is(item.meta._audio_id, undefined)) {
-        // 音频播放地址
-        item.url = await metaModel.getAttachment('file', item.meta._audio_id)
-      }
-      */
-      const userModel = this.model('users');
-
-      // 作者信息
-      item.author = await userModel.getById(item.author)
-      _formatOneMeta(item.author)
-      if (think._.has(item.author, 'meta')) {
-        if (!Object.is(item.author.meta[`picker_${this.appId}_wechat`], undefined)) {
-          item.author.avatar = item.author.meta[`picker_${this.appId}_wechat`].avatarUrl
-        } else {
-          item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
-        }
-        // 清理 Author的 meta 数据
-        Reflect.deleteProperty(item.author, 'meta')
-      }
-      // 清理 liked 信息
-      if (think._.has(item.author, 'liked')) {
-        Reflect.deleteProperty(item.author, 'liked')
-      }
-      item.like_count = await metaModel.getLikedCount(item.id)
-      // 统计留言数据
-      // const repliesCount = await this.model('comments', {appId: this.appId}).where({'comment_post_id': item.id}).count()
-      // item.replies_count = repliesCount
-      if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-      } else {
-        item.featured_image = this.getRandomCover()
-      }
-
-      // 清理 post 的 meta 数据
-      if (think._.has(item, 'meta')) {
-        Reflect.deleteProperty(item, 'meta')
-      }
-    }
-    return list
   }
 
   /**
@@ -156,71 +50,90 @@ module.exports = class extends BaseRest {
    * 按分页查询全部内容
    * @returns {Promise<Array>}
    */
-  async getAllFromPage () {
-    const query = {}
-    const format = this.get('format')
-    let rand = this.get('rand')
-    if (!rand) {
-      rand = true
-    }
-    const title = this.get('title')
-    const author = this.get('author')
-    if (!think.isEmpty(author)) {
-      query.author = author
-    }
-    const status = this.get('status')
-    if (think.isEmpty(status) || status === 'all') {
+  async getAll () {
+    const query = this.get()
+    // 清除两个固定条件
+    Reflect.deleteProperty(query, 'appId')
+    if (!think._.has(query, 'status')) {
       query.status = 'publish'
-      // query.status = ['NOT IN', 'trash']
-    } else {
-      query.status = status
     }
-    query.parent = !think.isEmpty(this.get('parent')) ? this.get('parent') : 0
-    query.type = !think.isEmpty(this.get('type')) ? this.get('type') : 'post_format'
+    if (!think._.has(query, 'status')) {
+      query.parent = 0
+    }
     let list = []
-    const category = this.get('category')
-    if (!think.isEmpty(category)) {
-      list = await this.model('posts', {appId: this.appId})
-        .findByCategory(category, this.get('page'), 12, rand)
+
+    // const category = this.get('category')
+    if (!think.isEmpty(this.get('category'))) {
+      switch (query.category) {
+        case 'new' : {
+          list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query.status)
+          break
+        }
+        case 'popular': {
+          list = await this.model('posts', {appId: this.appId}).getPopular(this.get('page'), this.get('pagesize'))
+          break
+        }
+        case 'featured': {
+          const stickys = this.options.stickys
+          list = await this.model('posts', {appId: this.appId}).getStickys(stickys, this.get('page'), this.get('pagesize'))
+          break
+        }
+        default: {
+          // 用随机方法查询数据
+          let rand = this.get('rand')
+          if (think.isEmpty(rand)) {
+            rand = true
+          }
+          list = await this.model('posts', {appId: this.appId})
+            .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand)
+        }
+      }
 
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
 
     } else {
+      Reflect.deleteProperty(query, 'page')
+      Reflect.deleteProperty(query, 'pagesize')
       list = await this.model('posts', {appId: this.appId})
         .where(query).field(fields.join(","))
         .order('modified DESC')
-        .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30).countSelect()
+        .page(this.get('page'), this.get('pagesize')).countSelect()
     }
-    _formatMeta(list.data)
+
+    // 处理数据，主要处理 meta 内容
+    await this._dealData(list.data)
+
+    // 如果需要格式化内容
+    // 格式化父子关系为 tree 格式数据
+    if (this.get('format') === true) {
+      list.data = await this.formatData(list.data)
+    }
+    return list
+  }
+
+  /**
+   * 处理数据
+   * @param data
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _dealData (data) {
+    _formatMeta(data)
     const metaModel = this.model('postmeta', {appId: this.appId})
 
-    // if (!think.isEmpty(data.items)) {
-    //   data.meta = {
-    //     '_items': JSON.stringify(data.items)
-    //   }
-    //   await metaModel.save(this.id, data.meta)
-    // }
-    for (let item of list.data) {
+    for (let item of data) {
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
-        // think._.reverse(item.items
-
       }
-      // Reflect.deleteProperty(item.meta, '_items')
 
-      // console.log(JSON.stringify(item.meta))
       item.url = ''
       // 如果有音频
       if (!Object.is(item.meta._audio_id, undefined)) {
         // 音频播放地址
         item.url = await metaModel.getAttachment('file', item.meta._audio_id)
       }
-
-      // if (!Object.is(item.meta._style, undefined)) {
-      //   item.style =
-      // }
 
       const userModel = this.model('users');
 
@@ -239,7 +152,7 @@ module.exports = class extends BaseRest {
         Reflect.deleteProperty(item.author, 'liked')
       }
       item.like_count = await metaModel.getLikedCount(item.id)
-
+      item.view_count = await metaModel.getViewCount(item.id)
       const repliesCount = await this.model('comments', {appId: this.appId}).where({'comment_post_id': item.id}).count()
       // const user = this.ctx.state.user
       // item.author = user
@@ -261,15 +174,7 @@ module.exports = class extends BaseRest {
       } else {
         item.featured_image = this.getRandomCover()
       }
-
-      // if (think._.has(item, 'meta')) {
-      //   Reflect.deleteProperty(item, 'meta')
-      // }
     }
-    if (format) {
-      list = await this.dealFormat(list)
-    }
-    return list
   }
 
   /**
@@ -300,6 +205,10 @@ module.exports = class extends BaseRest {
     return this.success(list)
   }
 
+  /**
+   * 新建内容
+   * @returns {Promise<*|boolean>}
+   */
   async newAction () {
     const data = this.post()
     if (think._.has(data, 'formId')) {
@@ -417,6 +326,11 @@ module.exports = class extends BaseRest {
     return this.success(newPost)
   }
 
+  /**
+   * 新喜欢状态
+   * @param postId
+   * @returns {Promise<*|boolean>}
+   */
   async newLike (postId) {
     const userId = this.ctx.state.user.id
     const id = postId
@@ -569,17 +483,18 @@ module.exports = class extends BaseRest {
    * @param list
    * @returns {Promise.<*>}
    */
-  async dealFormat (list) {
+  async formatData (data) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    for (const item of list.data) {
+    for (const item of data) {
       item.format = await _taxonomy.getFormat(item.id)
     }
     // 处理内容层级
     // let treeList = await arr_to_tree(list.data, 0);
-    list.data = await arr_to_tree(list.data, 0);
+    data = await arr_to_tree(data, 0);
 
-    return list
+    return data
   }
+
   /**
    * 处理内容标签信息
    * @param list
@@ -633,4 +548,43 @@ module.exports = class extends BaseRest {
     post.likes = likes
   }
 
+  // async
+  /**
+   * 处理内容喜欢的信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async dealViews (post) {
+    // const userId = this.ctx.state.user.id
+    const postMeta = this.model('postmeta', {appId: this.appId})
+
+    const result = await postMeta.where({
+      post_id: post.id,
+      meta_key: '_post_views'
+    }).find()
+    // 当前登录用户是否喜欢
+    // let iLike = false
+    const likes = []
+    // const userModel = this.model('users')
+    let totalCount = 0
+
+    if (!think.isEmpty(result) && !think.isEmpty(result.meta_value)) {
+      // if (!think.isEmpty(result.meta_value)) {
+      // const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId])
+      // if (exists) {
+      //   iLike = true
+      // }
+      const list = JSON.parse(result.meta_value)
+      totalCount = list.length
+      // for (const u of list) {
+      //   const user = await userModel.where({id: u.id}).find()
+      //   _formatOneMeta(user)
+      //   likes.push(user)
+      // }
+      // }
+    }
+    post.view_count = totalCount
+    // post.i_like = iLike
+    // post.likes = likes
+  }
 }

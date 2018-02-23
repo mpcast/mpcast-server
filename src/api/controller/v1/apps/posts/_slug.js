@@ -630,7 +630,6 @@ module.exports = class extends BaseRest {
    */
   async dealLikes (post) {
     const userId = this.ctx.state.user.id
-    console.log(this.ctx.state.user)
     const postMeta = this.model('postmeta', {appId: this.appId})
 
     const result = await postMeta.where({
