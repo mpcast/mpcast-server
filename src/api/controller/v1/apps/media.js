@@ -1,7 +1,7 @@
 /* eslint-disable no-undef,no-return-await,default-case,max-depth,no-warning-comments,comma-spacing */
 const BaseRest = require('./Base')
 const slug = require('limax')
-
+const mime = require('mime-types')
 const fields = [
   'id',
   'author',
@@ -14,6 +14,7 @@ const fields = [
   'excerpt',
   'date',
   'modified',
+  'mime_type',
   'parent'
 ]
 
@@ -60,6 +61,7 @@ module.exports = class extends BaseRest {
     if (!think._.has(query, 'status')) {
       query.parent = 0
     }
+    query.type = 'attachment'
     let list = []
 
     // const category = this.get('category')
@@ -85,10 +87,9 @@ module.exports = class extends BaseRest {
             rand = true
           }
           list = await this.model('posts', {appId: this.appId})
-            .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand, query.status)
+            .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand)
         }
       }
-
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
@@ -124,6 +125,7 @@ module.exports = class extends BaseRest {
     const metaModel = this.model('postmeta', {appId: this.appId})
 
     for (let item of data) {
+      item.extension = mime.extension(item.mime_type)
       if (!Object.is(item.meta._items, undefined)) {
         item.items = item.meta._items
       }
@@ -184,9 +186,7 @@ module.exports = class extends BaseRest {
   async searchAction () {
     const title = this.get('param')
     const postModel = this.model('posts', {appId: this.appId})
-    const defaultTerm = Number(this.options.default.term)
-    // 原来是默认查询  loves 分类下针对采撷最爱， 现在是按分类
-    const list = await postModel.findByTitleFromTerms(defaultTerm, title, this.get('page'), this.get('pagesize'))
+    const list = await postModel.findByTitle(title, this.get('page'), this.get('pagesize'))
     const metaModel = this.model('postmeta', {appId: this.appId})
     _formatMeta(list.data)
 

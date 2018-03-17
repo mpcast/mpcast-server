@@ -2,7 +2,9 @@ module.exports = class extends think.Model {
   constructor(...args) {
     super(...args);
     this.appId = ''
+    this.prefix = ''
     if (this.config.appId !== undefined) {
+      this.prefix = this.config.appId
       this.appId = this.config.appId + '_'
     }
     // this.prefix = 'picker_' + this.appId + '_'

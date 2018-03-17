@@ -207,7 +207,8 @@ module.exports = class extends BaseRest {
     const userInfo = await userModel.where({user_login: userLogin}).find();
     // 验证用户是否存在
     if (think.isEmpty(userInfo)) {
-      return this.fail(404, 'ACCOUNT_NOT_FOUND');
+      // return this.fail(404, 'ACCOUNT_NOT_FOUND');
+      throw new Error('ACCOUNT_NOT_FOUND')
     }
     // 验证机构中是否存在此用户并处理用户角色权限
     _formatOneMeta(userInfo)
@@ -227,7 +228,9 @@ module.exports = class extends BaseRest {
     // 校验密码
     const password = data.user_pass;
     if (!userModel.checkPassword(userInfo, password)) {
-      return this.fail(400, 'ACCOUNT_PASSWORD_ERROR');
+      // return this.fail(400, 'ACCOUNT_PASSWORD_ERROR');
+      throw new Error('ACCOUNT_PASSWORD_ERROR')
+
     }
     // return this.success(userInfo)
     // 获取签名盐
@@ -238,7 +241,8 @@ module.exports = class extends BaseRest {
     // const user = jwt.verify();
     // const user = jwt.verify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mbyI6eyJpZCI6MTUsInVzZXJfbG9naW4iOiJhZG1pbiIsInVzZXJfcGFzcyI6IiQyYSQwOCRybDFpb29TMHN3YW1uck1jL0dtU3VlTTh0MWRXdzB1bjdMaHhCdzkxRnRsNUNldG9iZVAzYSIsInVzZXJfbmljZW5hbWUiOiLnrqHnkIblkZgiLCJ1c2VyX2VtYWlsIjoiYmFpc2hlbmdAb3V0bG9vay5jb20iLCJ1c2VyX3VybCI6bnVsbCwidXNlcl9yZWdpc3RlcmVkIjoxNTAzODEwMzIwOTk2LCJ1c2VyX2FjdGl2YXRpb25fa2V5IjpudWxsLCJ1c2VyX3N0YXR1cyI6MSwiZGlzcGxheV9uYW1lIjpudWxsLCJzcGFtIjowLCJkZWxldGVkIjowLCJ1c2VyX3Bob25lIjpudWxsLCJtZXRhIjp7InBpY2tlcl8xX2NhcGFiaWxpdGllcyI6eyJyb2xlIjoiZWRpdG9yIn0sIm9yZ18xX2NhcGFiaWxpdGllcyI6eyJyb2xlIjoiYWRtaW4ifSwicGlja2VyXzFfd3hhcHAiOiIxIiwiYXZhdGFyIjoiMjMifSwiYXZhdGFyIjoiaHR0cDovL2RhdGEucGlja2VyLmNjL3VwbG9hZF82OGMwYjM5MjcxNzViNjIyN2EyMmQ2NjIxYjY2YjBjOS5qcGciLCJyb2xlIjoiYWRtaW4ifSwiaWF0IjoxNTA3ODgzMjM1LCJleHAiOjE1MDgxNDI0MzV9.CfdEENtA_NW6vLmZdNnpaUZf3eHJMC7hKiHTfxLv1Xc', 'S1BNbRp2b');
     // return this.success(user)
-    return this.success({user: userInfo.user_login, token: {value: token, expires: 3}});
+    return this.success({user: userInfo.user_login, token: token});
+    // return this.success({user: userInfo.user_login, token: {value: token, expires: 3}});
     // }
   }
 

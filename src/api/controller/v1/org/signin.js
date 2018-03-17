@@ -42,7 +42,8 @@ module.exports = class extends think.Controller {
     // user: userInfo.user_login,
     // let validity_days = 7;
     // let expires = validity_days * 1000 * 60 * 60 * 24;
-    return this.success({user: userInfo.user_login, token: {value: token, expires: 3}});
+    // return this.success({user: userInfo.user_login, token: {value: token, expires: 3}});
+    return this.success({user: userInfo.user_login, token: token});
     // }
   }
 

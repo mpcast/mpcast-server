@@ -20,10 +20,10 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/auth?(\/\w+)$/, '/api/v1/apps/auth/:2?appId=:1', 'get, post'],
   [/\/v1\/apps\/(\w+)\/posts\/counts?/, '/api/v1/apps/posts/counts?appId=:1', 'get'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/replies?/, '/api/v1/apps/posts/replies?appId=:1&id=:2', 'get'],
-  [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)$/, '/api/v1/apps/:2/_id?appId=:1&id=:3', 'get, post'],
-  [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)\/(delete)$/, '/api/v1/apps/:2/_id/:4?appId=:1&id=:3', 'post'],
   [/\/v1\/apps\/(\w+)\/comments\/(\d+)?/, '/api/v1/apps/comments?appId=:1&id=:2', 'get'],
   [/\/v1\/apps\/(\w+)\/comments-(\w+)?/, '/api/v1/apps/comments?appId=:1&action=:2', 'get'],
+  [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)$/, '/api/v1/apps/:2/_id?appId=:1&id=:3', 'get, post'],
+  [/\/v1\/apps\/(\w+)\/(\w+)\/(\d+)\/(delete)$/, '/api/v1/apps/:2/_id/:4?appId=:1&id=:3', 'post'],
   [/\/v1\/apps\/(\w+)\/posts$/, '/api/v1/apps/posts?appId=:1', 'get'],
 
   // LIKES API
@@ -59,7 +59,8 @@ module.exports = [
   // [/\/v1\/app\/(\w+)\/me\/likes?/, '/api/v1/app/me/likes?appId=:1', 'get'],
   // [/\/v1\/app\/(\w+)\/posts\/(\d+)\/likes?/, '/api/v1/app/posts/likes?appId=:1&id=:2', 'get'],
   // [/\/v1\/app\/(\w+)\/posts\/(\d+)\/(\w+)\/(\w+)?/, '/api/v1/app/posts/:4?appId=:1&id=:3&action=:5', 'rest'],
-  [/\/v1\/org\/(\d+)(?:\/(subdomain_validation|signin|signout))?/, '/api/v1/org/public?orgId=:1&action=:2', 'rest'],
+  [/\/v1\/org\/(\d+)\/me?/, '/api/v1/org/me/index?orgId=:1', 'get'],
+  [/\/v1\/org\/(\d+)\/(subdomain_validation|signin|signout)?/, '/api/v1/org/public?orgId=:1&action=:2', 'rest'],
   [/\/v1\/org\/(\w+)\/(\w+)(?:\/(\d+))?/, '/api/v1/org/:2?appId=:1&id=:3', 'rest'],
   [/\/v1\/app?/, '/api/v1/app', 'rest'],
   // [/\/v1\/app\/(\w+)\/auth\/(\w+)\/?/, '/api/v1/app/auth?appId=:1&action=:2', 'rest'],

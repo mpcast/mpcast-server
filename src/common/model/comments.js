@@ -1,88 +1,64 @@
+/* eslint-disable no-undef */
 const Base = require('./base');
 
 /**
  * model
  */
 module.exports = class extends Base {
+  // constructor(...args) {
+  //   super(...args)
+  //   this.relation = {
+  //     posts: {
+  //       type: think.model.HAS_MANY,
+  //       relation: false
+  //     }
+  //   }
+  // }
   get relation () {
     return {
-      // children: {
-      //   type:think.Model.HAS_MANY,
-      //   model: 'posts',
-      //   fKey: 'parent'
-      // },
-      // metas: {
-      //   type: think.Model.HAS_MANY,
-      //   model: 'postmeta',
-      //   fKey: 'post_id',
-      //   field: "post_id,meta_key,meta_value"
-        // rModel: 'usermeta',
-        // fKey: 'users_id'
-      // }
-    };
-  }
-
-  /**
-   * 添加 meta 信息
-   *
-   * @param post_id
-   * @param meta_key
-   * @param meta_value
-   * @param unique
-   * @returns {Promise.<*>}
-   */
-  async addMeta (post_id, meta_key, meta_value, unique = false) {
-    let _metaModel = this.model('postmeta', {appId: this.appId})
-    let _id = await _metaModel.add({
-      post_id: post_id,
-      meta_key: meta_key,
-      meta_value: JSON.stringify(meta_value)
-    })
-    return _id
-  }
-
-  /**
-   * 根据分类与内容状态获取 内容列表
-   * @param termIds
-   * @param status
-   * @param page
-   * @param pagesize
-   * @returns {Promise<Object>}
-   */
-  async getList (termIds, page = 1, status, pagesize = 50) {
-    let query = ''
-    if (think.isEmpty(status)) {
-      query = `p.status not in ('trash')`
-    } else {
-      query = `p.status = '${status}'`
-    }
-
-    // SELECT p.id, p.title, p.content FROM picker_S11SeYT2W_posts as p LEFT JOIN picker_S11SeYT2W_term_relationships AS tt ON p.id=tt.object_id
-    // LEFT JOIN picker_S11SeYT2W_term_taxonomy as tr on tt.term_taxonomy_id = tr.term_id where tr.term_id IN(1, 3, 4) and tr.taxonomy = 'category' and p.status = 'publish' order by id desc;
-    // SELECT * FROM think_user AS a LEFT JOIN `think_cate` AS c ON a.`id`=c.`id` LEFT JOIN `think_group_tag` AS d ON a.`id`=d.`group_id`
-    return this.alias('p').join({
-      term_relationships: {
-        join: 'left', // 有 left,right,inner 3 个值
-        as: 'tt',
-        on: ['p.id', 'tt.object_id']
+      post: {
+        model: 'posts',
+        type: think.Model.BELONG_TO,
+        key: 'post_id',
+        field: 'id, title, name, type'
       },
-      term_taxonomy: {
-        join: 'left',
-        as: 'tr',
-        on: ['tr.term_id', 'tt.term_taxonomy_id']
+      author: {
+        model: 'users',
+        type: think.Model.BELONG_TO,
+        key: 'user_id',
+        field: 'id, user_nicename AS name, user_email AS mail'
       }
-    }).field('p.id, p.author, p.title, p.status, p.content, p.modified, p.parent').where(`tr.term_id IN(${termIds}) AND tr.taxonomy = 'category' AND ${query}`).order('p.id DESC').page(page, pagesize).countSelect()
+    }
   }
 
-  // async update (data) {
-  // return await super.update(data, this.options)
-  // if (!Object.is(data['featured_image'], undefined)) {
-  //   console.log(JSON.stringify(data))
-  //
-  // }
-  // }
-  // async save(data) {
-  // let res = await this.add{{
-  // }}
-  // }
+  async getList (page = 1, pageSize = 10) {
+    let fields = [
+      'id',
+      'comment_post_id as post_id',
+      // 'comment_author as author',
+      'comment_author_ip as ip',
+      'comment_date as date',
+      'comment_content as content',
+      'comment_parent as parent',
+      'user_id'
+    ]
+    let data = await this.field(fields).page(page, pageSize).countSelect()
+    // let userIds = []
+    for (let item of data.data) {
+      item.author = Object.assign({}, item.author, {meta:{}})
+      // console.log(JSON.stringify(item.author))
+      // item.author.meta = {}
+      _formatOneMeta(item.author)
+      // userIds.push(item.author)
+      if (think._.has(item.author, 'meta')) {
+        if (!Object.is(item.author.meta[`picker_${this.prefix}_wechat`], undefined)) {
+          item.author.avatar = item.author.meta[`picker_${this.prefix}_wechat`].avatarUrl
+        } else {
+          item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+        }
+        Reflect.deleteProperty(item.author, 'meta')
+      }
+    }
+    return data
+  }
 }

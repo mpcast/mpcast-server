@@ -10,7 +10,7 @@ let fields = [
   // 'user_url as url',
   'user_status as status'
 ]
-module.exports = class extends Base {
+module.exports = class extends think.Model {
 
   get relation () {
     return {
@@ -475,6 +475,16 @@ async updateWechatUser (data) {
         'meta_value': ['exp', `JSON_REMOVE(meta_value, SUBSTRING_INDEX(REPLACE(JSON_SEARCH(meta_value, 'one', '${post_id}', NULL, '$**.post_id'), '"', ''), '.', 1))`]
       }
     )
+    return res
+  }
+
+  /**
+   * 多 id 查询
+   * @param ids
+   * @returns {Promise<any>}
+   */
+  async findByIds (ids) {
+    const res = await this.where({id: ['IN', ids]}).select()
     return res
   }
 }

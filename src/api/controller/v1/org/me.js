@@ -1,8 +1,7 @@
 /* eslint-disable default-case,no-undef */
-const Base = require('./Base')
 const jwt = require('jsonwebtoken')
 
-module.exports = class extends Base {
+module.exports = class extends think.Controller {
   constructor(ctx) {
     super(ctx);
     this.DAO = this.model('users')
@@ -10,61 +9,33 @@ module.exports = class extends Base {
   }
 
   async indexAction () {
-    const userId = this.get('id')
-    const appid = this.get('appId')
-    const userMeta = this.model('usermeta')
-    let type = this.get('type')
-
-    // 根据 id 获取单用户
-    if (!think.isEmpty(userId)) {
-      let user = await this.model('users').where({id: userId}).find()
-      _formatOneMeta(user)
-      if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-        user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
-        // user.type = 'wechat'
-        user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
-      } else {
-        user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
-      }
-      return this.success(user)
-    } else {
-      if (think.isEmpty(type)) {
-        type = 'team'
-      }
-      // 获取用户默认获取团队成员
-      // const userIds = await userMeta.where(query).select()
-      const userMetaDatas = await userMeta.where(`meta_value ->'$.type' = '${type}' and meta_key = 'picker_${appid}_capabilities'`).page(this.get('page'), 12).countSelect()
-      // console.log(userIds)
-
-      if (!think.isEmpty(userMetaDatas) && userMetaDatas.count > 0) {
-        const ids = []
-        // console.log(JSON.stringify(userIds.data))
-        for (const item of userMetaDatas.data) {
-          ids.push(item.user_id)
-        }
-        userMetaDatas.data = []
-
-        // console.log()
-        // userIds.data.forEach((item) => {
-        //   ids.push(item.user_id)
-        // })
-        const users = await this.model('users').where({id: ['IN', ids]}).select()
-        _formatMeta(users)
-        for (let user of users) {
-          if (!think.isEmpty(user.meta.avatar)) {
-            user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
-          } else if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-            user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
-            user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
-            // user.type = 'wechat'
-            Reflect.deleteProperty(user, 'meta')
-          }
-        }
-        userMetaDatas.data = users
-        return this.success(userMetaDatas)
-      }
-      return this.success(userMetaDatas)
-    }
+    // console.log('let me')
+    // console.log(this.ctx)
+    const curUser = this.ctx.state.user
+    console.log(curUser)
+    // if (!think.isEmpty(curUser)) {
+    //   return this.sus
+    // }
+    let user = await this.DAO.getById(curUser.id)
+    // const user = await this.model('users').where({id: curUser.id}).find()
+    // _formatOneMeta(user)
+    // if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+    //   user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+    //   user.type = 'wechat'
+    // } else {
+    //   user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    // }
+    // if (!Object.is(user.meta[`picker_${this.appId}_liked_posts`], undefined)) {
+    //   if (!think.isEmpty(user.meta[`picker_${this.appId}_liked_posts`])) {
+    //     user.likes = user.meta[`picker_${this.appId}_liked_posts`].length
+    //   }
+    // } else {
+    //   user.likes = 0
+    // }
+    // user.recalls = 0
+    // user.stories = 0
+    // Reflect.deleteProperty(user, 'meta')
+    return this.success(user)
   }
 
   async postAction () {
@@ -233,9 +204,9 @@ module.exports = class extends Base {
     if (think.isEmpty(category)) {
       return this.fail('分类不能为空')
     }
-    // const curUser = this.get('id')
+    const curUser = this.ctx.state.user
     const postsApi = this.model('posts', {appId: this.appId})
-    const list = await postsApi.findByAuthorPost(category, this.get('id'), this.get('page'), this.get('pagesize'))
+    const list = await postsApi.findByAuthorPost(category, curUser.id, this.get('page'), this.get('pagesize'))
     return this.success(list)
   }
 }

@@ -1,5 +1,6 @@
 module.exports = class extends think.Controller {
   async cloaAction() {
+    console.log('update cache ....')
     const orgs = await think.model('orgs').list()
     await think.cache('orgs', orgs)
     // 获取全部应用列表并缓存

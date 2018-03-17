@@ -29,6 +29,7 @@ module.exports = class extends think.Controller {
     // orgs = JSON.parse(orgs)
     // this.orgId = orgs[this.ctx.host]
     this.orgId = this.get('orgId')
+    console.log(this.orgId + '--------')
     this.cachePrefix = 'picker_' + this.orgId + '_'
     if (!think.isEmpty(this.orgId)) {
       this.modelInstance = this.model(this.resource, {orgId: this.orgId});
@@ -54,17 +55,17 @@ module.exports = class extends think.Controller {
     }
     return '';
   }
-  async getAction() {
-    // console.log('lllget action')
-    let data;
-    if (this.id) {
-      const pk = this.modelInstance.pk;
-      data = await this.modelInstance.where({[pk]: this.id}).find();
-      return this.success(data);
-    }
-    data = await this.modelInstance.select();
-    return this.success(data);
-  }
+  // async getAction() {
+  //   // console.log('lllget action')
+  //   let data;
+  //   if (this.id) {
+  //     const pk = this.modelInstance.pk;
+  //     data = await this.modelInstance.where({[pk]: this.id}).find();
+  //     return this.success(data);
+  //   }
+  //   data = await this.modelInstance.select();
+  //   return this.success(data);
+  // }
   /**
    * put resource
    * @return {Promise} []

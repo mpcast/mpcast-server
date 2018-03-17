@@ -128,7 +128,8 @@ global._formatOneMeta = (item) => {
   // const _items = [];
 
   // for (const item of list) {
-  item.meta = {};
+  // item = Object.assign({}, {meta: {}});
+  item.meta = {}
   if (!think.isEmpty(item.metas) && item.metas.length > 0) {
     for (const meta of item.metas) {
       if (meta.meta_key.includes('_liked_posts') && meta.meta_key.includes('picker_')) {

@@ -5,13 +5,9 @@ const Base = require('./base');
  * model
  */
 module.exports = class extends Base {
-  get relation () {
-    return {
-      // children: {
-      //   type:think.Model.HAS_MANY,
-      //   model: 'posts',
-      //   fKey: 'parent'
-      // },
+  constructor(...args){
+    super(...args);
+    this.relation = {
       metas: {
         type: think.Model.HAS_MANY,
         model: 'postmeta',
@@ -22,6 +18,23 @@ module.exports = class extends Base {
       }
     };
   }
+  // get relation () {
+  //   return {
+      // children: {
+      //   type:think.Model.HAS_MANY,
+      //   model: 'posts',
+      //   fKey: 'parent'
+      // },
+      // metas: {
+      //   type: think.Model.HAS_MANY,
+      //   model: 'postmeta',
+      //   fKey: 'post_id',
+      //   field: "post_id,meta_key,meta_value"
+        // rModel: 'usermeta',
+        // fKey: 'users_id'
+      // }
+    // };
+  // }
 
   /**
    * 添加 meta 信息
@@ -94,6 +107,59 @@ module.exports = class extends Base {
         on: ['p.id', 'tr.object_id']
       }
     }).field(fileds).where(`t.slug = 'loves' AND p.title LIKE '%${title}%'`)
+      .page(page, pagesize)
+      .setRelation(true).countSelect()
+    const postIds = []
+    data.data.forEach((item) => {
+      postIds.push(item.id)
+    })
+
+    if (!think.isEmpty(postIds)) {
+      // 处理 Meta 信息
+      const metaModel = this.model('postmeta')
+      const metaData = await metaModel.field('post_id, meta_key, meta_value').where({
+        post_id: ['IN', postIds]
+      }).select()
+
+      data.data.forEach((item, i) => {
+        item.metas = think._.filter(metaData, {post_id: item.id})
+      })
+    }
+    return data
+  }
+
+  async findByTitleFromTerms (terms, title, page = 1, pagesize = 6) {
+    // const list = await this.where({
+    //   'title': ['like', `%${title}%`],
+    //   'type': 'post_format'
+    // }).page(page, pagesize).countSelect()
+    // return list
+
+    const fileds = [
+      'p.id',
+      'p.name',
+      'p.title',
+      'p.content',
+      'p.author',
+      'p.modified'
+    ]
+    const data = await this.model('terms', {appId: this.appId}).alias('t').join({
+      term_taxonomy: {
+        join: 'inner',
+        as: 'tt',
+        on: ['t.id', 'tt.term_id']
+      },
+      term_relationships: {
+        join: 'inner',
+        as: 'tr',
+        on: ['tr.term_taxonomy_id', 'tt.id'],
+      },
+      posts: {
+        join: 'inner',
+        as: 'p',
+        on: ['p.id', 'tr.object_id']
+      }
+    }).field(fileds).where(`t.id IN(${terms}) AND p.title LIKE '%${title}%'`)
       .page(page, pagesize)
       .setRelation(true).countSelect()
     const postIds = []

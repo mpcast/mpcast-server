@@ -1,8 +1,8 @@
 /* eslint-disable prefer-promise-reject-errors,no-console */
 // const {PasswordHash} = require('phpass');
-const Base = require('./base');
+// const Base = require('./base');
 
-module.exports = class extends Base {
+module.exports = class extends think.Model {
   // constructor(...args) {
   //   super(...args);
   //   this.orgId = ''
