@@ -31,7 +31,6 @@ module.exports = class extends Base {
           break
       }
     }
-
   }
 
   /**
@@ -246,6 +245,7 @@ module.exports = class extends Base {
    * @param postId
    * @param itemId
    * @returns {Promise<number>}
+   * @deprecated
    */
   async removeItem (postId, itemId) {
     const res = await this.where(`post_id = '${postId}' AND meta_key = '_items' AND JSON_SEARCH(meta_value, 'one', ${itemId}) IS NOT NULL`).update({
@@ -256,11 +256,59 @@ module.exports = class extends Base {
   }
 
   /**
+   * 删除关联的资源项目
+   * @param postId
+   * @param assetId
+   * @returns {Promise<any>}
+   */
+  async removeAsset (postId, assetId) {
+    const res = await this.where(`post_id = '${postId}' AND meta_key = '_assets' AND JSON_SEARCH(meta_value, 'one', ${assetId}) IS NOT NULL`).update({
+      'meta_value': ['exp', `JSON_REMOVE(meta_value, SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '${assetId}', NULL , '$**.id'), '"', ''), '.', 1))`]
+    })
+    const {items} = await this.field(`meta_value as assets`).where(`post_id = '${postId}' AND meta_key = '_assets'`).find()
+    return JSON.parse(items)
+  }
+  /**
+   * 更新关联的 并没有 状态
+   * @param postId
+   * @param assetId
+   * @param status
+   * @returns {Promise<number>}
+   */
+  async changeAssetStatus (postId, assetId, status) {
+    // CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '3', NULL , '$**.id')
+    // 这个是为了处理 JSON 返回的值 $[0] 这样的，来处理对应的 json array 下的 json object Key value
+    const res = await this.where(`post_id = '${postId}' AND meta_key = '_assets' AND JSON_SEARCH(meta_value, 'one', ${assetId}) IS NOT NULL`).update({
+      'meta_value': ['exp', `JSON_REPLACE(meta_value, CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '${assetId}', NULL , '$**.id'), '"', ''), '.', 1),'.status'), '${status}')`]
+    })
+    return res
+  }
+
+  /**
+   * 关联资源对象
+   * @param postId
+   * @param assetId
+   * @param status
+   * @returns {Promise<void>}
+   */
+  async relationAsset (postId, assetId, status) {
+    // 每次添加插入至顶部
+    await this.where({
+      post_id: postId,
+      meta_key: '_assets'
+    }).update({
+      'post_id': postId,
+      'meta_key': '_assets',
+      'meta_value': ['exp', `JSON_ARRAY_INSERT(meta_value, '$[0]', JSON_OBJECT('id', '${assetId}','status', '${status}'))`]
+    })
+  }
+  /**
    * 关联 Item 对象
    * @param postId
    * @param itemId
    * @param status
    * @returns {Promise<void>}
+   * @deprecated
    */
   async related (postId, itemId, status) {
     // 每次添加插入至顶部
@@ -273,12 +321,14 @@ module.exports = class extends Base {
       'meta_value': ['exp', `JSON_ARRAY_INSERT(meta_value, '$[0]', JSON_OBJECT('id', '${itemId}','status', '${status}'))`]
     })
   }
+
   /**
    * 更新关联的 Item 状态
    * @param postId
    * @param itemId
    * @param status
    * @returns {Promise<number>}
+   * @deprecated
    */
   async changeItemStatus (postId, itemId, status) {
     // CONCAT(SUBSTRING_INDEX(replace(JSON_SEARCH(meta_value, 'one', '3', NULL , '$**.id')
@@ -304,12 +354,6 @@ module.exports = class extends Base {
       }
     }
     return {'like_count': 0, 'contain': 0}
-    // if (!think.isEmpty(data)) {
-    //   console.log(JSON.stringify(data))
-    // } else {
-    //   console.log('xxxxxxxxxxxx')
-    // }
-    // return !think.isEmpty(data);
   }
 
 
@@ -328,11 +372,5 @@ module.exports = class extends Base {
       }
     }
     return {'thumbs_count': 0, 'contain': 0}
-    // if (!think.isEmpty(data)) {
-    //   console.log(JSON.stringify(data))
-    // } else {
-    //   console.log('xxxxxxxxxxxx')
-    // }
-    // return !think.isEmpty(data);
   }
 }

@@ -16,79 +16,20 @@ let fields = [
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
-    if (this.isPost) {
-      if (!this.id) {
-        return this.fail(400, 'params error');
-      }
-      const data = this.post()
-      if (think.isEmpty(data.type)) {
-        data.type = 'post_format'
-      }
-      const currentTime = new Date().getTime();
-      // data.date = currentTime
-      data.modified = currentTime
-      if (think.isEmpty(data.author)) {
-        data.author = this.ctx.state.user.id
-      }
-      const metaModel = await this.model('postmeta', {appId: this.appId})
-
-      // if data.itemStatus === 'delete' 从数组中 remove 并返回完整的数组
-      if (!think.isEmpty(data.item_id)) {
-        if (data.item_status === 'delete') {
-          const res = await metaModel.removeItem(this.id, data.item_id)
-          await this.model('posts', {appId: this.appId}).where({id: data.item_id}).update({status: 'trash'});
-
-          return this.success(res)
-          // const newData = await this.getPost(this.id)
-          // return this.success(newData)
-        }
-        // 更新 relate item
-        const res = await metaModel.changeItemStatus(this.id, data.item_id, data.item_status)
-        // 更新 item 状态
-        return this.success(res)
-      }
-      // if (think.isEmpty(data.status)) {
-      //   data.status = 'auto-draft';
-      // }
-      // const postId = await this.modelInstance.add(data)
-      await this.model('posts', {appId: this.appId}).where({id: this.id}).update(data);
-      // 2 更新 meta 数据
-      if (!Object.is(data.meta, undefined)) {
-        // 保存 meta 信息
-        await metaModel.save(this.id, data.meta)
-      }
-      if (!think.isEmpty(data.items)) {
-        data.meta = {
-          '_items': JSON.stringify(data.items)
-
-        }
-        await metaModel.save(this.id, data.meta)
-      }
-      // 3 添加内容与 term 分类之间的关联
-      // term_taxonomy_id
-      // const defaultTerm = this.options.default.term
-      // 如果这里也更新 就会删除分类的关联，所以是错误的
-      let categories = []
-      if (!Object.is(data.categories, undefined) && !think.isEmpty(data.categories)) {
-        categories = categories.concat(JSON.parse(data.categories))
-      }
-
-      for (const cate of categories) {
-        await this.model('taxonomy', {appId: this.appId}).relationships(this.id, cate)
-      }
-      const newData = await this.getPost(this.id)
-      return this.success(newData)
-    }
     if (this.isGet) {
-      const post_id = this.get('id')
-      if (!think.isEmpty(post_id)) {
-        const data = await this.getPost(post_id)
-        // 返回一条数据
-        return this.success(data)
-      }
+      const postId = this.get('id')
+      const metaModel = this.model('posts', {appId: this.appId})
+      let data = await metaModel.getAssets(postId, this.get('page'), this.get('pagesize') || 12)
+      return this.success(data)
     }
   }
 
+  async assetsAction () {
+    if (this.isGet) {
+      const postId = this.get('id')
+      return this.success('assets' + postId)
+    }
+  }
   async getPost (post_id) {
     const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})
@@ -129,8 +70,10 @@ module.exports = class extends BaseRest {
     }
 
 
+    Reflect.deleteProperty(user, 'meta')
     data.author = user
     // 清除 meta
+    Reflect.deleteProperty(data, 'meta')
 
     // 处理分类及内容层级
     await this._dealTerms(data)
@@ -138,9 +81,6 @@ module.exports = class extends BaseRest {
     await this._dealTags(data)
 
     await this._dealLikes(data)
-
-    Reflect.deleteProperty(user, 'meta')
-    Reflect.deleteProperty(data, 'meta')
 
     return data
 
@@ -157,32 +97,6 @@ module.exports = class extends BaseRest {
   async _dealTerms (post) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
-    const postFormat = await _taxonomy.getFormat(post.id)
-    if (!think.isEmpty(postFormat)) {
-      post.format = postFormat.slug
-    }
-    const users = [
-      { 'user': 'barney' },
-      { 'user': 'fred' }
-    ];
-
-// The `_.property` iteratee shorthand.
-    let test = think._.map(users, 'user');
-    console.log(test)
-    // console.log(post.format)
-    if (post.format === 'post-format-audio') {
-      // const laal = await think._.map(post.meta._audio_list, 'status')
-      // console.log(laal)
-
-// => ['barney', 'fred']
-      const audios = await this.model('posts', {appId: this.appId})
-        .getAudios(think._.map(post.meta._audio_list, 'id'))
-      //
-      // item.audios = await think._.map(attachments, (obj) => {
-      //   return JSON.parse(obj.meta_value)
-      // })
-      post.audios = audios
-    }
     return post
 
     // 处理内容层级
@@ -190,24 +104,6 @@ module.exports = class extends BaseRest {
     // list.data = await arr_to_tree(list.data, 0);
     //
     // return list
-  }
-
-
-  /**
-   * 处理内容格式
-   * @param list
-   * @returns {Promise.<*>}
-   */
-  async formatData (data) {
-    const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    for (const item of data) {
-      item.format = await _taxonomy.getFormat(item.id)
-    }
-    // 处理内容层级
-    // let treeList = await arr_to_tree(list.data, 0);
-    // data = await arr_to_tree(data, 0);
-
-    return data
   }
 
   /**

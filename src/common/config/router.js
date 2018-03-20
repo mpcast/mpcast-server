@@ -31,6 +31,7 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/(\w+)\/new?/, '/api/v1/apps/posts/:3/new?appId=:1&id=:2', 'post'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/likes?/, '/api/v1/apps/posts/likes?appId=:1&id=:2', 'get'],
   [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/views?/, '/api/v1/apps/posts/views?appId=:1&id=:2', 'get'],
+  [/\/v1\/apps\/(\w+)\/posts\/(\d+)\/assets?/, '/api/v1/apps/posts/assets?appId=:1&id=:2', 'get'],
 
   [/\/v1\/apps\/(\w+)\/me\/likes?/, '/api/v1/apps/me/likes?appId=:1', 'get'],
   // V2 版本
@@ -45,9 +46,9 @@ module.exports = [
 
   // GET POST
   // apps/$app/taxonomies/$taxonomy/terms/slug:$slug
-  [/\/v1\/apps\/(\w+)$/, '/api/v1/apps/app?appId=:1', 'get'],
+  [/\/v1\/apps\/(\w+)$/, '/api/v1/apps/app?appId=:1', 'get, post'],
   [/\/v1\/apps\/(\w+)\/(\w+)\/(\w+)?/, '/api/v1/apps/:2/:3?appId=:1', 'get, post'],
-  [/\/v1\/apps\/(\w+)\/(\w+)$/, '/api/v1/apps/:2?appId=:1', 'get'],
+  [/\/v1\/apps\/(\w+)\/(\w+)$/, '/api/v1/apps/:2?appId=:1', 'get, post'],
   // [/\/v1\/apps\/(\w+)\/posts\/search?/, '/api/v1/apps/posts/search?appId=:1', 'get'],
 
 

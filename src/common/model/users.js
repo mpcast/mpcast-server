@@ -11,18 +11,31 @@ let fields = [
   'user_status as status'
 ]
 module.exports = class extends think.Model {
-
+ /* constructor (...args) {
+    super(...args);
+    this.relation = {
+      metas: {
+        type: think.Model.HAS_MANY,
+        model: 'usermeta',
+        fKey: 'user_id',
+        field: "user_id,meta_key,meta_value"
+        // rModel: 'usermeta',
+        // fKey: 'users_id'
+      }
+    };
+  }*/
   get relation () {
     return {
       metas: {
         type: think.Model.HAS_MANY,
         model: 'usermeta',
+        fKey: 'user_id',
+        field: "user_id,meta_key,meta_value"
         // rModel: 'usermeta',
-        fKey: 'user_id'
+        // fKey: 'users_id'
       }
-    };
+    }
   }
-
   /**
    * get password
    * @param  {String} username []
@@ -73,7 +86,7 @@ module.exports = class extends think.Model {
    * @returns {Promise.<void>}
    */
   async getById(user_id) {
-    const user = await this.field(fields).where({
+    const user = await this.field(['id, user_login, user_nicename, user_email, user_status']).where({
       id: user_id
     }).find()
     const meta = await this.model('usermeta').where({user_id: user_id}).select()
@@ -170,15 +183,18 @@ async updateWechatUser (data) {
         user_registered: createTime,
         user_status: 1
       });
+      // console.log(' ---x-xx--x')
+      // console.log(res)
       if (!think.isEmpty(res)) {
         if (res.type === 'add') {
           const role = think.isEmpty(data.role) ? 'subscriber' : data.role
           const usermeta = this.model('usermeta')
-          await usermeta.add({
+          const metaRes = await usermeta.add({
             user_id: res.id,
             meta_key: data.appId ? `picker_${data.appId}_capabilities` : '_capabilities',
             meta_value: JSON.stringify({'role': role, 'type': 'team'})
           }, {appId: data.appId})
+          console.log(metaRes)
           // 后续这里的用户简介可以处理与 resume 模型关联
           if (!think.isEmpty(data.summary)) {
             await usermeta.save(res.id, {
@@ -191,6 +207,7 @@ async updateWechatUser (data) {
             })
           }
         }
+        return res
       }
     } else {
       // Update
@@ -258,12 +275,12 @@ async updateWechatUser (data) {
     const createTime = new Date().getTime();
     const encryptPassword = this.getEncryptPassword(data.user_pass);
     const res = await this.where({
-      user_login: data.user_login,
+      // user_login: data.user_login,
       // user_phone: data.user_phone,
       user_email: data.user_email,
       _logic: 'OR'
-    }).thenAdd({
-      user_login: data.user_login,
+    }).setRelation(false).thenAdd({
+      user_login: data.user_email,
       user_email: data.user_email,
       user_phone: data.user_phone,
       user_nicename: data.user_nicename,

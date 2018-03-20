@@ -21,6 +21,11 @@ module.exports = class extends Base {
       if (!think.isEmpty(userId)) {
         const user = await this.model('users').getById(userId)
         _formatOneMeta(user)
+
+        console.log(user)
+        if (!Object.is(user.meta[`picker_${appid}_capabilities`], undefined)) {
+          user.role = user.meta[`picker_${appid}_capabilities`].role
+        }
         if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
           // user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
           const wechat = user.meta[`picker_${appid}_wechat`]
@@ -30,11 +35,13 @@ module.exports = class extends Base {
             country: wechat.country,
             province: wechat.province,
             language: wechat.language,
-            avatar: wechat.avatarUrl
+            avatarUrl: wechat.avatarUrl
           })
           // user.type = 'wechat'
         } else {
-          user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+          console.log(user.meta.avatar)
+          user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+          console.log(user)
         }
         Reflect.deleteProperty(user, 'meta')
         return this.success(user)
@@ -57,9 +64,9 @@ module.exports = class extends Base {
         _formatMeta(users.data)
         for (const user of users.data) {
           if (!think.isEmpty(user.meta.avatar)) {
-            user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+            user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
           } else if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-            user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+            user.avatarUrl = user.meta[`picker_${appid}_wechat`].avatarUrl
             // user.type = 'wechat'
           }
         }

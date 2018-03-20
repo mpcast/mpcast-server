@@ -2,28 +2,22 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = class extends think.Controller {
-  constructor(ctx) {
+  constructor (ctx) {
     super(ctx);
     this.DAO = this.model('users')
     this.metaDAO = this.model('usermeta')
   }
 
   async indexAction () {
-    // console.log('let me')
-    // console.log(this.ctx)
     const curUser = this.ctx.state.user
-    console.log(curUser)
-    // if (!think.isEmpty(curUser)) {
-    //   return this.sus
-    // }
     let user = await this.DAO.getById(curUser.id)
-    // const user = await this.model('users').where({id: curUser.id}).find()
-    // _formatOneMeta(user)
+    _formatOneMeta(user)
+    // console.log(user)
     // if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
     //   user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
     //   user.type = 'wechat'
     // } else {
-    //   user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
     // }
     // if (!Object.is(user.meta[`picker_${this.appId}_liked_posts`], undefined)) {
     //   if (!think.isEmpty(user.meta[`picker_${this.appId}_liked_posts`])) {
@@ -42,7 +36,7 @@ module.exports = class extends think.Controller {
     const data = this.post()
     const approach = this.post('approach')
     // 注册用户来源
-    switch(approach) {
+    switch (approach) {
       // 微信小程序
       case 'wxapp': {
         // 判断用户是否已注册
@@ -65,7 +59,7 @@ module.exports = class extends think.Controller {
       }
       default: {
         data.appid = this.appId
-        const userId = await this.model('users').save(data)
+        const userId = await this.model('users').addUser(data)
         return this.success(userId)
       }
     }
@@ -77,7 +71,7 @@ module.exports = class extends think.Controller {
     // console.log(approach)
     // console.log(approach + '------')
     // 注册用户来源
-    switch(approach) {
+    switch (approach) {
       // 微信小程序
       case 'wxapp': {
         // 判断用户是否已注册
@@ -116,17 +110,17 @@ module.exports = class extends think.Controller {
         // const res = await this.DAO.where({id: data.id}).update(data);
         // if (res > 0) {
         //   更新 meta 图片数据
-          // if (!Object.is(data.meta, undefined)) {
-          //   const res = await this.metaDAO.save(data.id, data.meta)
-          //   if (res) {
-          //     return this.success()
-          //   } else {
-          //     return this.fail('Update fail')
-          //   }
-          //   const metaModel = await this.model('postmeta', {appId: this.appId})
-          //   保存 meta 信息
-          //   await metaModel.save(this.id, data.meta)
-          // }
+        // if (!Object.is(data.meta, undefined)) {
+        //   const res = await this.metaDAO.save(data.id, data.meta)
+        //   if (res) {
+        //     return this.success()
+        //   } else {
+        //     return this.fail('Update fail')
+        //   }
+        //   const metaModel = await this.model('postmeta', {appId: this.appId})
+        //   保存 meta 信息
+        //   await metaModel.save(this.id, data.meta)
+        // }
         // } else {
         //   return this.fail('Update fail')
         // }
@@ -174,13 +168,14 @@ module.exports = class extends think.Controller {
     // ]
     return this.success(user)
   }
+
   /**
    * 根据用户来源创建 token
    * @param approach
    * @param data
    * @returns {Promise.<*>}
    */
-  async createToken(approach, data) {
+  async createToken (approach, data) {
     switch (approach) {
       case 'password': {
         break

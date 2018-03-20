@@ -250,6 +250,12 @@ module.exports = class extends Base {
     return await think._.flattenDeep(_terms);
   }
 
+  /**
+   * 获取内容格式
+   *
+   * @param object_id
+   * @returns {Promise<Array>}
+   */
   async getFormat (object_id) {
 
     // 从缓存中提取到所有 term
@@ -265,13 +271,12 @@ module.exports = class extends Base {
      * @type {Array}
      * @private
      */
-      // const _terms = [];
     let postFormat = {}
     taxonomies.forEach((item) => {
       postFormat = think._.findLast(all_terms, function (o) {
         return (o.term_id === item.term_id && o.slug.indexOf('post-format') >= 0)
-      });
-    });
+      })
+    })
     return postFormat
   }
 

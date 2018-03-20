@@ -1,4 +1,4 @@
-/* eslint-disable default-case,no-undef */
+/* eslint-disable default-case,no-undef,no-return-await */
 const Base = require('./Base')
 const jwt = require('jsonwebtoken')
 
@@ -10,21 +10,31 @@ module.exports = class extends Base {
   }
 
   async indexAction () {
+
+    if (this.isPost) {
+      await this.postAction()
+    }
+    if (this.isGet) {
+      await this.getAction()
+    }
+
+  }
+
+  async getAction () {
     const userId = this.get('id')
     const appid = this.get('appId')
     const userMeta = this.model('usermeta')
     let type = this.get('type')
-
     // 根据 id 获取单用户
     if (!think.isEmpty(userId)) {
       let user = await this.model('users').where({id: userId}).find()
       _formatOneMeta(user)
       if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-        user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+        user.avatarUrl = user.meta[`picker_${appid}_wechat`].avatarUrl
         // user.type = 'wechat'
         user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
       } else {
-        user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+        user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
       }
       return this.success(user)
     } else {
@@ -33,9 +43,8 @@ module.exports = class extends Base {
       }
       // 获取用户默认获取团队成员
       // const userIds = await userMeta.where(query).select()
-      const userMetaDatas = await userMeta.where(`meta_value ->'$.type' = '${type}' and meta_key = 'picker_${appid}_capabilities'`).page(this.get('page'), 12).countSelect()
-      // console.log(userIds)
-
+      const userMetaDatas = await userMeta.where(`meta_value ->'$.type' = '${type}' and meta_key = 'picker_${appid}_capabilities'`)
+        .page(this.get('page'), 12).countSelect()
       if (!think.isEmpty(userMetaDatas) && userMetaDatas.count > 0) {
         const ids = []
         // console.log(JSON.stringify(userIds.data))
@@ -54,7 +63,7 @@ module.exports = class extends Base {
           if (!think.isEmpty(user.meta.avatar)) {
             user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
           } else if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
-            user.avatar = user.meta[`picker_${appid}_wechat`].avatarUrl
+            user.avatarUrl = user.meta[`picker_${appid}_wechat`].avatarUrl
             user = Object.assign(user, user.meta[`picker_${appid}_wechat`])
             // user.type = 'wechat'
             Reflect.deleteProperty(user, 'meta')
@@ -66,7 +75,6 @@ module.exports = class extends Base {
       return this.success(userMetaDatas)
     }
   }
-
   async postAction () {
     const data = this.post()
     const approach = this.post('approach')
@@ -94,7 +102,7 @@ module.exports = class extends Base {
       }
       default: {
         data.appid = this.appId
-        const userId = await this.model('users').save(data)
+        const userId = await this.model('users').addUser(data)
         return this.success(userId)
       }
     }

@@ -82,7 +82,7 @@ module.exports = class extends BaseRest {
           // 用随机方法查询数据
           let rand = this.get('rand')
           if (think.isEmpty(rand)) {
-            rand = true
+            rand = false
           }
           list = await this.model('posts', {appId: this.appId})
             .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand, query.status)

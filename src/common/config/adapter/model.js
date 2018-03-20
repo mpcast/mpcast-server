@@ -9,8 +9,8 @@ module.exports = {
   type: 'mysql',
   common: {
     charset: 'UTF8MB4',
-    logConnect: isDev,
-    logSql: isDev,
+    logConnect: false,
+    logSql: false,
     logger: msg => think.logger.info(msg)
   },
   mysql: {

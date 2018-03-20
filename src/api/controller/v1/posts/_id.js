@@ -16,6 +16,22 @@ let fields = [
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
+    // 处理 GET 请求
+    if (this.isGet) {
+      const post_id = this.get('id')
+      if (!think.isEmpty(post_id)) {
+        const data = await this.getPost(post_id)
+        return this.success(data)
+      }
+      return this.error('请求参数错误')
+    }
+  }
+  /**
+   * @deprecated
+   * @returns {Promise<*|boolean>}
+   * @private
+   */
+  async _indexAction () {
     if (this.isPost) {
       if (!this.id) {
         return this.fail(400, 'params error');
@@ -135,18 +151,9 @@ module.exports = class extends BaseRest {
       const userModel = this.model('users');
 
       // 如果有作者信息
-      // if (!Object.is(item.meta._author_id, undefined)) {
-      //   const author = await userModel.where({id: item.meta._author_id}).find()
-      //   _formatOneMeta(author)
-      //   item.authorInfo = author
-      // 查询 出对应的作者信息
-      // } else {
-      // const author = await userModel.where({id: item.author}).find()
       const author = await userModel.getById(item.author)
-      // console.log(JSON.stringify(author))
       _formatOneMeta(author)
       item.author = author
-      // }
       // 取得头像地址
       if (!Object.is(item.author.meta.avatar, undefined)) {
         item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
@@ -156,23 +163,19 @@ module.exports = class extends BaseRest {
       //   item.author.resume = item.author.meta.resume
       // }
 
-      if (!Object.is(item.meta._items, undefined)) {
-        item.items = item.meta._items
-        // think._.reverse(item.items)
+      if (!Object.is(item.meta._assets, undefined)) {
+        item.assets = item.meta._assets
       }
-      Reflect.deleteProperty(item.meta, '_items')
+      Reflect.deleteProperty(item.meta, '_assets')
       // 删除无用 meta 值
       Reflect.deleteProperty(item.author, 'meta')
       // 音频播放的歌词信息
       // lrc
 
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      // if (!Object.is(item.meta['_featured_image']))
       if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
         item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
       }
-
       // 获取内容的分类信息
       // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
       // console.log(JSON.stringify(terms))

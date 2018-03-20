@@ -1,40 +1,62 @@
-/* eslint-disable no-undef */
+/* eslint-disable no-undef,no-warning-comments */
 const Base = require('./base');
 
 /**
  * model
  */
 module.exports = class extends Base {
-  constructor(...args){
-    super(...args);
-    this.relation = {
+
+  get relation () {
+    return {
+      // children: {
+      //   type: think.Model.HAS_MANY,
+      //   model: 'posts',
+      //   fKey: 'parent'
+      // },
       metas: {
         type: think.Model.HAS_MANY,
         model: 'postmeta',
         fKey: 'post_id',
         field: "post_id,meta_key,meta_value"
-        // rModel: 'usermeta',
-        // fKey: 'users_id'
       }
     };
   }
-  // get relation () {
-  //   return {
-      // children: {
-      //   type:think.Model.HAS_MANY,
-      //   model: 'posts',
-      //   fKey: 'parent'
-      // },
-      // metas: {
-      //   type: think.Model.HAS_MANY,
-      //   model: 'postmeta',
-      //   fKey: 'post_id',
-      //   field: "post_id,meta_key,meta_value"
-        // rModel: 'usermeta',
-        // fKey: 'users_id'
-      // }
-    // };
-  // }
+
+  async getAttachmentInfo (postId) {
+    let info = await this.getById(postId)
+    _formatOneMeta(info)
+    return info
+  }
+
+  /**
+   * 根据 id 批量获取附件内容
+   * @param ids
+   * @returns {Promise<any>}
+   */
+  async getAudios (ids) {
+    // 还需要处理 author name, cover url
+    let list = await this.field('id, author, status, title').where({id: ['IN', ids]}).select()
+    _formatMeta(list)
+    for (let item of list) {
+      if (!Object.is(item.meta._attachment_file, undefined)) {
+        item.url = item.meta._attachment_file
+      }
+      if (!Object.is(item.meta._attachment_metadata, undefined)) {
+        if (item.meta._attachment_metadata !== '{}') {
+          item = think.extend(item, item.meta._attachment_metadata)
+        }
+      }
+      Reflect.deleteProperty(item, 'meta')
+    }
+    return list
+  }
+
+  async getById (id) {
+    const data = await this.setRelation('metas').where({
+      id: id
+    }).find()
+    return data
+  }
 
   /**
    * 添加 meta 信息
@@ -206,6 +228,95 @@ module.exports = class extends Base {
     }).order(`INSTR (',${items},', CONCAT(',',id,','))`).select()
     return list
   }
+  /**
+   * 按 id 查找资源内容
+   * @param id
+   * @returns {Promise.<*>}
+   */
+  async getAssets (id, page = 1, pagesize) {
+    const metaModel = this.model('postmeta', {appId: this.appId})
+    const metaAssets = await metaModel.getMeta(id, '_assets')
+    if (think.isEmpty(metaAssets)) {
+      return []
+    }
+
+    let assetsArray = []
+    for (const item of JSON.parse(metaAssets.meta_value)) {
+      assetsArray.push(item.id)
+    }
+    const list = await this.where({
+      id: ['IN', assetsArray]
+      // 按 IN 条件的顺序查询出结果
+    }).order(`INSTR (',${assetsArray},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
+    _formatMeta(list.data)
+    // assetsArray = []
+    const taxonomyModel = this.model('taxonomy', {appId: this.appId})
+    // 用于一次性处理
+    let singleIds = []
+    // 处理资源附件
+    // 1 如果仅有一项内容，暂存至数组，后续批量获取
+    // 2 如果有多项内容，直接批量获取
+    for (let item of list.data) {
+      item.format = await taxonomyModel.getFormat(item.id)
+
+      // TODO: 处理音频资源... @baisheng 20180320
+      if (item.format.slug === 'post-format-audio') {
+        if (!Object.is(item.meta._audio_list, undefined)) {
+          if (item.meta._audio_list.length === 1) {
+            singleIds.push(item.meta._audio_list[0])
+          } else {
+            item.audios = []
+            const audios = await this.getAudios(item.meta._audio_list)
+            // const attachments = await metaModel.getAttachments(item.meta._audio_list)
+            // item.audios = await think._.map(attachments, (obj) => {
+            //   return JSON.parse(obj.meta_value)
+            // })
+            item.audios = audios
+          }
+        }
+      }
+    }
+    const attachments = await this.getAudios(singleIds)
+
+    // const attachments = await metaModel.getAttachments(singleIds)
+    for (const attachItem of attachments) {
+      for (let item of list.data) {
+        if (!Object.is(item.meta._audio_list, undefined)) {
+          if (item.meta._audio_list[0] === attachItem.id) {
+            item.audios = []
+            item.audios.push(attachItem)
+          }
+        }
+        // if (!Object.is(item.meta._audio_list, undefined)) {
+        //   if (item.meta._audio_list[0] === attachItem.id) {
+        //     item.audios = []
+        //     item.audios.push()
+        //   }
+        // }
+      }
+    }
+
+    // 处理附件资源信息
+
+    // console.log(attachments)
+    // for (const attachItem of attachments) {
+    //   for (let item of list.data) {
+    //     // 处理音频
+    //     if (!Object.is(item.meta._audio_id, undefined)) {
+    //       if (item.meta._audio_id === attachItem.post_id) {
+    //         item.audio = JSON.parse(attachItem.meta_value)
+    //       }
+    //     }
+    //     if (!Object.is(item.meta._thumbnail_id, undefined)) {
+    //       if (item.meta._thumbnail_id === attachItem.post_id) {
+    //         item.featured_image = JSON.parse(attachItem.meta_value)
+    //       }
+    //     }
+    //   }
+    // }
+
+    return list
+  }
 
   /**
    * 根据分类与内容状态获取 内容列表
@@ -337,9 +448,9 @@ module.exports = class extends Base {
     // const data = await this.field(`JSON_LENGTH(meta_value) AS views_count`).where(`meta_key = '_thumbs' and post_id = ${post_id}`).find()
     // if (!think.isEmpty(data)) {
     //   if (!Object.is(data.contain, undefined)) {
-        // return true
-        // return data
-      // }
+    // return true
+    // return data
+    // }
     // }
     // return {'thumbs_count': 0, 'contain': 0}
   }
@@ -422,7 +533,7 @@ module.exports = class extends Base {
    * @param status
    * @returns {Promise<void>}
    */
-  async countByAuthorPost(category, author, status = 'trash') {
+  async countByAuthorPost (category, author, status = 'trash') {
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
         join: 'inner',
@@ -444,6 +555,7 @@ module.exports = class extends Base {
 
     return data
   }
+
   /**
    * 查询分类下作者相关的内容
    *
@@ -506,7 +618,8 @@ module.exports = class extends Base {
 
   async deletePost (id) {
   }
-  async getNavItems(ids) {
+
+  async getNavItems (ids) {
     // let ret = await think.cache("_nav_items", async() => {
     let _fields = [];
     _fields.push('id');
@@ -544,7 +657,7 @@ module.exports = class extends Base {
     // }
 
     // console.log(JSON.stringify(nav_items) + "___333")
-    return nav_items;
+    // return nav_items;
 
     // }, this.cacheOptions);
 
