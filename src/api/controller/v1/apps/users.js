@@ -61,7 +61,7 @@ module.exports = class extends Base {
         _formatMeta(users)
         for (let user of users) {
           if (!think.isEmpty(user.meta.avatar)) {
-            user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+            user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
           } else if (!think.isEmpty(user.meta[`picker_${appid}_wechat`])) {
             user.avatarUrl = user.meta[`picker_${appid}_wechat`].avatarUrl
             user = Object.assign(user, user.meta[`picker_${appid}_wechat`])

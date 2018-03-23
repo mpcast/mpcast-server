@@ -156,8 +156,12 @@ module.exports = class extends BaseRest {
       item.author = author
       // 取得头像地址
       if (!Object.is(item.author.meta.avatar, undefined)) {
-        item.author.avatar = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+        item.author.avatarUrl = await this.model('postmeta').getAttachment('file', item.author.meta.avatar)
+      } else if (!think.isEmpty(author.meta[`picker_${this.appId}_wechat`])) {
+        item.author.avatarUrl = author.meta[`picker_${this.appId}_wechat`].avatarUrl
+        item.author.type = 'wechat'
       }
+
       // 作者简历
       // if (!Object.is(item.author.meta.resume, undefined)) {
       //   item.author.resume = item.author.meta.resume

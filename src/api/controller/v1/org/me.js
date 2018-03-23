@@ -13,12 +13,12 @@ module.exports = class extends think.Controller {
     let user = await this.DAO.getById(curUser.id)
     _formatOneMeta(user)
     // console.log(user)
-    // if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
-    //   user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
-    //   user.type = 'wechat'
-    // } else {
-    user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
-    // }
+    if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+      user.avatar = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+      user.type = 'wechat'
+    } else {
+    user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    }
     // if (!Object.is(user.meta[`picker_${this.appId}_liked_posts`], undefined)) {
     //   if (!think.isEmpty(user.meta[`picker_${this.appId}_liked_posts`])) {
     //     user.likes = user.meta[`picker_${this.appId}_liked_posts`].length
@@ -147,7 +147,7 @@ module.exports = class extends think.Controller {
 
     // Reflect.deleteProperty(user, 'metas')
     _formatOneMeta(user)
-    user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
     if (!Object.is(user.meta.resume, undefined)) {
       user.resume = user.meta.resume
     }

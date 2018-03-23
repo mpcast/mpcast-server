@@ -35,7 +35,7 @@ module.exports = class extends Base {
    */
   async getAudios (ids) {
     // 还需要处理 author name, cover url
-    let list = await this.field('id, author, status, title').where({id: ['IN', ids]}).select()
+    let list = await this.field('id, author, status, title').where({id: ['IN', ids]}).order(`INSTR (',${ids},', CONCAT(',',id,','))`).select()
     _formatMeta(list)
     for (let item of list) {
       if (!Object.is(item.meta._attachment_file, undefined)) {
@@ -228,12 +228,68 @@ module.exports = class extends Base {
     }).order(`INSTR (',${items},', CONCAT(',',id,','))`).select()
     return list
   }
+
   /**
-   * 按 id 查找资源内容
+   * 根据内容格式返回关联的资源
    * @param id
-   * @returns {Promise.<*>}
+   * @param format
+   * @param page
+   * @param pagesize
+   * @returns {Promise<void>}
+   */
+  async getFormatAssets (id, format, page = 1, pagesize) {
+    let assetList = []
+    const metaModel = this.model('postmeta', {appId: this.appId})
+    const metaAssets = await metaModel.getMeta(id, '_assets')
+    if (think.isEmpty(metaAssets)) {
+      return []
+    }
+    // 查出资源列表
+    let assetsArray = []
+    for (const item of JSON.parse(metaAssets.meta_value)) {
+      assetsArray.push(item.id)
+    }
+
+    if (format === 'post-format-audio') {
+      // assetList = await this.getAudios(assetsArray)
+
+      assetList = await this.field('id, author, status, title').where({id: ['IN', assetsArray]}).order(`INSTR (',${assetsArray},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
+      _formatMeta(assetList.data)
+      for (let item of assetList.data) {
+        if (!Object.is(item.meta._attachment_file, undefined)) {
+          item.url = item.meta._attachment_file
+        }
+        if (!Object.is(item.meta._attachment_metadata, undefined)) {
+          if (item.meta._attachment_metadata !== '{}') {
+            item = think.extend(item, item.meta._attachment_metadata)
+          }
+        }
+        Reflect.deleteProperty(item, 'meta')
+      }
+      return assetList
+      // assetList = list
+    }
+
+    // return assetList
+    // const list = await this.where({
+    //   id: ['IN', assetsArray]
+      // 按 IN 条件的顺序查询出结果
+    // }).order(`INSTR (',${assetsArray},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
+    // _formatMeta(list.data)
+
+
+  }
+
+  /**
+   * 取 post 关联的资源
+   * @param id
+   * @param formatKey
+   * @param page
+   * @param pagesize
+   * @returns {Promise<any>}
    */
   async getAssets (id, page = 1, pagesize) {
+    // formatKey = '_assets, _audios'
     const metaModel = this.model('postmeta', {appId: this.appId})
     const metaAssets = await metaModel.getMeta(id, '_assets')
     if (think.isEmpty(metaAssets)) {
@@ -249,6 +305,8 @@ module.exports = class extends Base {
       // 按 IN 条件的顺序查询出结果
     }).order(`INSTR (',${assetsArray},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
     _formatMeta(list.data)
+
+
     // assetsArray = []
     const taxonomyModel = this.model('taxonomy', {appId: this.appId})
     // 用于一次性处理
@@ -261,12 +319,12 @@ module.exports = class extends Base {
 
       // TODO: 处理音频资源... @baisheng 20180320
       if (item.format.slug === 'post-format-audio') {
-        if (!Object.is(item.meta._audio_list, undefined)) {
-          if (item.meta._audio_list.length === 1) {
-            singleIds.push(item.meta._audio_list[0])
+        if (!Object.is(item.meta._assets, undefined)) {
+          if (item.meta._assets.length === 1) {
+            singleIds.push(item.meta._assets[0])
           } else {
-            item.audios = []
-            const audios = await this.getAudios(item.meta._audio_list)
+            item.assets = []
+            const assets = await this.getAudios(item.meta._assets)
             // const attachments = await metaModel.getAttachments(item.meta._audio_list)
             // item.audios = await think._.map(attachments, (obj) => {
             //   return JSON.parse(obj.meta_value)
@@ -281,10 +339,10 @@ module.exports = class extends Base {
     // const attachments = await metaModel.getAttachments(singleIds)
     for (const attachItem of attachments) {
       for (let item of list.data) {
-        if (!Object.is(item.meta._audio_list, undefined)) {
-          if (item.meta._audio_list[0] === attachItem.id) {
-            item.audios = []
-            item.audios.push(attachItem)
+        if (!Object.is(item.meta._assets, undefined)) {
+          if (item.meta._assets[0] === attachItem.id) {
+            item.assets = []
+            item.assets.push(attachItem)
           }
         }
         // if (!Object.is(item.meta._audio_list, undefined)) {

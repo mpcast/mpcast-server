@@ -20,6 +20,18 @@ module.exports = class extends BaseRest {
       if (!this.id) {
         return this.fail(400, 'params error');
       }
+      const action = this.get('action')
+      if (!think.isEmpty(action) && action === 'change-author') {
+        const res = await this.model('posts', {appId: this.appId}).setRelation(false).where({id: this.id}).update({
+          author: this.post('author')
+        })
+        if (res > 0) {
+          // console.log(res)
+          return this.success()
+        } else {
+          return this.error('更新失败')
+        }
+      }
       const data = this.post()
       if (think.isEmpty(data.type)) {
         data.type = 'post_format'
@@ -161,35 +173,14 @@ module.exports = class extends BaseRest {
     if (!think.isEmpty(postFormat)) {
       post.format = postFormat.slug
     }
-    const users = [
-      { 'user': 'barney' },
-      { 'user': 'fred' }
-    ];
-
-// The `_.property` iteratee shorthand.
-    let test = think._.map(users, 'user');
-    console.log(test)
-    // console.log(post.format)
+    post.assets = think._.map(post.meta._assets)
+    /*
     if (post.format === 'post-format-audio') {
-      // const laal = await think._.map(post.meta._audio_list, 'status')
-      // console.log(laal)
-
-// => ['barney', 'fred']
       const audios = await this.model('posts', {appId: this.appId})
         .getAudios(think._.map(post.meta._audio_list, 'id'))
-      //
-      // item.audios = await think._.map(attachments, (obj) => {
-      //   return JSON.parse(obj.meta_value)
-      // })
       post.audios = audios
-    }
+    }*/
     return post
-
-    // 处理内容层级
-    // let treeList = await arr_to_tree(list.data, 0);
-    // list.data = await arr_to_tree(list.data, 0);
-    //
-    // return list
   }
 
 

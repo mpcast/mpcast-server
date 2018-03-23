@@ -17,9 +17,17 @@ let fields = [
 module.exports = class extends BaseRest {
   async indexAction () {
     if (this.isGet) {
+      const postModel = this.model('posts', {appId: this.appId})
       const postId = this.get('id')
-      const metaModel = this.model('posts', {appId: this.appId})
-      let data = await metaModel.getAssets(postId, this.get('page'), this.get('pagesize') || 12)
+      const format = this.get('format')
+      if (format === 'post-format-audio') {
+        let data = await postModel.getFormatAssets(postId, format)
+        return this.success(data)
+        // const audios = await this.model('posts', {appId: this.appId})
+        //   .getAudios(think._.map(post.meta._audio_list, 'id'))
+        // post.audios = audios
+      }
+      let data = await postModel.getAssets(postId, this.get('page'), this.get('pagesize') || 12)
       return this.success(data)
     }
   }

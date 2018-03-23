@@ -26,7 +26,7 @@ module.exports = [
     handle: 'trace',
     enable: !think.isCli,
     options: {
-      contentType(ctx) {
+      contentType (ctx) {
         console.log('trace')
         console.log(ctx)
         // All request url starts of /api or request header contains `X-Requested-With: XMLHttpRequest` will output json error
@@ -45,7 +45,7 @@ module.exports = [
       },
       sourceMap: false,
       debug: isDev,
-      error(err, ctx) {
+      error (err, ctx) {
         console.log(ctx.request.path)
         return console.error(err)
       }
@@ -81,8 +81,7 @@ module.exports = [
   },
   {
     handle: cors,
-    options: {
-    }
+    options: {}
   },
   {
     handle: jwt,
@@ -90,10 +89,9 @@ module.exports = [
       secret: 'S1BNbRp2b'
     },
     match: ctx => { // match 为一个函数，将 ctx 传递给这个函数，如果返回结果为 true，则启用该 middleware
-      console.log(ctx.url)
-      if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/))) {
+      // if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/))) {
+      if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) || ctx.url.match(/^\/v1\/apps\/\w+\/options?/) || ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token?/))) {
 
-        console.log('false')
         return false;
       } else if (ctx.url.match(ctx.url.match(/^\/v1*?/) || ctx.url.match(/^\/v2*?/))) {
         return true
