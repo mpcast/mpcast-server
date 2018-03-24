@@ -2,6 +2,7 @@ const path = require('path');
 const isDev = think.env === 'development';
 const cors = require('@koa/cors')
 const jwt = require('koa-jwt')
+const payload = require('think-payload');
 // const swaggerParser = require('think-swagger-parser')
 // const swaggerRouter = require('think-swagger-router')
 // const swaggerController = require('think-swagger-controller')
@@ -52,8 +53,10 @@ module.exports = [
     }
   },
   {
-    handle: 'payload',
-    options: {}
+    handle: payload,
+    options: {
+      maxFileSize: 200 * 1024 * 1024
+    }
   },
   {
     handle: 'router',

@@ -28,6 +28,44 @@ module.exports = class extends Base {
     return info
   }
 
+  async loadBlock (type, blockIds) {
+    // page 取一级
+    // 附件取全部
+
+    // types
+    // post-format-album
+    // post-format-gallern
+    // post-format-audio
+    // post-format-video
+    // post-format-quote
+    // post-format-doc
+
+    // 1 先取出所有内容，包含内容的 meta 信息
+    let list = await this.field('id, author, status, title').where({id: ['IN', blockIds]}).order(`INSTR (',${blockIds},', CONCAT(',',id,','))`).select()
+    _formatMeta(list)
+
+    switch (type) {
+      // 如果是音频辑就处理音频文件
+      case 'post-format-album': {
+        for (let item of list) {
+          if (!Object.is(item.meta._attachment_file, undefined)) {
+            item.url = item.meta._attachment_file
+          }
+          if (!Object.is(item.meta._attachment_metadata, undefined)) {
+            if (item.meta._attachment_metadata !== '{}') {
+              item = think.extend(item, item.meta._attachment_metadata)
+            }
+          }
+          Reflect.deleteProperty(item, 'meta')
+        }
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return list
+  }
   /**
    * 根据 id 批量获取附件内容
    * @param ids
@@ -237,7 +275,7 @@ module.exports = class extends Base {
    * @param pagesize
    * @returns {Promise<void>}
    */
-  async getFormatAssets (id, format, page = 1, pagesize) {
+  async getFormatAssetsByPage (id, format, page = 1, pagesize) {
     let assetList = []
     const metaModel = this.model('postmeta', {appId: this.appId})
     const metaAssets = await metaModel.getMeta(id, '_assets')

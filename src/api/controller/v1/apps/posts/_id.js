@@ -69,13 +69,12 @@ module.exports = class extends BaseRest {
         // 保存 meta 信息
         await metaModel.save(this.id, data.meta)
       }
-      if (!think.isEmpty(data.items)) {
-        data.meta = {
-          '_items': JSON.stringify(data.items)
-
-        }
-        await metaModel.save(this.id, data.meta)
-      }
+      // if (!think.isEmpty(data.items)) {
+      //   data.meta = {
+      //     '_items': JSON.stringify(data.items)
+      //   }
+      //   await metaModel.save(this.id, data.meta)
+      // }
       // 3 添加内容与 term 分类之间的关联
       // term_taxonomy_id
       // const defaultTerm = this.options.default.term
@@ -130,9 +129,9 @@ module.exports = class extends BaseRest {
     if (!Object.is(user.meta.resume, undefined)) {
       user.resume = user.meta.resume
     }
-    if (!Object.is(data.meta._assets, undefined)) {
-      data.assets = data.meta._assets
-    }
+    // if (!Object.is(data.meta._assets, undefined)) {
+    //   data.assets = data.meta._assets
+    // }
 
     // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
     // if (!Object.is(item.meta['_featured_image']))
@@ -171,15 +170,11 @@ module.exports = class extends BaseRest {
     post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
     const postFormat = await _taxonomy.getFormat(post.id)
     if (!think.isEmpty(postFormat)) {
-      post.format = postFormat.slug
+      post.type = postFormat.slug
     }
-    post.assets = think._.map(post.meta._assets)
-    /*
-    if (post.format === 'post-format-audio') {
-      const audios = await this.model('posts', {appId: this.appId})
-        .getAudios(think._.map(post.meta._audio_list, 'id'))
-      post.audios = audios
-    }*/
+    const blockList = await this.model('posts', {appId: this.appId}).loadBlock(post.type, post.block)
+    post.block = blockList
+
     return post
   }
 

@@ -21,7 +21,7 @@ module.exports = class extends BaseRest {
       const postId = this.get('id')
       const format = this.get('format')
       if (format === 'post-format-audio') {
-        let data = await postModel.getFormatAssets(postId, format)
+        let data = await postModel.getFormatAssetsByPage(postId, format)
         return this.success(data)
         // const audios = await this.model('posts', {appId: this.appId})
         //   .getAudios(think._.map(post.meta._audio_list, 'id'))

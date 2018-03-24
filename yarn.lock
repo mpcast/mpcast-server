@@ -3784,6 +3784,17 @@ think-payload@^1.0.0:
     think-helper "^1.0.5"
     xml2js "^0.4.17"
 
+think-payload@^1.3.1:
+  version "1.3.1"
+  resolved "http://registry.npm.taobao.org/think-payload/download/think-payload-1.3.1.tgz#8105c24f9ab8613517543c456005792c8a4e270c"
+  dependencies:
+    formidable "^1.1.1"
+    inflation "^2.0.0"
+    on-finished "^2.3.0"
+    raw-body "^2.2.0"
+    think-helper "^1.0.5"
+    xml2js "^0.4.17"
+
 think-pm2@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/think-pm2/download/think-pm2-1.0.0.tgz#b1871691c3f7fd5b0a44253d30fbf44ccb295729"

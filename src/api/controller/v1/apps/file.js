@@ -11,7 +11,7 @@ const BaseRest = require('./Base')
 module.exports = class extends BaseRest {
 
   async postAction () {
-    const postModel = this.model('posts', {appId: this.appId})
+    const postModel = this.model('posts', {appId: this.appId}).setRelation(false)
     // const optionsModel = this.model('options', {appId: this.appId})
     // 获取 当前用户配置
     // const option = await optionsModel.get(true)
