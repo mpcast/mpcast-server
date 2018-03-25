@@ -21,17 +21,11 @@ module.exports = class extends BaseRest {
         return this.fail(400, 'params error');
       }
       const action = this.get('action')
+      // 单独更新作者信息
       if (!think.isEmpty(action) && action === 'change-author') {
-        const res = await this.model('posts', {appId: this.appId}).setRelation(false).where({id: this.id}).update({
-          author: this.post('author')
-        })
-        if (res > 0) {
-          // console.log(res)
-          return this.success()
-        } else {
-          return this.error('更新失败')
-        }
+        return await this.changeAuthor()
       }
+
       const data = this.post()
       if (think.isEmpty(data.type)) {
         data.type = 'post_format'
@@ -42,28 +36,24 @@ module.exports = class extends BaseRest {
       if (think.isEmpty(data.author)) {
         data.author = this.ctx.state.user.id
       }
-      const metaModel = await this.model('postmeta', {appId: this.appId})
 
+      const metaModel = await this.model('postmeta', {appId: this.appId})
       // if data.itemStatus === 'delete' 从数组中 remove 并返回完整的数组
       if (!think.isEmpty(data.item_id)) {
         if (data.item_status === 'delete') {
           const res = await metaModel.removeItem(this.id, data.item_id)
-          await this.model('posts', {appId: this.appId}).where({id: data.item_id}).update({status: 'trash'});
+          await this.model('posts', {appId: this.appId}).setRelation(false).where({id: data.item_id}).update({status: 'trash'});
 
           return this.success(res)
-          // const newData = await this.getPost(this.id)
-          // return this.success(newData)
         }
         // 更新 relate item
         const res = await metaModel.changeItemStatus(this.id, data.item_id, data.item_status)
-        // 更新 item 状态
         return this.success(res)
       }
-      // if (think.isEmpty(data.status)) {
-      //   data.status = 'auto-draft';
-      // }
-      // const postId = await this.modelInstance.add(data)
-      await this.model('posts', {appId: this.appId}).where({id: this.id}).update(data);
+
+
+
+      await this.model('posts', {appId: this.appId}).setRelation(false).where({id: this.id}).update(data);
       // 2 更新 meta 数据
       if (!Object.is(data.meta, undefined)) {
         // 保存 meta 信息
@@ -81,14 +71,21 @@ module.exports = class extends BaseRest {
       // 如果这里也更新 就会删除分类的关联，所以是错误的
       let categories = []
       if (!Object.is(data.categories, undefined) && !think.isEmpty(data.categories)) {
-        categories = categories.concat(JSON.parse(data.categories))
+        const curCategories = await this.model('taxonomy', {appId: this.appId}).findCategoriesByObject(this.id.toString())
+        const xors = think._.xor(think._.map(curCategories, 'term_id'), data.categories)
+        // 没有添加，有就删除
+        // categories = categories.concat(data.categories)
+        for (const cate of xors) {
+          await this.model('taxonomy', {appId: this.appId}).relationships(this.id, cate)
+        }
       }
 
-      for (const cate of categories) {
-        await this.model('taxonomy', {appId: this.appId}).relationships(this.id, cate)
+      // 为了兼容更新返回完整数据的 API
+      if (this.get('model') === 'full') {
+        const newData = await this.getPost(this.id)
+        return this.success(newData)
       }
-      const newData = await this.getPost(this.id)
-      return this.success(newData)
+      return this.success()
     }
     if (this.isGet) {
       const post_id = this.get('id')
@@ -100,6 +97,29 @@ module.exports = class extends BaseRest {
     }
   }
 
+  /**
+   * 更新作者
+   * @returns {Promise<*>}
+   */
+  async changeAuthor () {
+    const res = await this.model('posts', {appId: this.appId})
+      .setRelation(false)
+      .where({id: this.id}).update({
+      author: this.post('author')
+    })
+    if (res > 0) {
+      // console.log(res)
+      return this.success()
+    } else {
+      return this.error('更新失败')
+    }
+  }
+
+  /**
+   * 获取内容
+   * @param post_id
+   * @returns {Promise<*>}
+   */
   async getPost (post_id) {
     const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})

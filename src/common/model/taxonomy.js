@@ -413,6 +413,13 @@ module.exports = class extends Base {
   async relationships (object_id, term_taxonomy_id) {
     const _term_relationships = this.model('term_relationships', {appId: this.appId});
     const res = await _term_relationships.where({object_id: object_id, term_taxonomy_id: term_taxonomy_id}).find()
+    // 不存在就添加
+    // const res = await model.thenAdd({object_id: term_taxonomy_id}, {object_id: term_taxonomy_id})
+
+    // 存在就删除
+    // if (!think.isEmpty(res)) {
+    //   await model.where({object_id: object_id, term_taxonomy_id: term_taxonomy_id}).delete();
+    // }
     if (think.isEmpty(res)) {
       await _term_relationships.add({object_id: object_id, term_taxonomy_id: term_taxonomy_id})
     } else {
