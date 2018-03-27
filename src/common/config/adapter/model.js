@@ -10,6 +10,7 @@ module.exports = {
   common: {
     charset: 'UTF8MB4',
     logConnect: false,
+    // logSql: true,
     logSql: false,
     logger: msg => think.logger.info(msg)
   },

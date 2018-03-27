@@ -20,6 +20,7 @@ module.exports = class extends BaseRest {
       if (!this.id) {
         return this.fail(400, 'params error');
       }
+      // if (this.post('sticky')) {}
       const action = this.get('action')
       // 单独更新作者信息
       if (!think.isEmpty(action) && action === 'change-author') {
@@ -27,46 +28,39 @@ module.exports = class extends BaseRest {
       }
 
       const data = this.post()
+      if (think._.has(data, 'sticky')) {
+        if (data.sticky === true) {
+          await this.model('options', {appId: this.appId}).addSticky(this.id.toString())
+        }
+        if (data.sticky === false) {
+          await this.model('options', {appId: this.appId}).removeSticky(this.id.toString())
+        }
+      }
+
       if (think.isEmpty(data.type)) {
         data.type = 'post_format'
       }
+
+      if (!think.isEmpty(data.block)) {
+        data.block = JSON.stringify(data.block)
+      }
       const currentTime = new Date().getTime();
-      // data.date = currentTime
       data.modified = currentTime
+
       if (think.isEmpty(data.author)) {
         data.author = this.ctx.state.user.id
       }
-
       const metaModel = await this.model('postmeta', {appId: this.appId})
-      // if data.itemStatus === 'delete' 从数组中 remove 并返回完整的数组
-      if (!think.isEmpty(data.item_id)) {
-        if (data.item_status === 'delete') {
-          const res = await metaModel.removeItem(this.id, data.item_id)
-          await this.model('posts', {appId: this.appId}).setRelation(false).where({id: data.item_id}).update({status: 'trash'});
 
-          return this.success(res)
-        }
-        // 更新 relate item
-        const res = await metaModel.changeItemStatus(this.id, data.item_id, data.item_status)
-        return this.success(res)
-      }
-
-
-
-      await this.model('posts', {appId: this.appId}).setRelation(false).where({id: this.id}).update(data);
+      await this.model('posts', {appId: this.appId})
+        .setRelation(false)
+        .where({id: this.id})
+        .update(data);
       // 2 更新 meta 数据
       if (!Object.is(data.meta, undefined)) {
         // 保存 meta 信息
         await metaModel.save(this.id, data.meta)
       }
-      // if (!think.isEmpty(data.items)) {
-      //   data.meta = {
-      //     '_items': JSON.stringify(data.items)
-      //   }
-      //   await metaModel.save(this.id, data.meta)
-      // }
-      // 3 添加内容与 term 分类之间的关联
-      // term_taxonomy_id
       // const defaultTerm = this.options.default.term
       // 如果这里也更新 就会删除分类的关联，所以是错误的
       let categories = []
@@ -105,8 +99,8 @@ module.exports = class extends BaseRest {
     const res = await this.model('posts', {appId: this.appId})
       .setRelation(false)
       .where({id: this.id}).update({
-      author: this.post('author')
-    })
+        author: this.post('author')
+      })
     if (res > 0) {
       // console.log(res)
       return this.success()
@@ -121,12 +115,23 @@ module.exports = class extends BaseRest {
    * @returns {Promise<*>}
    */
   async getPost (post_id) {
+    // 获取精选内容列表
+    const stickys = this.options.stickys
+    // console.log(stickys)
     const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})
     const userModel = this.model('users');
 
     let data = await postModel.getById(post_id)
+    const isSticky = think._.find(stickys, (id) => {
+      return post_id.toString() === id
+    })
 
+    if (isSticky) {
+      data.sticky = true
+    } else {
+      data.sticky = false
+    }
     _formatOneMeta(data)
     data.url = ''
     // 处理音频
@@ -192,9 +197,11 @@ module.exports = class extends BaseRest {
     if (!think.isEmpty(postFormat)) {
       post.type = postFormat.slug
     }
-    const blockList = await this.model('posts', {appId: this.appId}).loadBlock(post.type, post.block)
-    post.block = blockList
-
+    if (!think.isEmpty(post.block)) {
+      const blockList = await this.model('posts', {appId: this.appId})
+        .loadBlock(post.type, JSON.parse(post.block))
+      post.block = blockList
+    }
     return post
   }
 

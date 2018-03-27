@@ -260,22 +260,15 @@ module.exports = class extends Base {
 
     // 从缓存中提取到所有 term
     const all_terms = await this.allTerms();
-    // console.log(JSON.stringify(all_terms))
     const _term_relationships = this.model("term_relationships", {appId: this.appId});
 
     // 查询内容关联的分类法 id == term_id
     const taxonomies = await _term_relationships.field('term_taxonomy_id as term_id').where({"object_id": object_id}).select();
 
-    /**
-     * 按 term_id 查询 term
-     * @type {Array}
-     * @private
-     */
-    let postFormat = {}
-    taxonomies.forEach((item) => {
-      postFormat = think._.findLast(all_terms, function (o) {
-        return (o.term_id === item.term_id && o.slug.indexOf('post-format') >= 0)
-      })
+    const curPostHasTerms = think._.intersectionBy(all_terms, taxonomies, 'term_id')
+    // 处理包含 post-format 格式
+    let postFormat = think._.findLast(curPostHasTerms, function (o) {
+      return (o.slug.toString().indexOf('post-format') >= 0)
     })
     return postFormat
   }
@@ -480,6 +473,7 @@ module.exports = class extends Base {
     return data
 
   }
+
   /**
    * 根据 slug 查询所属分类方法的分类信息
    * @param taxonomy
@@ -625,6 +619,7 @@ module.exports = class extends Base {
     menus.items = items
     return menus
   }
+
   /**
    * 获取全部菜单
    * @returns {Promise<Array>}

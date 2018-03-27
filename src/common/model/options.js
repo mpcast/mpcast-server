@@ -3,7 +3,7 @@ const Base = require('./base');
 const redisCache = require('think-cache-redis');
 
 module.exports = class extends Base {
-  constructor(...args) {
+  constructor (...args) {
     super(...args);
     this.cacheKey = this.tablePrefix + 'options';
   }
@@ -25,11 +25,44 @@ module.exports = class extends Base {
     }
     const _options = await think.cache(this.cacheKey)
     return _options
-    // return JSON.parse(_options)
   }
 
+  async removeSticky (id) {
+    const options = await this.get()
+    let stickys = options.stickys
+    if (stickys.includes(id)) {
+      for (let i = 0; i < stickys.length; i++) {
+        if (stickys[i] === id) {
+          stickys.splice(i, 1)
+        }
+      }
+      await this.saveStickys(stickys)
+    }
+  }
 
-  async updateOptions(key, value) {
+  async addSticky (id) {
+    const options = await this.get()
+    let stickys = options.stickys
+    if (!stickys.includes(id)) {
+      stickys.unshift(id)
+      await this.saveStickys(stickys)
+    }
+  }
+
+  async saveStickys (stickys) {
+    const res = await this.where({
+      key: 'stickys'
+    }).update({
+      value: JSON.stringify(stickys)
+    })
+
+    if (res) {
+      const options = await this.get(true)
+      return options
+    }
+  }
+
+  async updateOptions (key, value) {
 
     console.log(key + ": " + value);
 
@@ -39,7 +72,7 @@ module.exports = class extends Base {
     // console.log(JSON.stringify(cacheData))
     // update picker_resume.picker_options set value = json_set(value,'$.current_theme', 'limitless') where `key` = 'site';
     if (think.isEmpty(cacheData)) {
-      cacheData = await this.getOptions();
+      cacheData = await this.get();
     }
     const changedData = {};
     for (const key in data) {
@@ -49,7 +82,7 @@ module.exports = class extends Base {
     }
 
     // console.log(JSON.stringify(changedData) + "-----")
-    const json_sql = `update picker_resume.picker_options set value = json_set(value,'$.${value.key}', '${value.value}') where \`key\` = '${key}'`;
+    const json_sql = `update ${this.cacheKey} set value = json_set(value,'$.${value.key}', '${value.value}') where \`key\` = '${key}'`;
 
     // console.log(json_sql)
     // console.log(JSON.stringify(changedData))
@@ -78,7 +111,7 @@ module.exports = class extends Base {
     await Promise.all(promises);
     // console.log(JSON.stringify(p1) +"======")
 
-    const ret = await this.getOptions(true);
+    const ret = await this.get(true)
 
     return ret;
   }
@@ -88,7 +121,7 @@ module.exports = class extends Base {
    * 获取网站配置
    * @returns {{}}
    */
-  async lists() {
+  async lists () {
     const map = {}
     map.status = 1;
     const list = await this.where(map).order("sort ASC").field(["name", "value", "type"]).select();

@@ -55,7 +55,7 @@ module.exports = class extends BaseRest {
     // 清除两个固定条件
     Reflect.deleteProperty(query, 'appId')
     if (!think._.has(query, 'status')) {
-      query.status = 'publish'
+      query.status = ['publish', 'auto-draft', 'draft']
     }
     if (!think._.has(query, 'status')) {
       query.parent = 0

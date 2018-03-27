@@ -7,7 +7,7 @@ const mediaTags = require("jsmediatags")
 module.exports = class extends think.Controller {
 
   async postAction () {
-    const postModel = this.model('posts')
+    const postModel = this.model('posts').setRelation(false)
     const optionsModel = this.model('options')
     // 获取 当前用户配置
     const option = await optionsModel.get(true)

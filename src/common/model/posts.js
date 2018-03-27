@@ -41,20 +41,24 @@ module.exports = class extends Base {
     // post-format-doc
 
     // 1 先取出所有内容，包含内容的 meta 信息
-    let list = await this.field('id, author, status, title').where({id: ['IN', blockIds]}).order(`INSTR (',${blockIds},', CONCAT(',',id,','))`).select()
-    _formatMeta(list)
+    let list = await this.field('id, author, status, title')
+      .where({id: ['IN', blockIds]}).setRelation(true)
+      .order(`INSTR (',${blockIds},', CONCAT(',',id,','))`).select()
 
+    // const list = await this.where({
+    //   id: ['IN', stickys]
+    // }).order(`INSTR (',${stickys},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
+    // return list
+    _formatMeta(list)
     switch (type) {
       // 如果是音频辑就处理音频文件
       case 'post-format-album': {
         for (let item of list) {
-          if (!Object.is(item.meta._attachment_file, undefined)) {
+          if (think._.has(item.meta, '_attachment_file')) {
             item.url = item.meta._attachment_file
           }
-          if (!Object.is(item.meta._attachment_metadata, undefined)) {
-            if (item.meta._attachment_metadata !== '{}') {
-              item = think.extend(item, item.meta._attachment_metadata)
-            }
+          if (think._.has(item.meta, '_attachment_metadata')) {
+            item = think.extend(item, item.meta._attachment_metadata)
           }
           Reflect.deleteProperty(item, 'meta')
         }
@@ -64,6 +68,7 @@ module.exports = class extends Base {
         break;
       }
     }
+
     return list
   }
   /**
@@ -488,11 +493,14 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`(tt.taxonomy = 'category') AND p.status = '${status}'`)
+    }).field(fileds).where({
+      'tt.taxonomy': 'category',
+      'p.status': ['IN', status]
+    })
       .order('modified DESC')
       .page(page, pagesize)
       .setRelation(true).countSelect()
-
+      // `(tt.taxonomy = 'category') AND p.status IN(${status})`
     const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)
@@ -559,7 +567,7 @@ module.exports = class extends Base {
    * @param status
    * @returns {Promise<Object>}
    */
-  async findByCategory (category, page = 1, pagesize, rand, status = 'publish') {
+  async findByCategory (category, page = 1, pagesize, rand, status) {
     const fileds = [
       'p.id',
       'p.name',
@@ -587,11 +595,14 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where(`(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`)
+    }).field(fileds).where({
+      't.slug': category,
+      'p.status': ['IN', status]
+    })
       .order(orderBy)
       .page(page, pagesize)
       .setRelation(true).countSelect()
-
+      // `(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`
     const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)
@@ -712,8 +723,6 @@ module.exports = class extends Base {
     return data
   }
 
-  async deletePost (id) {
-  }
 
   async getNavItems (ids) {
     // let ret = await think.cache("_nav_items", async() => {
