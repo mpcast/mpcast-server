@@ -61,9 +61,9 @@ module.exports = class extends BaseRest {
         // 保存 meta 信息
         await metaModel.save(this.id, data.meta)
       }
-      // const defaultTerm = this.options.default.term
+      const defaultTerm = this.options.default.term
       // 如果这里也更新 就会删除分类的关联，所以是错误的
-      let categories = []
+      // let categories = []
       if (!Object.is(data.categories, undefined) && !think.isEmpty(data.categories)) {
         const curCategories = await this.model('taxonomy', {appId: this.appId}).findCategoriesByObject(this.id.toString())
         const xors = think._.xor(think._.map(curCategories, 'term_id'), data.categories)
@@ -135,10 +135,9 @@ module.exports = class extends BaseRest {
     _formatOneMeta(data)
     data.url = ''
     // 处理音频
-    if (!Object.is(data.meta._audio_id, undefined)) {
-      // 音频播放地址
-      data.url = await metaModel.getAttachment('file', item.meta._audio_id)
-    }
+    // if (!Object.is(data.meta._audio_id, undefined)) {
+    //   data.url = await metaModel.getAttachment('file', item.meta._audio_id)
+    // }
     // 处理作者信息
     let user = await userModel.getById(data.author)
     _formatOneMeta(user)
@@ -164,7 +163,9 @@ module.exports = class extends BaseRest {
       data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
     }
 
-
+    if(think.isEmpty(data.block)) {
+      data.block = []
+    }
     data.author = user
     // 清除 meta
 
@@ -193,6 +194,7 @@ module.exports = class extends BaseRest {
   async _dealTerms (post) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
+    post.categories = think._.map(post.categories, 'term_id')
     const postFormat = await _taxonomy.getFormat(post.id)
     if (!think.isEmpty(postFormat)) {
       post.type = postFormat.slug

@@ -224,6 +224,7 @@ module.exports = class extends BaseRest {
     if (think.isEmpty(slugName)) {
       return this.fail('创建失败，请检查主题内容')
     }
+
     if (!think.isEmpty(data.content)) {
       data.content = think.tc.filter(data.content)
     }
@@ -231,32 +232,48 @@ module.exports = class extends BaseRest {
 
     const postModel = this.model('posts', {appId: this.appId})
     const res = await postModel.findByName(slugName)
+
     if (!think.isEmpty(res)) {
       return this.success(res)
     }
     if (think.isEmpty(data.type)) {
       data.type = 'post_format'
     }
+
+    if (think._.has(data, 'sticky')) {
+      if (data.sticky === true) {
+        await this.model('options', {appId: this.appId}).addSticky(this.id.toString())
+      }
+      if (data.sticky === false) {
+        await this.model('options', {appId: this.appId}).removeSticky(this.id.toString())
+      }
+    }
+
     const currentTime = new Date().getTime();
     data.date = currentTime
     data.modified = currentTime
 
+    if (!think.isEmpty(data.block)) {
+      data.block = JSON.stringify(data.block)
+    }
+
     // 3 添加内容与 term 分类之间的关联
     // term_taxonomy_id
     const defaultTerm = Number(this.options.default.term)
+    const defaultPostFormat = Number(this.options.default.format)
 
-
+/*
     let categories = []
     if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
       categories = categories.concat(defaultTerm)
     } else {
-      // 处理提交过来的分类信息，可能是单分类 id 也可能是数组, 分类 id 为 term_taxonomy_id
       categories = categories.concat(JSON.parse(data.categories))
-    }
+    }*/
+
     // 4 获取内容的格式类别
-    if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
-      categories = categories.concat(data.format)
-    }
+    // if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
+    //   categories = categories.concat(data.format)
+    // }
     if (think._.hasIn(this.options, 'default.publish')) {
       const defaultPublish = this.options.default.publish
       // 处理内容默认发布状态
@@ -265,13 +282,15 @@ module.exports = class extends BaseRest {
         data.status = 'publish'
       }
     }
+
     if (think.isEmpty(data.author)) {
       data.author = this.ctx.state.user.id
     }
     if (think.isEmpty(data.status)) {
       data.status = 'auto-draft';
     }
-    const postId = await this.modelInstance.add(data)
+    const postId = await this.modelInstance.setRelation(false).add(data)
+
     // 2 更新 meta 数据
     if (!Object.is(data.meta, undefined)) {
       const metaModel = this.model('postmeta', {appId: this.appId})
@@ -279,24 +298,45 @@ module.exports = class extends BaseRest {
       await metaModel.save(postId, data.meta)
     }
 
-    for (const cate of categories) {
-      await this.model('taxonomy', {appId: this.appId}).relationships(postId, cate)
+    // for (const cate of categories) {
+    //   await this.model('taxonomy', {appId: this.appId}).relationships(postId, cate)
+    // }
+
+    // const defaultTerm = this.options.default.term
+    // 如果这里也更新 就会删除分类的关联，所以是错误的
+    // let categories = []
+    if (!Object.is(data.categories, undefined) && !think.isEmpty(data.categories)) {
+      const curCategories = await this.model('taxonomy', {appId: this.appId}).findCategoriesByObject(this.id.toString())
+      const xors = think._.xor(think._.map(curCategories, 'term_id'), data.categories)
+      // 没有添加，有就删除
+      // categories = categories.concat(data.categories)
+      for (const cate of xors) {
+        await this.model('taxonomy', {appId: this.appId}).relationships(postId, cate)
+      }
+    } else {
+      await this.model('taxonomy', {appId: this.appId}).relationships(postId, defaultTerm)
     }
+    if (think.isEmpty(data.format)) {
+      await this.model('taxonomy', {appId: this.appId}).relationships(postId, defaultPostFormat)
+
+    }
+
     // 5 如果有关联信息，更新关联对象信息
     if (!Object.is(data.relateTo, undefined) && !think.isEmpty(data.relateTo)) {
       const metaModel = this.model('postmeta', {appId: this.appId})
       // 保存关联对象的 meta 信息
       await metaModel.related(data.relateTo, postId, data.relateStatus)
     }
-    const isDefaultPost = think._.findLast(categories, (value) => {
-      return defaultTerm === value
-    })
 
-    // console.log(isDefaultPost + 'x0009sad9fasifasidfpoiasp')
-    if (isDefaultPost) {
-      // 6 添加 Love(like) 信息
-      await this.newLike(postId)
-    }
+    // 发布在默认类别下的内容
+    // const isDefaultPost = think._.findLast(categories, (value) => {
+    //   return defaultTerm === value
+    // })
+
+    // if (isDefaultPost) {
+    //   6 添加 Love(like) 信息
+      // await this.newLike(postId)
+    // }
     const newPost = await this.getPost(postId)
 
     // 下发回忆通知
@@ -380,8 +420,175 @@ module.exports = class extends BaseRest {
     }
     await this.model('users').newLike(userId, this.appId, id, date)
   }
-
+  /**
+   * 获取内容
+   * @param post_id
+   * @returns {Promise<*>}
+   */
   async getPost (post_id) {
+    // 获取精选内容列表
+    const stickys = this.options.stickys
+    // console.log(stickys)
+    const postModel = this.model('posts', {appId: this.appId})
+    const metaModel = this.model('postmeta', {appId: this.appId})
+    const userModel = this.model('users');
+
+    let data = await postModel.getById(post_id)
+    const isSticky = think._.find(stickys, (id) => {
+      return post_id.toString() === id
+    })
+
+    if (isSticky) {
+      data.sticky = true
+    } else {
+      data.sticky = false
+    }
+    _formatOneMeta(data)
+    data.url = ''
+    // 处理音频
+    // if (!Object.is(data.meta._audio_id, undefined)) {
+    //   data.url = await metaModel.getAttachment('file', item.meta._audio_id)
+    // }
+    // 处理作者信息
+    let user = await userModel.getById(data.author)
+    _formatOneMeta(user)
+
+    // 获取头像地址
+    if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+      user.avatarUrl = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+    } else {
+      user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    }
+
+    // 作者简历
+    if (!Object.is(user.meta.resume, undefined)) {
+      user.resume = user.meta.resume
+    }
+    // if (!Object.is(data.meta._assets, undefined)) {
+    //   data.assets = data.meta._assets
+    // }
+
+    // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+    // if (!Object.is(item.meta['_featured_image']))
+    if (!Object.is(data.meta._thumbnail_id, undefined)) {
+      data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
+    }
+
+    if(think.isEmpty(data.block)) {
+      data.block = []
+    }
+    data.author = user
+    // 清除 meta
+
+    // 处理分类及内容层级
+    await this._dealTerms(data)
+    // 处理标签信息
+    await this._dealTags(data)
+
+    await this._dealLikes(data)
+
+    Reflect.deleteProperty(user, 'meta')
+    Reflect.deleteProperty(data, 'meta')
+
+    return data
+
+  }
+  //
+  // Private methods
+  //
+  /**
+   * 处理分类信息，为查询的结果添加分类信息
+   * @param post
+   * @returns {Promise.<*>}
+   */
+  async _dealTerms (post) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
+    post.categories = think._.map(post.categories, 'term_id')
+    const postFormat = await _taxonomy.getFormat(post.id)
+    if (!think.isEmpty(postFormat)) {
+      post.type = postFormat.slug
+    }
+    if (!think.isEmpty(post.block)) {
+      const blockList = await this.model('posts', {appId: this.appId})
+        .loadBlock(post.type, JSON.parse(post.block))
+      post.block = blockList
+    }
+    return post
+  }
+
+
+  /**
+   * 处理内容格式
+   * @param list
+   * @returns {Promise.<*>}
+   */
+  async formatData (data) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    for (const item of data) {
+      item.format = await _taxonomy.getFormat(item.id)
+    }
+    // 处理内容层级
+    // let treeList = await arr_to_tree(list.data, 0);
+    // data = await arr_to_tree(data, 0);
+
+    return data
+  }
+
+  /**
+   * 处理内容标签信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async _dealTags (post) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    post.tags = await _taxonomy.findTagsByObject(post.id)
+  }
+
+  /**
+   * 处理内容喜欢的信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async _dealLikes (post) {
+    const userId = this.ctx.state.user.id
+    const postMeta = this.model('postmeta', {appId: this.appId})
+
+    const result = await postMeta.where({
+      post_id: post.id,
+      meta_key: '_liked'
+    }).find()
+    // 当前登录用户是否喜欢
+    let iLike = false
+    const likes = []
+    const userModel = this.model('users')
+    let totalCount = 0
+    if (!think.isEmpty(result)) {
+      if (!think.isEmpty(result.meta_value)) {
+        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
+        if (exists) {
+          iLike = true
+          post.like_date = exists.date
+        }
+        const list = JSON.parse(result.meta_value)
+        totalCount = list.length
+        for (const u of list) {
+          let user = await userModel.where({id: u.id}).find()
+          likes.push(user)
+        }
+      }
+    }
+
+    _formatMeta(likes)
+
+    for (let user of likes) {
+      Reflect.deleteProperty(user, 'meta')
+    }
+    post.like_count = totalCount
+    post.i_like = iLike
+    post.likes = likes
+  }
+  async __getPost (post_id) {
     let fields = [
       'id',
       'author',
@@ -485,7 +692,7 @@ module.exports = class extends BaseRest {
    * @param list
    * @returns {Promise.<*>}
    */
-  async formatData (data) {
+  async __formatData (data) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     for (const item of data) {
       item.format = await _taxonomy.getFormat(item.id)

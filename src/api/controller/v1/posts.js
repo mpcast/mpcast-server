@@ -355,122 +355,6 @@ module.exports = class extends BaseRest {
     return list
   }
 
-  async getPodcastList (query, fields) {
-    const list = await this.modelInstance.where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
-    // 处理播放列表音频 Meta 信息
-    _formatMeta(list.data)
-    // 根据 Meta 信息中的音频附件 id 查询出音频地址
-    const metaModel = this.model('postmeta', {appId: this.appId})
-    for (const item of list.data) {
-      item.url = ''
-      // 如果有音频
-      if (!Object.is(item.meta._audio_id, undefined)) {
-        // 音频播放地址
-        item.url = await metaModel.getAttachment('file', item.meta._audio_id)
-      }
-      const userModel = this.model('users');
-      // 如果有作者信息
-      if (!Object.is(item.meta._author_id, undefined)) {
-        const authorInfo = await userModel.where({id: item.meta._author_id}).find()
-        // userInfo.avatar = await this.model('postmeta').getAttachment('file', userInfo.meta.avatar)
-
-        // item.author =
-        item.authorInfo = authorInfo
-        // 查询 出对应的作者信息
-      } else {
-        item.authorInfo = await userModel.where({id: item.author}).find()
-      }
-      _formatOneMeta(item.authorInfo)
-      if (item.authorInfo.hasOwnProperty('meta')) {
-        if (item.authorInfo.meta.hasOwnProperty('avatar')) {
-          item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
-        }
-      }
-
-      // const user = this.ctx.state.user
-      // item.author = user
-      // 音频播放的歌词信息
-      // lrc
-
-      // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      // if (!Object.is(item.meta['_featured_image']))
-      if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail = {
-        //   id: item.meta['_thumbnail_id']
-        // }
-        // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
-        item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
-      }
-    }
-    // 处理分类及内容层级
-    // await this.dealTerms(list)
-    // 返回一条数据
-    return this.success(list.data)
-  }
-
-  /**
-   * 获取播客类型的内容
-   *
-   * @returns {Promise.<void>}
-   */
-  async getPodcast (query, fields) {
-    const list = await this.modelInstance.where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
-
-    // 处理播放列表音频 Meta 信息
-    _formatMeta(list.data)
-
-    // 根据 Meta 信息中的音频附件 id 查询出音频地址
-    const metaModel = this.model('postmeta', {appId: this.appId})
-    for (const item of list.data) {
-      item.url = ''
-      // 如果有音频
-      if (!Object.is(item.meta._audio_id, undefined)) {
-        // 音频播放地址
-        item.url = await metaModel.getAttachment('file', item.meta._audio_id)
-      }
-      const userModel = this.model('users');
-
-      // 如果有作者信息
-      if (!Object.is(item.meta._author_id, undefined)) {
-        const author = await userModel.where({id: item.meta._author_id}).find()
-        _formatOneMeta(author)
-        item.authorInfo = author
-        // 查询 出对应的作者信息
-      } else {
-        const author = await userModel.where({id: item.author}).find()
-        _formatOneMeta(author)
-        item.authorInfo = author
-
-      }
-      // 取得头像地址
-      if (!Object.is(item.authorInfo.meta.avatar, undefined)) {
-        item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
-      }
-
-      // 音频播放的歌词信息
-      // lrc
-
-      // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      // if (!Object.is(item.meta['_featured_image']))
-      if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        // item.thumbnail = {
-        //   id: item.meta['_thumbnail_id']
-        // }
-        // item.thumbnail.url = await metaModel.getAttachment('file', item.meta['_thumbnail_id'])
-        item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        // item.thumbnal = await metaModel.getThumbnail({post_id: item.id})
-      }
-
-      // 获取内容的分类信息
-      // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-    }
-    // 处理分类及内容层级
-    await this.dealTerms(list)
-    // 返回一条数据
-    return this.success(list.data[0])
-  }
-
   async newAction () {
     const data = this.post()
     if (think.isEmpty(data.type)) {
@@ -479,14 +363,27 @@ module.exports = class extends BaseRest {
     const currentTime = new Date().getTime();
     data.date = currentTime
     data.modified = currentTime
-    // console.log(JSON.stringify(this.ctx.state.user.userInfo.id))
     if (think.isEmpty(data.author)) {
       data.author = this.ctx.state.user.id
     }
     if (think.isEmpty(data.status)) {
       data.status = 'auto-draft';
     }
-    const postId = await this.modelInstance.add(data)
+    if (think._.has(data, 'sticky')) {
+      if (data.sticky === true) {
+        await this.model('options', {appId: this.appId}).addSticky(this.id.toString())
+      }
+      if (data.sticky === false) {
+        await this.model('options', {appId: this.appId}).removeSticky(this.id.toString())
+      }
+    }
+    if (!think.isEmpty(data.block)) {
+      data.block = JSON.stringify(data.block)
+    }
+
+    const postId = await this.modelInstance.setRelation(false).add(data)
+
+
     // 2 更新 meta 数据
     if (!Object.is(data.meta, undefined)) {
       const metaModel = this.model('postmeta', {appId: this.appId})
@@ -497,13 +394,16 @@ module.exports = class extends BaseRest {
     // term_taxonomy_id
     const defaultTerm = this.options.default.term
     await this.model('taxonomy').relationships(postId, defaultTerm)
-    // 5 如果有关联信息，更新关联对象信息
-    if (!Object.is(data.relateTo, undefined) && !think.isEmpty(data.relateTo)) {
-      const metaModel = this.model('postmeta')
-      // 保存关联对象的 meta 信息
-      await metaModel.related(data.relateTo, postId, data.relateStatus)
-    }
 
+    // 已用 block 替代
+    /*
+     // 5 如果有关联信息，更新关联对象信息
+     if (!Object.is(data.relateTo, undefined) && !think.isEmpty(data.relateTo)) {
+       const metaModel = this.model('postmeta')
+       // 保存关联对象的 meta 信息
+       await metaModel.related(data.relateTo, postId, data.relateStatus)
+     }
+ */
     // 6 添加 Love(like) 信息
     await this.newLike(postId)
 
@@ -517,24 +417,24 @@ module.exports = class extends BaseRest {
     // {{keyword2.DATA}}
     // 留言内容
     // {{keyword3.DATA}}
-    await this.wechatService.API
-      .sendMiniProgramTemplate(
-        'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
-        'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
-        `/page/love?id=${data.parent}`,
-        data.formId,
-        {
-          keyword1: {
-            value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
-            color: '#175177'
-          },
-          keyword2: {
-            value: data.content
-          },
-          keyword3: {
-            value: '点击进入小程序查看'
-          }
-        })
+    /*    await this.wechatService.API
+          .sendMiniProgramTemplate(
+            'oTUP60A_0LCR7hYH0EQ7kEaakLCg',
+            'Q6oT1lITd1kp3swZnJh3dRDftvtiJrEmOWeaN6AlTqM',
+            `/page/love?id=${data.parent}`,
+            data.formId,
+            {
+              keyword1: {
+                value: `你最爱的：${data.title.split('-')[0]} 有新的回忆`,
+                color: '#175177'
+              },
+              keyword2: {
+                value: data.content
+              },
+              keyword3: {
+                value: '点击进入小程序查看'
+              }
+            })*/
     // 下发主题通知
     // 0bEMgmkRis7a09BsGreIgj-paRSca9fN-pvMz5WpmH8
     // oTUP60A_0LCR7hYH0EQ7kEaakLCg
@@ -590,84 +490,138 @@ module.exports = class extends BaseRest {
     }
     await this.model('users').newLike(userId, this.appId, id)
   }
-
+  /**
+   * 获取内容
+   * @param post_id
+   * @returns {Promise<*>}
+   */
   async getPost (post_id) {
-    let fields = [
-      'id',
-      'author',
-      'status',
-      'type',
-      'title',
-      'name',
-      'content',
-      'excerpt',
-      'date',
-      'modified',
-      'parent'
-    ];
-    fields = unique(fields);
-
-    let query = {}
-    query.id = post_id
-    query = {status: ['NOT IN', 'trash'], id: post_id}
-
-    const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('modified ASC').page(this.get('page'), 10).countSelect()
-    // 处理播放列表音频 Meta 信息
-    _formatMeta(list.data)
-    // console.log(JSON.stringify(list))
-    // 根据 Meta 信息中的音频附件 id 查询出音频地址
+    // 获取精选内容列表
+    const stickys = this.options.stickys
+    // console.log(stickys)
+    const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})
-    for (const item of list.data) {
-      item.url = ''
-      // 如果有音频
-      if (!Object.is(item.meta._audio_id, undefined)) {
-        // 音频播放地址
-        item.url = await metaModel.getAttachment('file', item.meta._audio_id)
-      }
-      const userModel = this.model('users');
+    const userModel = this.model('users');
 
-      // 如果有作者信息
-      if (!Object.is(item.meta._author_id, undefined)) {
-        const author = await userModel.where({id: item.meta._author_id}).find()
-        _formatOneMeta(author)
-        item.authorInfo = author
-        // 查询 出对应的作者信息
-      } else {
-        const author = await userModel.where({id: item.author}).find()
-        _formatOneMeta(author)
-        item.authorInfo = author
+    let data = await postModel.getById(post_id)
+    const isSticky = think._.find(stickys, (id) => {
+      return post_id.toString() === id
+    })
 
-      }
-      // 取得头像地址
-      if (!Object.is(item.authorInfo.meta.avatar, undefined)) {
-        item.authorInfo.avatar = await this.model('postmeta').getAttachment('file', item.authorInfo.meta.avatar)
-      }
-
-      // 音频播放的歌词信息
-      // lrc
-
-      // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      if (!Object.is(item.meta._thumbnail_id, undefined)) {
-        item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-      }
+    if (isSticky) {
+      data.sticky = true
+    } else {
+      data.sticky = false
     }
+    _formatOneMeta(data)
+    data.url = ''
+    // 处理音频
+    // if (!Object.is(data.meta._audio_id, undefined)) {
+    //   data.url = await metaModel.getAttachment('file', item.meta._audio_id)
+    // }
+    // 处理作者信息
+    let user = await userModel.getById(data.author)
+    _formatOneMeta(user)
+
+    // 获取头像地址
+    if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+      user.avatarUrl = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+    } else {
+      user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    }
+
+    // 作者简历
+    if (!Object.is(user.meta.resume, undefined)) {
+      user.resume = user.meta.resume
+    }
+    // if (!Object.is(data.meta._assets, undefined)) {
+    //   data.assets = data.meta._assets
+    // }
+
+    // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+    // if (!Object.is(item.meta['_featured_image']))
+    if (!Object.is(data.meta._thumbnail_id, undefined)) {
+      data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
+    }
+
+    if(think.isEmpty(data.block)) {
+      data.block = []
+    }
+    data.author = user
+    // 清除 meta
+
     // 处理分类及内容层级
-    // await this.dealTerms(list)
+    await this._dealTerms(data)
     // 处理标签信息
-    // await this.dealTags(list)
+    await this._dealTags(data)
 
-    await this.dealLikes(list.data[0])
+    await this._dealLikes(data)
 
-    return list.data[0]
+    Reflect.deleteProperty(user, 'meta')
+    Reflect.deleteProperty(data, 'meta')
+
+    return data
+
   }
 
-  // async
+  //
+  // Private methods
+  //
+  /**
+   * 处理分类信息，为查询的结果添加分类信息
+   * @param post
+   * @returns {Promise.<*>}
+   */
+  async _dealTerms (post) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
+    post.categories = think._.map(post.categories, 'term_id')
+    const postFormat = await _taxonomy.getFormat(post.id)
+    if (!think.isEmpty(postFormat)) {
+      post.type = postFormat.slug
+    }
+    if (!think.isEmpty(post.block)) {
+      const blockList = await this.model('posts', {appId: this.appId})
+        .loadBlock(post.type, JSON.parse(post.block))
+      post.block = blockList
+    }
+    return post
+  }
+
+
+  /**
+   * 处理内容格式
+   * @param list
+   * @returns {Promise.<*>}
+   */
+  async formatData (data) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    for (const item of data) {
+      item.format = await _taxonomy.getFormat(item.id)
+    }
+    // 处理内容层级
+    // let treeList = await arr_to_tree(list.data, 0);
+    // data = await arr_to_tree(data, 0);
+
+    return data
+  }
+
+  /**
+   * 处理内容标签信息
+   * @param post
+   * @returns {Promise.<void>}
+   */
+  async _dealTags (post) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    post.tags = await _taxonomy.findTagsByObject(post.id)
+  }
+
   /**
    * 处理内容喜欢的信息
    * @param post
    * @returns {Promise.<void>}
    */
-  async dealLikes (post) {
+  async _dealLikes (post) {
     const userId = this.ctx.state.user.id
     const postMeta = this.model('postmeta', {appId: this.appId})
 
@@ -680,20 +634,26 @@ module.exports = class extends BaseRest {
     const likes = []
     const userModel = this.model('users')
     let totalCount = 0
-
     if (!think.isEmpty(result)) {
       if (!think.isEmpty(result.meta_value)) {
-        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId])
+        const exists = await think._.find(JSON.parse(result.meta_value), ['id', userId.toString()])
         if (exists) {
           iLike = true
+          post.like_date = exists.date
         }
         const list = JSON.parse(result.meta_value)
         totalCount = list.length
         for (const u of list) {
-          const user = await userModel.where({id: u.id}).find()
+          let user = await userModel.where({id: u.id}).find()
           likes.push(user)
         }
       }
+    }
+
+    _formatMeta(likes)
+
+    for (let user of likes) {
+      Reflect.deleteProperty(user, 'meta')
     }
     post.like_count = totalCount
     post.i_like = iLike
