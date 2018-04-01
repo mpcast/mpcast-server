@@ -3,13 +3,11 @@ const BaseRest = require('./_rest')
 module.exports = class extends BaseRest {
 
   async getAction() {
-    console.log('apps ....')
     let orgId = this.get('orgId')
     if (!think.isEmpty(orgId)) {
       // const data = await this.modelInstance.findByOrgId(orgId)
       const list = await this.model('apps').where({org_id: orgId}).select()
       await this._format_Meta(list)
-      // console.log(data)
       return this.success(list)
     }
     return this.fail()
@@ -42,7 +40,6 @@ module.exports = class extends BaseRest {
       if (item.metas.length > 0) {
         for (let meta of item.metas) {
           if (meta.meta_key === 'basic') {
-            console.log('====' + meta.meta_key)
             item.meta[meta.meta_key] = JSON.parse(meta.meta_value);
           } else {
             item.meta[meta.meta_key] = meta.meta_value;

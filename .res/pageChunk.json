@@ -1,0 +1,219 @@
+{
+  "recordMap": {
+    "block": {
+      "35a6fdf3-bd8b-49db-a2da-a744617ac8a1": {
+        "role": "editor",
+        "value": {
+          "id": "35a6fdf3-bd8b-49db-a2da-a744617ac8a1",
+          "version": 0,
+          "type": "page",
+          "properties": {
+            "title": [
+              [
+                "vue  音乐播放"
+              ]
+            ]
+          },
+          "content": [
+            "56435e79-6cf1-469c-8514-7bae8bb1b074",
+            "54664a39-139e-4840-9df4-35147c49f2eb",
+            "387636ec-fe3d-4368-ae30-63663503d567"
+          ],
+          "format": {
+            "page_icon": "🍉",
+            "page_cover": "/images/page-cover/nasa_robert_stewart_spacewalk.jpg",
+            "page_cover_position": 0.6
+          },
+          "created_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "created_time": 1498363679077,
+          "last_edited_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "last_edited_time": 1498363679077,
+          "parent_id": "c8305d13-0446-4fe8-8f46-32bf1e84207c",
+          "parent_table": "block",
+          "alive": true
+        }
+      },
+      "c8305d13-0446-4fe8-8f46-32bf1e84207c": {
+        "role": "editor",
+        "value": {
+          "id": "c8305d13-0446-4fe8-8f46-32bf1e84207c",
+          "version": 41,
+          "type": "page",
+          "properties": {
+            "title": [
+              [
+                "出行计划"
+              ]
+            ]
+          },
+          "content": [
+            "0521dc09-9d25-4385-bdca-723bc35113ea",
+            "b10fb955-a7a5-4aba-a8e8-8b6c26c8b877",
+            "b34146f4-6a07-4250-ac25-e103dfa42a4a",
+            "6851bc6a-7c93-4217-95dd-4561ce528215",
+            "e3cc2d74-4f56-4b71-b52b-900d6acff266",
+            "d0896a2d-fca8-42cc-a2ce-0ac391972cee",
+            "8ec93133-5d8a-49c3-b396-6758d4a8d0fd",
+            "d2e63ac9-f976-4069-98fb-0652b6b5cc25",
+            "ca1aefa1-f961-42a8-8920-abd89d88bbf9",
+            "0ad4c486-0dc8-4b0d-9909-4d3eaea34cfd",
+            "113f1910-de66-4a5e-a17d-5cf98aa8c4c9",
+            "fbbd22b6-adc9-4f47-bc1c-8925b8892a19",
+            "262d6f34-4368-4080-a796-6cdb022cc376",
+            "0f78ff9e-23c3-4b36-ae5c-7e86d6ce95b1",
+            "851919d3-bc13-4717-92cd-42bf557cb443",
+            "621e86a9-ce89-414b-87fd-e00583be57a3",
+            "35a6fdf3-bd8b-49db-a2da-a744617ac8a1"
+          ],
+          "format": {
+            "page_icon": "🎏",
+            "page_cover": "/images/page-cover/woodcuts_8.jpg",
+            "page_cover_position": 1
+          },
+          "permissions": [
+            {
+              "role": "editor",
+              "type": "user_permission",
+              "user_id": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10"
+            },
+            {
+              "role": "reader",
+              "type": "space_permission"
+            },
+            {
+              "role": "editor",
+              "type": "user_permission",
+              "user_id": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10"
+            },
+            {
+              "role": "reader",
+              "type": "public_permission"
+            },
+            {
+              "role": "editor",
+              "type": "user_permission",
+              "user_id": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10"
+            }
+          ],
+          "created_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "created_time": 1497606284760,
+          "last_edited_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "last_edited_time": 1516980693484,
+          "parent_id": "851081ff-0ab1-4f63-aa69-8b258047489a",
+          "parent_table": "space",
+          "alive": true
+        }
+      },
+      "56435e79-6cf1-469c-8514-7bae8bb1b074": {
+        "role": "editor",
+        "value": {
+          "id": "56435e79-6cf1-469c-8514-7bae8bb1b074",
+          "version": 0,
+          "type": "embed",
+          "format": {
+            "block_width": 336,
+            "display_source": "https://cnodejs.org/topic/57a409657a922d6f358cd22d"
+          },
+          "created_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "created_time": 1498363777452,
+          "last_edited_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "last_edited_time": 1498363777452,
+          "parent_id": "35a6fdf3-bd8b-49db-a2da-a744617ac8a1",
+          "parent_table": "block",
+          "alive": true
+        }
+      },
+      "54664a39-139e-4840-9df4-35147c49f2eb": {
+        "role": "editor",
+        "value": {
+          "id": "54664a39-139e-4840-9df4-35147c49f2eb",
+          "version": 0,
+          "type": "text",
+          "created_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "created_time": 1498363817304,
+          "last_edited_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "last_edited_time": 1498363817304,
+          "parent_id": "35a6fdf3-bd8b-49db-a2da-a744617ac8a1",
+          "parent_table": "block",
+          "alive": true
+        }
+      },
+      "387636ec-fe3d-4368-ae30-63663503d567": {
+        "role": "editor",
+        "value": {
+          "id": "387636ec-fe3d-4368-ae30-63663503d567",
+          "version": 0,
+          "type": "quote",
+          "properties": {
+            "title": [
+              [
+                "生活就是应该这样。"
+              ]
+            ]
+          },
+          "created_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "created_time": 1498363807141,
+          "last_edited_by": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "last_edited_time": 1498363807141,
+          "parent_id": "35a6fdf3-bd8b-49db-a2da-a744617ac8a1",
+          "parent_table": "block",
+          "alive": true
+        }
+      }
+    },
+    "space": {
+      "851081ff-0ab1-4f63-aa69-8b258047489a": {
+        "role": "editor",
+        "value": {
+          "id": "851081ff-0ab1-4f63-aa69-8b258047489a",
+          "version": 8,
+          "name": "Baisheng's Workspace",
+          "permissions": [
+            {
+              "role": "editor",
+              "type": "user_permission",
+              "user_id": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10"
+            }
+          ],
+          "beta_enabled": false,
+          "pages": [
+            "60c4b78e-277f-441d-b858-31a5467a12d1",
+            "51680381-f25c-4dd7-bb56-bbdce8b6a96a",
+            "c8305d13-0446-4fe8-8f46-32bf1e84207c",
+            "0ebe5f75-b154-4185-930c-d93869912873",
+            "f8b5c3c6-2163-45cb-be6d-06165ca9f087",
+            "d31d7011-1d5a-4249-b817-1c97ee08a1d7",
+            "fb053477-f032-4989-85fd-1431341aa7ff",
+            "6c2e3b95-1d3b-475b-92c1-a6e409ccfe3b",
+            "a21d8556-a816-40bb-8143-5d1f8f7c785e",
+            "51856c02-25e0-4f86-b1ce-13e3670be9eb",
+            "e0669e32-a4bc-486a-81de-305c150a0f30",
+            "46ca7816-85a5-49da-9773-da48434b9746",
+            "a00fd4a1-e19d-428c-8fb8-5171ab082008",
+            "9e295ecf-5e81-4dbb-8a07-24daab8b3059",
+            "4578ba89-e454-450a-9db3-4e0ee1193965"
+          ]
+        }
+      }
+    },
+    "notion_user": {
+      "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10": {
+        "role": "editor",
+        "value": {
+          "id": "c80e87a1-4fd2-45b7-9783-06f3cd0d0f10",
+          "version": 6,
+          "email": "baisheng@gmail.com",
+          "given_name": "Baisheng",
+          "family_name": "Liu",
+          "profile_photo": "https://lh3.googleusercontent.com/-gAW4AqtnNPA/AAAAAAAAAAI/AAAAAAAACAU/UllZm1KVMtM/photo.jpg?sz=50",
+          "mobile_onboarding_completed": true,
+          "onboarding_completed": true,
+          "time_zone": "Asia/Shanghai"
+        }
+      }
+    }
+  },
+  "cursor": {
+    "stack": []
+  }
+}

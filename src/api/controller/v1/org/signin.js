@@ -37,7 +37,6 @@ module.exports = class extends think.Controller {
       return this.fail(400, '密码错误');
     }
     // 获取签名盐
-    console.log(JSON.stringify(userInfo))
     const token = jwt.sign(userInfo, 'S1BNbRp2b', {expiresIn: '3d'})
     // user: userInfo.user_login,
     // let validity_days = 7;

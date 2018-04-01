@@ -46,7 +46,6 @@ module.exports = class extends Base {
     // let userIds = []
     for (let item of data.data) {
       item.author = Object.assign({}, item.author, {meta:{}})
-      // console.log(JSON.stringify(item.author))
       // item.author.meta = {}
       _formatOneMeta(item.author)
       // userIds.push(item.author)

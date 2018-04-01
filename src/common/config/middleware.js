@@ -28,11 +28,8 @@ module.exports = [
     enable: !think.isCli,
     options: {
       contentType (ctx) {
-        console.log('trace')
-        console.log(ctx)
         // All request url starts of /api or request header contains `X-Requested-With: XMLHttpRequest` will output json error
         const APIRequest = /^\/v*/.test(ctx.request.path);
-        console.log(ctx.request.path + '-----')
         const AJAXRequest = ctx.is('X-Requested-With', 'XMLHttpRequest');
         return APIRequest || AJAXRequest ? 'json' : 'html';
       },
@@ -47,7 +44,6 @@ module.exports = [
       sourceMap: false,
       debug: isDev,
       error (err, ctx) {
-        console.log(ctx.request.path)
         return console.error(err)
       }
     }
@@ -93,7 +89,9 @@ module.exports = [
     },
     match: ctx => { // match 为一个函数，将 ctx 传递给这个函数，如果返回结果为 true，则启用该 middleware
       // if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/))) {
-      if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) || ctx.url.match(/^\/v1\/apps\/\w+\/options?/) || ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token?/))) {
+      if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) ||
+          ctx.url.match(/^\/v1\/apps\/\w+\/options?/) ||
+          ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token|verify?/))) {
 
         return false;
       } else if (ctx.url.match(ctx.url.match(/^\/v1*?/) || ctx.url.match(/^\/v2*?/))) {

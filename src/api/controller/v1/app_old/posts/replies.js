@@ -137,7 +137,6 @@ module.exports = class extends BaseRest {
       // Current User
       const data = await postMeta.getLikeStatus(userId, this.id)
       // if (!think.isEmpty(data.value_index))
-      console.log(JSON.stringify(data))
       const res = {
         'i_like': data.contain === 1,
         'like_count': data.like_count,

@@ -47,13 +47,11 @@ module.exports = class extends Base {
         .page(this.get('page'), 12).countSelect()
       if (!think.isEmpty(userMetaDatas) && userMetaDatas.count > 0) {
         const ids = []
-        // console.log(JSON.stringify(userIds.data))
         for (const item of userMetaDatas.data) {
           ids.push(item.user_id)
         }
         userMetaDatas.data = []
 
-        // console.log()
         // userIds.data.forEach((item) => {
         //   ids.push(item.user_id)
         // })
@@ -111,8 +109,6 @@ module.exports = class extends Base {
   async putAction () {
     const data = this.post()
     const approach = this.post('approach')
-    // console.log(approach)
-    // console.log(approach + '------')
     // 注册用户来源
     switch(approach) {
       // 微信小程序

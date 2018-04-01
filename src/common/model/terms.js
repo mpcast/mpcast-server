@@ -34,7 +34,6 @@ module.exports = class extends Base {
   }
 
   async allTaxonomies(flag) {
-    console.log(this.appId)
     const cacheKey = this.tablePrefix + 'taxonomies';
 
     if (flag) {

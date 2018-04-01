@@ -19,16 +19,12 @@ module.exports = class extends BaseRest {
     // let nav_menus = await this.model('taxonomy').getAllMenu();
     // this.assign('nav_menus', nav_menus)
     // let path1 = think.getPath("common", "config");
-    //     console.log(path1  + "--------")
 
     // let _lang = await language();
 
     // let mods = await this.model('options').getThemeMods();
-    // console.log(JSON.parse(mods)['nav_menu_locations'])
     // this.assign('menu_locations', JSON.parse(mods)['nav_menu_locations']);
-    // console.log(JSON.stringify());
 
-    // console.log(JSON.stringify(nav_menus));
     // return this.display();
   }
 
@@ -43,10 +39,8 @@ module.exports = class extends BaseRest {
     //     item.key = item.id;
     // })
 
-    // console.log(JSON.stringify(menus))
     // let nav_menus = await this.model('taxonomy').getAllMenu();
     //
-    // console.log(JSON.stringify(nav_menus));
     // this.assign('nav_menus', nav_menus)
     //
     // return this.json(arr_to_tree(nav_menus, 0))
@@ -58,7 +52,6 @@ module.exports = class extends BaseRest {
     if (this.isPost()) {
       let data = await this.post();
 
-      console.log(JSON.stringify(data));
 
       if (!think.isEmpty(data.id)) {
         let menus = await this.model('taxonomy').getNavMenuItems(data.id);
@@ -68,7 +61,6 @@ module.exports = class extends BaseRest {
           item.key = item.id;
         })
         // let list = await this._to_tree(menus, 0);
-        // console.log(JSON.stringify(menu_tree(menus, 0)));
 
         return this.json(menu_tree(menus, 0))
       }

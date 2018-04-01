@@ -24,7 +24,6 @@ module.exports = class extends think.Controller {
     //   return this.fail('App is Not found')
     // }
     this.options = await this.model('options').get()
-    // console.log(JSON.stringify(this.options))
   }
 
   /**

@@ -53,7 +53,6 @@ module.exports = class extends think.Controller {
     if (config.type === 'qiniu') {
       const service = this.service('qiniu')
       const upload = await service.upload(filePath, basename, config.option)
-      // console.log(this.ctx.state)
       if (!think.isEmpty(upload)) {
         const data = {
           // 验证权限 后获取
@@ -102,8 +101,6 @@ module.exports = class extends think.Controller {
 
     const file = think.extend({}, this.file('file'));
 
-    // console.log(JSON.stringify(file))
-    // console.log(this.options)
     const filepath = file.path;
     const basename = path.basename(filepath);
 

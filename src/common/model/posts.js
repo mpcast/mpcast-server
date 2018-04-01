@@ -27,21 +27,47 @@ module.exports = class extends Base {
     _formatOneMeta(info)
     return info
   }
+  async getFormatData (item) {
+    switch (item.type) {
+      case 'post-format-audio': {
+        // 查询附件
+        if (!think.isEmpty(item.block)) {
+          item.block = JSON.parse(item.block)
+          const block = await this.getAttachmentInfo(item.block[0])
+          // console.log(block)
+          if (!Object.is(block.meta._attachment_file, undefined)) {
+            item.url = block.meta._attachment_file
+          }
+          if (!Object.is(block.meta._attachment_metadata, undefined)) {
+            if (block.meta._attachment_metadata !== '{}') {
+              item = think.extend(item, block.meta._attachment_metadata)
+            }
+          }
+        }
+        Reflect.deleteProperty(item, 'meta')
+        break
+      }
+      default:
+        Reflect.deleteProperty(item, 'meta')
+        break
+    }
 
+    return item
+  }
   async loadBlock (type, blockIds) {
     // page 取一级
     // 附件取全部
 
     // types
     // post-format-album
-    // post-format-gallern
+    // post-format-gallerden
     // post-format-audio
     // post-format-video
     // post-format-quote
     // post-format-doc
 
     // 1 先取出所有内容，包含内容的 meta 信息
-    let list = await this.field('id, author, status, title')
+    let list = await this.field('id, author, status, title, block, content')
       .where({id: ['IN', blockIds]}).setRelation(true)
       .order(`INSTR (',${blockIds},', CONCAT(',',id,','))`).select()
 
@@ -50,24 +76,42 @@ module.exports = class extends Base {
     // }).order(`INSTR (',${stickys},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
     // return list
     _formatMeta(list)
-    switch (type) {
-      // 如果是音频辑就处理音频文件
-      case 'post-format-album': {
-        for (let item of list) {
-          if (think._.has(item.meta, '_attachment_file')) {
-            item.url = item.meta._attachment_file
-          }
-          if (think._.has(item.meta, '_attachment_metadata')) {
-            item = think.extend(item, item.meta._attachment_metadata)
-          }
-          Reflect.deleteProperty(item, 'meta')
-        }
-        break;
-      }
-      default: {
-        break;
+    // 1 查出 block list
+    // 2 查出 block post format
+    // 3 处理 post format
+
+    const taxonomyModel = this.model('taxonomy', {appId: this.appId})
+    // 用于一次性处理
+    // let singleIds = []
+    // 处理资源附件
+    // 1 如果仅有一项内容，暂存至数组，后续批量获取
+    // 2 如果有多项内容，直接批量获取
+    for (let item of list) {
+      item.type = await taxonomyModel.getFormat(item.id)
+      console.log(item.type)
+      if (item.type) {
+        item.type = item.type.slug
+        await this.getFormatData(item)
       }
     }
+    // console.log(list)
+    // switch (type) {
+    //   case 'post-format-album': {
+    //     for (let item of list) {
+    //       if (think._.has(item.meta, '_attachment_file')) {
+    //         item.url = item.meta._attachment_file
+    //       }
+    //       if (think._.has(item.meta, '_attachment_metadata')) {
+    //         item = think.extend(item, item.meta._attachment_metadata)
+    //       }
+    //       Reflect.deleteProperty(item, 'meta')
+    //     }
+    //     break;
+    //   }
+    //   default: {
+    //     break;
+    //   }
+    // }
 
     return list
   }
@@ -399,7 +443,6 @@ module.exports = class extends Base {
 
     // 处理附件资源信息
 
-    // console.log(attachments)
     // for (const attachItem of attachments) {
     //   for (let item of list.data) {
     //     // 处理音频
@@ -602,6 +645,7 @@ module.exports = class extends Base {
       .order(orderBy)
       .page(page, pagesize)
       .setRelation(true).countSelect()
+
       // `(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`
     const postIds = []
     data.data.forEach((item) => {
@@ -751,7 +795,6 @@ module.exports = class extends Base {
     //   item.meta = {};
     //   if (item.metas.length > 0) {
     //     for (let meta of item.metas) {
-    //       // console.log(meta.meta_key + ":" + meta.meta_value);
     //       item.meta[meta.meta_key] = meta.meta_value;
     //     }
     //   }
@@ -761,7 +804,6 @@ module.exports = class extends Base {
     //   nav_items.push(item);
     // }
 
-    // console.log(JSON.stringify(nav_items) + "___333")
     // return nav_items;
 
     // }, this.cacheOptions);

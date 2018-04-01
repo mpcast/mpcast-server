@@ -182,7 +182,6 @@ module.exports = class extends BaseRest {
       }
       // 获取内容的分类信息
       // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-      // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
     // await this.dealTerms(list)
@@ -474,7 +473,6 @@ module.exports = class extends BaseRest {
    */
   async dealTerms (list) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
-    console.log(list)
     for (let item of list.data) {
       item.categories = await _taxonomy.findCategoriesByObject(item.id.toString())
     }

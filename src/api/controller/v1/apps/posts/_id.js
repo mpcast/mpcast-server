@@ -16,6 +16,8 @@ let fields = [
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
+    const postModel = this.model('posts', {appId: this.appId})
+
     if (this.isPost) {
       if (!this.id) {
         return this.fail(400, 'params error');
@@ -37,9 +39,9 @@ module.exports = class extends BaseRest {
         }
       }
 
-      if (think.isEmpty(data.type)) {
-        data.type = 'post_format'
-      }
+      // if (think.isEmpty(data.type)) {
+      //   data.type = 'post_format'
+      // }
 
       if (!think.isEmpty(data.block)) {
         data.block = JSON.stringify(data.block)
@@ -77,67 +79,65 @@ module.exports = class extends BaseRest {
       // 为了兼容更新返回完整数据的 API
       if (this.get('model') === 'full') {
         const newData = await this.getPost(this.id)
+
+        await this.decoratorData(newData)
         return this.success(newData)
       }
       return this.success()
     }
     if (this.isGet) {
-      const post_id = this.get('id')
-      if (!think.isEmpty(post_id)) {
-        const data = await this.getPost(post_id)
+      const postId = this.get('id')
+      if (!think.isEmpty(postId)) {
+        let data = await postModel.getById(postId)
+        // console.log(data)
+        // data = await this.decoratorData(data)
+        await this._decoratorAuthor(data)
+        switch (data.type) {
+          case 'page': {
+            data = await this._pageData(data)
+            break
+          }
+          case 'post_format': {
+            data = await this._formatData(data)
+            break
+          }
+          default:
+            break
+        }
         // 返回一条数据
         return this.success(data)
       }
     }
+    return this.success()
   }
 
-  /**
-   * 更新作者
-   * @returns {Promise<*>}
-   */
-  async changeAuthor () {
-    const res = await this.model('posts', {appId: this.appId})
-      .setRelation(false)
-      .where({id: this.id}).update({
-        author: this.post('author')
-      })
-    if (res > 0) {
-      // console.log(res)
-      return this.success()
-    } else {
-      return this.error('更新失败')
+  async decoratorData(data) {
+    await this._decoratorAuthor(data)
+    switch (data.type) {
+      case 'page': {
+        data = await this._pageData(data)
+        break
+      }
+      case 'post_format': {
+        data = await this._formatData(data)
+        break
+      }
+      default:
+        break
     }
+    return data
   }
-
   /**
-   * 获取内容
-   * @param post_id
-   * @returns {Promise<*>}
+   * 装饰作者
+   * @param data
+   * @returns {Promise<void>}
+   * @private
    */
-  async getPost (post_id) {
-    // 获取精选内容列表
-    const stickys = this.options.stickys
-    // console.log(stickys)
-    const postModel = this.model('posts', {appId: this.appId})
+  async _decoratorAuthor (data) {
     const metaModel = this.model('postmeta', {appId: this.appId})
-    const userModel = this.model('users');
+    const userModel = this.model('users')
 
-    let data = await postModel.getById(post_id)
-    const isSticky = think._.find(stickys, (id) => {
-      return post_id.toString() === id
-    })
-
-    if (isSticky) {
-      data.sticky = true
-    } else {
-      data.sticky = false
-    }
     _formatOneMeta(data)
-    data.url = ''
-    // 处理音频
-    // if (!Object.is(data.meta._audio_id, undefined)) {
-    //   data.url = await metaModel.getAttachment('file', item.meta._audio_id)
-    // }
     // 处理作者信息
     let user = await userModel.getById(data.author)
     _formatOneMeta(user)
@@ -153,9 +153,6 @@ module.exports = class extends BaseRest {
     if (!Object.is(user.meta.resume, undefined)) {
       user.resume = user.meta.resume
     }
-    // if (!Object.is(data.meta._assets, undefined)) {
-    //   data.assets = data.meta._assets
-    // }
 
     // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
     // if (!Object.is(item.meta['_featured_image']))
@@ -163,25 +160,83 @@ module.exports = class extends BaseRest {
       data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
     }
 
-    if(think.isEmpty(data.block)) {
+    if (think.isEmpty(data.block)) {
       data.block = []
     }
     data.author = user
+    Reflect.deleteProperty(user, 'meta')
+  }
+  /**
+   * 更新作者
+   * @returns {Promise<*>}
+   */
+  async changeAuthor () {
+    const res = await this.model('posts', {appId: this.appId})
+      .setRelation(false)
+      .where({id: this.id}).update({
+        author: this.post('author')
+      })
+    if (res > 0) {
+      return this.success()
+    } else {
+      return this.error('更新失败')
+    }
+  }
+
+  async _formatData (data) {
+    const postModel = this.model('posts', {appId: this.appId})
+    await this._decoratorTerms(data)
+    data = await postModel.getFormatData(data)
+    return data
+  }
+  /**
+   * 获取内容
+   * @param post_id
+   * @returns {Promise<*>}
+   */
+  async _pageData (data) {
+    // 获取精选内容列表
+    const stickies = this.options.stickys
+    // const postModel = this.model('posts', {appId: this.appId})
+
+
+    // 根据 id 取内容
+    // let data = await postModel.getById(postId)
+
+    // console.log(data.type)
+    // const laal = await postModel.dealFormat(data)
+    // console.log(laal)
+    const isSticky = think._.find(stickies, (id) => {
+      return data.id.toString() === id
+    })
+
+    if (isSticky) {
+      data.sticky = true
+    } else {
+      data.sticky = false
+    }
+
     // 清除 meta
 
     // 处理分类及内容层级
-    await this._dealTerms(data)
+    // await this._dealTerms(data)
+    // 装饰类别与 format 信息
+    // await this._decoratorTerms(data)
+    // await this._decoratorTerms(data)
+
     // 处理标签信息
     await this._dealTags(data)
+    //
+    await this._detalBlock(data)
+    //
+    // await this._dealLikes(data)
 
-    await this._dealLikes(data)
-
-    Reflect.deleteProperty(user, 'meta')
     Reflect.deleteProperty(data, 'meta')
 
     return data
 
   }
+
 
   //
   // Private methods
@@ -191,20 +246,26 @@ module.exports = class extends BaseRest {
    * @param post
    * @returns {Promise.<*>}
    */
-  async _dealTerms (post) {
+  async _decoratorTerms (post) {
     const _taxonomy = this.model('taxonomy', {appId: this.appId})
     post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
-    post.categories = think._.map(post.categories, 'term_id')
+    post.categories = think._.map(post.categories, 'term_taxonomy_id')
     const postFormat = await _taxonomy.getFormat(post.id)
     if (!think.isEmpty(postFormat)) {
       post.type = postFormat.slug
     }
+
+    return post
+  }
+
+  async _detalBlock (post) {
     if (!think.isEmpty(post.block)) {
       const blockList = await this.model('posts', {appId: this.appId})
         .loadBlock(post.type, JSON.parse(post.block))
       post.block = blockList
     }
     return post
+
   }
 
 

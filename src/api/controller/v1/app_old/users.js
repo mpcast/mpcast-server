@@ -45,8 +45,6 @@ module.exports = class extends BaseRest {
   async putAction () {
     const data = this.post()
     const approach = this.post('approach')
-    // console.log(approach)
-    // console.log(approach + '------')
     // 注册用户来源
     switch(approach) {
       // 微信小程序

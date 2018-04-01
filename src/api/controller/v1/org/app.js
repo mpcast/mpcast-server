@@ -37,7 +37,6 @@ module.exports = class extends BaseRest {
       post.meta = {};
       if (post.metas.length > 0) {
         for (let meta of post.metas) {
-          // console.log(meta.meta_key + ":" + meta.meta_value);
           post.meta[meta.meta_key] = meta.meta_value;
         }
       }

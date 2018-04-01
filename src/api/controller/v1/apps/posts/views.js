@@ -67,7 +67,6 @@ module.exports = class extends BaseRest {
    */
   async newAction () {
     const userId = this.ctx.state.user.id
-    console.log(this.ctx.state)
     const id = this.get('id')
     // const id = postId
     let date = new Date().getTime()

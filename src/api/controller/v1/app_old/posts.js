@@ -154,7 +154,6 @@ module.exports = class extends BaseRest {
     //   status: ['NOT IN', 'trash']
     // }
     // let status = ['NOT IN', 'trash']
-    // console.log('------------------------------')
     // console.log(this.get('status'))
     // if (!think.isEmpty(this.get('status'))) {
     //   status = 'publish'

@@ -47,16 +47,16 @@ module.exports = class extends BaseRest {
       } else {
         data.description = data.name
       }
-      const res = await this.model('terms', {appId: this.appId}).add(data)
+      const res = await this.model('terms', {appId: this.appId}).setRelation(false).add(data)
       if (!think.isEmpty(res)) {
         data.term_id = res
         data.taxonomy = 'category'
-        await this.model('term_taxonomy', {appId: this.appId}).add(data)
+        await this.model('term_taxonomy', {appId: this.appId}).setRelation(false).add(data)
       }
       // 更新 meta 信息
       if (!Object.is(data.meta, undefined)) {
         const termMetaModel = this.model('termmeta', {appId: this.appId})
-        await termMetaModel.save(data.term_id, data.meta)
+        await termMetaModel.setRelation(false).save(data.term_id, data.meta)
       }
       // 更新缓存
       await this.model('taxonomy', {appId: this.appId}).allTerms(true)

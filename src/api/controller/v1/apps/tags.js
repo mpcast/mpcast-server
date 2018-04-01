@@ -43,7 +43,6 @@ module.exports = class extends BaseRest {
         data.description = data.name
       }
       const res = await this.model('terms', {appId: this.appId}).add(data)
-      console.log(JSON.stringify(res))
       if (!think.isEmpty(res)) {
         data.term_id = res
         data.taxonomy = 'post_tag'

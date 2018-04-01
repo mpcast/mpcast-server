@@ -74,7 +74,6 @@ module.exports = class extends BaseRest {
       post.meta = {};
       if (post.metas.length > 0) {
         for (const meta of post.metas) {
-          // console.log(meta.meta_key + ":" + meta.meta_value);
           post.meta[meta.meta_key] = meta.meta_value;
         }
       }
@@ -193,6 +192,7 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async signin () {
+    console.log('login ...')
     const orgId = this.get('orgId')
     if (think.isEmpty(orgId)) {
       return this.fail('机构信息错误')
@@ -218,11 +218,15 @@ module.exports = class extends BaseRest {
     if (!Object.is(userInfo.meta[`org_${orgId}_capabilities`], undefined)) {
       userInfo.role = userInfo.meta[`org_${orgId}_capabilities`].role
     } else {
-      return this.fail('ACCOUNT_FORBIDDEN');
+      throw new Error('ACCOUNT_FORBIDDEN')
+      // return this.fail('ACCOUNT_FORBIDDEN');
     }
     // 帐号是否被禁用，且投稿者不允许登录
     if ((userInfo.user_status | 0) !== 1 || userInfo.deleted === 1) {
-      return this.fail('ACCOUNT_FORBIDDEN');
+      // return this.fail(401, 'ACCOUNT_FORBIDDEN');
+      throw new Error('ACCOUNT_FORBIDDEN')
+
+      // return this.fail('ACCOUNT_FORBIDDEN');
     }
 
     // 校验密码
@@ -230,6 +234,8 @@ module.exports = class extends BaseRest {
     if (!userModel.checkPassword(userInfo, password)) {
       // return this.fail(400, 'ACCOUNT_PASSWORD_ERROR');
       throw new Error('ACCOUNT_PASSWORD_ERROR')
+      // return this.fail(400, 'ACCOUNT_PASSWORD_ERROR');
+
 
     }
     // return this.success(userInfo)

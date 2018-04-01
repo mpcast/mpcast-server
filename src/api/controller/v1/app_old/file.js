@@ -18,7 +18,6 @@ module.exports = class extends BaseRest {
       config = option.upload
     }
     const httpx = config.option.ssl ? 'https' : 'http'
-    console.log(config.option.ssl + "-------")
 
     // 获取 文件信息
     const file = think.extend({}, this.file('file'))
@@ -34,7 +33,6 @@ module.exports = class extends BaseRest {
     if (config.type === 'qiniu') {
       const service = this.service('qiniu')
       const upload = await service.upload(filePath, basename, config.option)
-      // console.log(this.ctx.state)
       if (!think.isEmpty(upload)) {
         const data = {
           // 验证权限 后获取
@@ -66,11 +64,8 @@ module.exports = class extends BaseRest {
           // .setTagsToRead(['title', 'artist', 'album', 'TLE'])
           // .read({
           //   onSuccess: function(tag) {
-          //     console.log(tag)
-          //     // console.log(JSON.stringify(tag) + '----');
           //   },
           //   onError: function(error) {
-          //     console.log(':(', error.type, error.info);
           //   }
           // })
           //
@@ -80,10 +75,8 @@ module.exports = class extends BaseRest {
           //   postModel.addMeta(_post_id, '_attachment_metadata', JSON.stringify(tag)),
           //   postModel.addMeta(_post_id, '_attachment_file', upload.key)
           // ])
-          // console.log(tag);
           // },
           // onError: function(error) {
-          //   console.log(':(', error.type, error.info);
           // }
           // })
           // ])
@@ -115,8 +108,6 @@ module.exports = class extends BaseRest {
 
     const file = think.extend({}, this.file('file'));
 
-    // console.log(JSON.stringify(file))
-    // console.log(this.options)
     const filepath = file.path;
     const basename = path.basename(filepath);
 

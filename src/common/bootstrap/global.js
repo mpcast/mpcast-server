@@ -74,8 +74,6 @@ global.arr_to_tree = function (data, parent) {
     data[0].chnum = data[0].children.length
     return data
   }
-  // console.log(JSON.stringify(data))
-  // console.log(length + 'xxx----')
   for (let i = 0; i < length; i++) {
 
     if (data[i].parent === parent) {
@@ -160,7 +158,6 @@ global._formatMeta = (list) => {
         }
         if (meta.meta_key.includes('_wechat') && meta.meta_key.includes('picker_')) {
           const wechat = JSON.parse(meta.meta_value)
-          // console.log(wechat.avatarUrl)
           Object.assign(item, {
             avatar: wechat.avatarUrl
           })
@@ -179,11 +176,10 @@ global._formatApps = (list) => {
 
 }
 
-global._formatOrgs = (orgs) => {
-  for (const item of orgs) {
-    // console.log(JSON.stringify(item) + '----')
-  }
-}
+// global._formatOrgs = (orgs) => {
+//   for (const item of orgs) {
+//   }
+// }
 
 global.verifyMsgCode = async (identity, code, destory = false) => {
   // const Redis = require('ioredis')
@@ -249,7 +245,6 @@ global.objKeySort = (obj) => { // 排序的函数
   // 先用Object内置类的keys方法获取要排序对象的属性名，再利用Array原型上的sort方法对获取的属性名进行排序，newkey是一个数组
   let newObj = {};// 创建一个新的对象，用于存放排好序的键值对
   for (let i = 0; i < newkey.length; i++) { // 遍历newkey数组
-    // console.log('-------- : ' + newkey[i])
     newObj[newkey[i]] = obj[newkey[i]];// 向新创建的对象中按照排好的顺序依次增加键值对
   }
   return newObj;// 返回排好序的新对象

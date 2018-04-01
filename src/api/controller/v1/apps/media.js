@@ -292,7 +292,6 @@ module.exports = class extends BaseRest {
       return defaultTerm === value
     })
 
-    // console.log(isDefaultPost + 'x0009sad9fasifasidfpoiasp')
     if (isDefaultPost) {
       // 6 添加 Love(like) 信息
       await this.newLike(postId)
@@ -451,7 +450,6 @@ module.exports = class extends BaseRest {
 
       // 获取内容的分类信息
       // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-      // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
     await this.dealTerms(list)

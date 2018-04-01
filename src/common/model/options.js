@@ -64,12 +64,8 @@ module.exports = class extends Base {
 
   async updateOptions (key, value) {
 
-    console.log(key + ": " + value);
-
     const data = think.isObject(key) ? think.extend({}, key) : {[key]: value};
     let cacheData = await think.cache(this.cacheKey, undefined, this.cacheOptions);
-
-    // console.log(JSON.stringify(cacheData))
     // update picker_resume.picker_options set value = json_set(value,'$.current_theme', 'limitless') where `key` = 'site';
     if (think.isEmpty(cacheData)) {
       cacheData = await this.get();
@@ -81,11 +77,8 @@ module.exports = class extends Base {
       }
     }
 
-    // console.log(JSON.stringify(changedData) + "-----")
     const json_sql = `update ${this.cacheKey} set value = json_set(value,'$.${value.key}', '${value.value}') where \`key\` = '${key}'`;
 
-    // console.log(json_sql)
-    // console.log(JSON.stringify(changedData))
     // data is not changed
     if (think.isEmpty(changedData)) {
       return;
@@ -109,7 +102,6 @@ module.exports = class extends Base {
       promises.push(p);
     }
     await Promise.all(promises);
-    // console.log(JSON.stringify(p1) +"======")
 
     const ret = await this.get(true)
 

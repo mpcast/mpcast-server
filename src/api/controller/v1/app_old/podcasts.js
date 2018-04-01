@@ -181,7 +181,6 @@ module.exports = class extends BaseRest {
     }
     // 条件查询
     // let list = await this.modelInstance.where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), 10).countSelect()
-    // console.log(JSON.stringify(list))
     // 处理分类
     // let _taxonomy = this.model('taxonomy', {appId: this.appId})
     // for (let item of list.data) {
@@ -199,7 +198,6 @@ module.exports = class extends BaseRest {
     // const list = await this.model('posts', {appId: this.appId}).where(query).field(fields.join(",")).order('sort ASC').
     // 处理播放列表音频 Meta 信息
     _formatMeta(list.data)
-    console.log(JSON.stringify(list))
     // 根据 Meta 信息中的音频附件 id 查询出音频地址
     const metaModel = this.model('postmeta', {appId: this.appId})
     for (const item of list.data) {

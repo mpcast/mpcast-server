@@ -12,7 +12,6 @@ module.exports = class extends think.Service {
     // if (think.isEmpty(option)) {
     //   option = await think.cache('options').upload.option
     // }
-    // console.log(JSON.stringify(option))
     // let $option = await think.cache(this.cacheKey);
 
     // let $upload = $option.upload;
@@ -177,7 +176,6 @@ module.exports = class extends think.Service {
 
     // 公开空间访问链接
     const publicDownloadUrl = bucketManager.publicDownloadUrl(publicBucketDomain, key);
-    console.log(publicDownloadUrl);
     return publicDownloadUrl;
   }
 }

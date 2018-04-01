@@ -40,12 +40,10 @@ module.exports = class extends BaseRest {
 
   async postAction () {
     const data = this.post()
-    console.log(JSON.stringify(data))
     if (!Object.is(data.action, undefined)) {
       if (data.action === 'verify_token') {
         jwt.verify(data.token, 'S1BNbRp2b', (err, decoded) => {
           if (err) {
-            console.log(err)
             return this.fail({"errno": 1000, data: err})
             /*
               err = {
@@ -74,7 +72,6 @@ module.exports = class extends BaseRest {
     //   await this.wxLogin(xWechatCode, encrypted, iv)
     // }
     // return this.json(this.ctx.headers)
-    // console.log(JSON.stringify(this.ctx.headers))
     // const wxcode = this.header
     // let orgId = this.get('orgId')
     // let data = this.post()
@@ -170,7 +167,6 @@ module.exports = class extends BaseRest {
     const data = this.post()
     const user_login = this.ctx.state.user.user_login
     const user_id = this.ctx.state.user.id
-    // console.log(this.ctx.state.user)
     const options = await this.model('options', {appId: this.appId}).get()
     const wxConfig = options.wechat
     if (!think.isEmpty(wxConfig)) {
@@ -194,8 +190,6 @@ module.exports = class extends BaseRest {
 
   async checkUserInfo () {
     const data = this.post()
-    console.log('----------- CHECK USER INFO -----------')
-    console.log(data)
     // { action: 'check_user_info',
     //   rawData: '{"nickName":"请好好说话🌱","gender":1,"language":"en","city":"Chaoyang","province":"Beijing","cy":"China","avatarUrl":"https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83ep0GdQEHK3tYdvq3DTMVhsdiaviaLg6b7CdDBLOYSWDGYOEtS7FFmvhd6CGCuQVfe4Rb0uQUlaq7XoA/0"}',
     //   signature: 'e9dfe22dfb4fbbad0ec359cb498915b84860295d' }
@@ -245,7 +239,6 @@ module.exports = class extends BaseRest {
         async (openid, sessionkey) => {
           await think.cache(openid, sessionkey)
         })
-      console.log('create time -------')
       /*
         "openId": "oQgDx0IVqAg0b3GibFYBdtg3BKMA",
         "nickName": "请好好说话🌱",

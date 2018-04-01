@@ -121,7 +121,6 @@ async updateWechatUser (data) {
         meta_key: `picker_${data.appId}_wechat`
       })
     } catch(e) {
-      console.log(e)
       throw e
     }
   }
@@ -183,8 +182,6 @@ async updateWechatUser (data) {
         user_registered: createTime,
         user_status: 1
       });
-      // console.log(' ---x-xx--x')
-      // console.log(res)
       if (!think.isEmpty(res)) {
         if (res.type === 'add') {
           const role = think.isEmpty(data.role) ? 'subscriber' : data.role
@@ -194,7 +191,6 @@ async updateWechatUser (data) {
             meta_key: data.appId ? `picker_${data.appId}_capabilities` : '_capabilities',
             meta_value: JSON.stringify({'role': role, 'type': 'team'})
           }, {appId: data.appId})
-          console.log(metaRes)
           // 后续这里的用户简介可以处理与 resume 模型关联
           if (!think.isEmpty(data.summary)) {
             await usermeta.save(res.id, {

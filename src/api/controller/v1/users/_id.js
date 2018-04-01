@@ -30,6 +30,10 @@ module.exports = class extends Base {
         } else {
           user.avatar = await this.model('postmeta').getAttachment('file', user.meta.avatar)
         }
+        if (!Object.is(user.meta.resume, undefined)) {
+          user.resume = user.meta.resume
+        }
+        Reflect.deleteProperty(user, 'meta')
         return this.success(user)
       } else {
         if (think.isEmpty(type)) {

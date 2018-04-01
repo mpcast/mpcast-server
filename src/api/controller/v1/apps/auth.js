@@ -38,7 +38,6 @@ module.exports = class extends BaseRest {
       const data = this.post()
       jwt.verify(data.token, 'S1BNbRp2b', (err, decoded) => {
         if (err) {
-          console.log(err)
           return this.fail({"errno": 1000, data: err})
           /*
             err = {
@@ -71,7 +70,7 @@ module.exports = class extends BaseRest {
     // 更新用户信息
     const userModel = this.model('users')
     wxUserInfo = think.extend({}, wxUserInfo, {appId: this.appId}, {userId: user_id})
-    await userModel.updateWechatUser(wxUserInfo)
+    await userModel.setRelation(false).updateWechatUser(wxUserInfo)
 
     return this.success(wxUserInfo)
   }

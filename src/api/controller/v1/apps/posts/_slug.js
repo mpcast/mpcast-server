@@ -312,13 +312,10 @@ module.exports = class extends BaseRest {
     // }
     // return data
     // return this.success(data)
-    // console.log(JSON.stringify(data))
     // const query = {
     //   status: ['NOT IN', 'trash']
     // }
     // let status = ['NOT IN', 'trash']
-    // console.log('------------------------------')
-    // console.log(this.get('status'))
     // if (!think.isEmpty(this.get('status'))) {
     //   status = 'publish'
     // }

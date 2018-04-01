@@ -106,17 +106,14 @@ module.exports = class extends BaseRest {
     for (let key of Object.keys(dest)) {
       if (dest[key].length > 0) {
         for (let i of dest[key]) {
-          console.log(i.id)
+          // console.log(i.id)
         }
         // for (let i = 0; i < dest[key]; i++) {
-        //   console.log(dest[key][i].id)
         // }
       }
       // if (typeof dest[key] === 'Array') {
       //
       // }
-      // console.log(JSON.stringify(dest[key]))
-      // console.log(key + ": " + dest[key]);
     }
     return this.success(dest)
   }

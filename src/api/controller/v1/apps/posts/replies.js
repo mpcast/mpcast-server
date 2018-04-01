@@ -84,7 +84,6 @@ module.exports = class extends BaseRest {
    */
   async newAction () {
     const curUser = this.ctx.state.user
-    console.log(JSON.stringify(curUser))
     const post_id = this.get('id')
 
     const data = this.post()
@@ -147,7 +146,6 @@ module.exports = class extends BaseRest {
       // Current User
       const data = await postMeta.getLikeStatus(userId, this.id)
       // if (!think.isEmpty(data.value_index))
-      console.log(JSON.stringify(data))
       const res = {
         'i_like': data.contain === 1,
         'like_count': data.like_count,

@@ -10,10 +10,8 @@ think.beforeStartServer(async () => {
   const apps = await think.model('apps').list()
   await think.cache('apps', apps)
   const options = await think.model('options').get(true)
-  // console.log(JSON.stringify(options.sms))
   think.config('options', options)
 })
 
 think.app.on("appReady", function () {
-  // console.log('app ready')
 })

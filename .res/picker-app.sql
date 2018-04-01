@@ -393,7 +393,7 @@ CREATE TABLE `picker_posts` (
   `type`          VARCHAR(20)         NOT NULL DEFAULT 'post',
   `mime_type`     VARCHAR(100)        NOT NULL DEFAULT '',
   `parent`        BIGINT(20)          NOT NULL DEFAULT '0',
-  `content_json`  JSON                         DEFAULT NULL,
+  `block`  JSON                         DEFAULT NULL,
   `content`       LONGTEXT,
   `sort`          INT(11)             NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

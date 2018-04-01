@@ -29,10 +29,10 @@ module.exports = class extends BaseRest {
    * 获取置顶的推荐内容
    * @returns {Promise<void>}
    */
-  async getStickys () {
+  async getStickies () {
     const stickys = this.options.stickys
     const list = await this.model('posts', {appId: this.appId})
-      .getStickys(stickys)
+      .getStickys(stickys, this.get('page'), this.get('pagesize'))
     return list
   }
 
@@ -57,7 +57,7 @@ module.exports = class extends BaseRest {
     if (!think._.has(query, 'status')) {
       query.status = ['publish', 'auto-draft', 'draft']
     }
-    if (!think._.has(query, 'status')) {
+    if (!think._.has(query, 'parent')) {
       query.parent = 0
     }
     let list = []
@@ -89,10 +89,10 @@ module.exports = class extends BaseRest {
         }
       }
 
-    } else if (this.get('sticky') === 'true') {
-      const stickys = this.options.stickys
-      list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
-
+      // } else if (this.get('sticky') === 'true') {
+      //   const stickys = this.options.stickys
+      //   list = await this.model('posts', {appId: this.appId}).getStickies(stickys)
+      //
     } else {
       Reflect.deleteProperty(query, 'page')
       Reflect.deleteProperty(query, 'pagesize')
@@ -231,14 +231,20 @@ module.exports = class extends BaseRest {
     data.name = slugName
 
     const postModel = this.model('posts', {appId: this.appId})
-    const res = await postModel.findByName(slugName)
+    let hasData = await postModel.findByName(slugName)
 
-    if (!think.isEmpty(res)) {
-      return this.success(res)
+    if (!think.isEmpty(hasData)) {
+      await this.decoratorData(hasData)
+      return this.success(hasData)
     }
+
     if (think.isEmpty(data.type)) {
+      data.type = 'page'
+    }
+    if (!think.isEmpty(data.format)) {
       data.type = 'post_format'
     }
+
 
     if (think._.has(data, 'sticky')) {
       if (data.sticky === true) {
@@ -262,13 +268,13 @@ module.exports = class extends BaseRest {
     const defaultTerm = Number(this.options.default.term)
     const defaultPostFormat = Number(this.options.default.format)
 
-/*
-    let categories = []
-    if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
-      categories = categories.concat(defaultTerm)
-    } else {
-      categories = categories.concat(JSON.parse(data.categories))
-    }*/
+    /*
+        let categories = []
+        if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
+          categories = categories.concat(defaultTerm)
+        } else {
+          categories = categories.concat(JSON.parse(data.categories))
+        }*/
 
     // 4 获取内容的格式类别
     // if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
@@ -289,6 +295,7 @@ module.exports = class extends BaseRest {
     if (think.isEmpty(data.status)) {
       data.status = 'auto-draft';
     }
+
     const postId = await this.modelInstance.setRelation(false).add(data)
 
     // 2 更新 meta 数据
@@ -316,9 +323,11 @@ module.exports = class extends BaseRest {
     } else {
       await this.model('taxonomy', {appId: this.appId}).relationships(postId, defaultTerm)
     }
-    if (think.isEmpty(data.format)) {
-      await this.model('taxonomy', {appId: this.appId}).relationships(postId, defaultPostFormat)
 
+    // await this.model('taxonomy', {appId: this.appId}).relationships(postId, defaultPostFormat)
+    if (data.format) {
+      data.type = 'post_format'
+      await this.model('taxonomy', {appId: this.appId}).relationships(postId, data.format)
     }
 
     // 5 如果有关联信息，更新关联对象信息
@@ -335,10 +344,11 @@ module.exports = class extends BaseRest {
 
     // if (isDefaultPost) {
     //   6 添加 Love(like) 信息
-      // await this.newLike(postId)
+    // await this.newLike(postId)
     // }
-    const newPost = await this.getPost(postId)
-
+    let newPost = await postModel.getById(postId)
+    // let newPost = await this.getPost(postId)
+    await this.decoratorData(newPost)
     // 下发回忆通知
     // 0bEMgmkRis7a09BsGreIgj-paRSca9fN-pvMz5WpmH8
     // 项目名称
@@ -420,6 +430,169 @@ module.exports = class extends BaseRest {
     }
     await this.model('users').newLike(userId, this.appId, id, date)
   }
+
+
+  async decoratorData (data) {
+    await this._decoratorAuthor(data)
+    switch (data.type) {
+      case 'page': {
+        data = await this._pageData(data)
+        break
+      }
+      case 'post_format': {
+        data = await this._formatData(data)
+        break
+      }
+      default:
+        break
+    }
+    return data
+  }
+
+  /**
+   * 装饰作者
+   * @param data
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _decoratorAuthor (data) {
+    const metaModel = this.model('postmeta', {appId: this.appId})
+    const userModel = this.model('users')
+
+    _formatOneMeta(data)
+    // 处理作者信息
+    let user = await userModel.getById(data.author)
+    _formatOneMeta(user)
+
+    // 获取头像地址
+    if (!think.isEmpty(user.meta[`picker_${this.appId}_wechat`])) {
+      user.avatarUrl = user.meta[`picker_${this.appId}_wechat`].avatarUrl
+    } else {
+      user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
+    }
+
+    // 作者简历
+    if (!Object.is(user.meta.resume, undefined)) {
+      user.resume = user.meta.resume
+    }
+
+    // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+    // if (!Object.is(item.meta['_featured_image']))
+    if (!Object.is(data.meta._thumbnail_id, undefined)) {
+      data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
+    }
+
+    if (think.isEmpty(data.block)) {
+      data.block = []
+    }
+    data.author = user
+    Reflect.deleteProperty(user, 'meta')
+  }
+
+  /**
+   * 更新作者
+   * @returns {Promise<*>}
+   */
+  async changeAuthor () {
+    const res = await this.model('posts', {appId: this.appId})
+      .setRelation(false)
+      .where({id: this.id}).update({
+        author: this.post('author')
+      })
+    if (res > 0) {
+      return this.success()
+    } else {
+      return this.error('更新失败')
+    }
+  }
+
+  async _formatData (data) {
+    const postModel = this.model('posts', {appId: this.appId})
+    await this._decoratorTerms(data)
+    data = await postModel.getFormatData(data)
+    return data
+  }
+
+  /**
+   * 获取内容
+   * @param post_id
+   * @returns {Promise<*>}
+   */
+  async _pageData (data) {
+    // 获取精选内容列表
+    const stickies = this.options.stickys
+    // const postModel = this.model('posts', {appId: this.appId})
+
+
+    // 根据 id 取内容
+    // let data = await postModel.getById(postId)
+
+    // console.log(data.type)
+    // const laal = await postModel.dealFormat(data)
+    // console.log(laal)
+    const isSticky = think._.find(stickies, (id) => {
+      return data.id.toString() === id
+    })
+
+    if (isSticky) {
+      data.sticky = true
+    } else {
+      data.sticky = false
+    }
+
+    // 清除 meta
+
+    // 处理分类及内容层级
+    // await this._dealTerms(data)
+    // 装饰类别与 format 信息
+    // await this._decoratorTerms(data)
+    // await this._decoratorTerms(data)
+
+    // 处理标签信息
+    await this._dealTags(data)
+    //
+    await this._detalBlock(data)
+    //
+    // await this._dealLikes(data)
+
+    Reflect.deleteProperty(data, 'meta')
+
+    return data
+
+  }
+
+
+  //
+  // Private methods
+  //
+  /**
+   * 处理分类信息，为查询的结果添加分类信息
+   * @param post
+   * @returns {Promise.<*>}
+   */
+  async _decoratorTerms (post) {
+    const _taxonomy = this.model('taxonomy', {appId: this.appId})
+    post.categories = await _taxonomy.findCategoriesByObject(post.id.toString())
+    post.categories = think._.map(post.categories, 'term_taxonomy_id')
+    const postFormat = await _taxonomy.getFormat(post.id)
+    if (!think.isEmpty(postFormat)) {
+      post.type = postFormat.slug
+    }
+
+    return post
+  }
+
+  async _detalBlock (post) {
+    if (!think.isEmpty(post.block)) {
+      const blockList = await this.model('posts', {appId: this.appId})
+        .loadBlock(post.type, JSON.parse(post.block))
+      post.block = blockList
+    }
+    return post
+
+  }
+
+
   /**
    * 获取内容
    * @param post_id
@@ -428,7 +601,6 @@ module.exports = class extends BaseRest {
   async getPost (post_id) {
     // 获取精选内容列表
     const stickys = this.options.stickys
-    // console.log(stickys)
     const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})
     const userModel = this.model('users');
@@ -464,17 +636,13 @@ module.exports = class extends BaseRest {
     if (!Object.is(user.meta.resume, undefined)) {
       user.resume = user.meta.resume
     }
-    // if (!Object.is(data.meta._assets, undefined)) {
-    //   data.assets = data.meta._assets
-    // }
-
     // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
     // if (!Object.is(item.meta['_featured_image']))
     if (!Object.is(data.meta._thumbnail_id, undefined)) {
       data.featured_image = await metaModel.getAttachment('file', data.meta._thumbnail_id)
     }
 
-    if(think.isEmpty(data.block)) {
+    if (think.isEmpty(data.block)) {
       data.block = []
     }
     data.author = user
@@ -484,6 +652,7 @@ module.exports = class extends BaseRest {
     await this._dealTerms(data)
     // 处理标签信息
     await this._dealTags(data)
+    await this._detalBlock(data)
 
     await this._dealLikes(data)
 
@@ -493,6 +662,7 @@ module.exports = class extends BaseRest {
     return data
 
   }
+
   //
   // Private methods
   //
@@ -509,13 +679,23 @@ module.exports = class extends BaseRest {
     if (!think.isEmpty(postFormat)) {
       post.type = postFormat.slug
     }
-    if (!think.isEmpty(post.block)) {
-      const blockList = await this.model('posts', {appId: this.appId})
-        .loadBlock(post.type, JSON.parse(post.block))
-      post.block = blockList
-    }
+    // if (!think.isEmpty(post.block)) {
+    //   const blockList = await this.model('posts', {appId: this.appId})
+    //     .loadBlock(post.type, JSON.parse(post.block))
+    //   post.block = blockList
+    // }
     return post
   }
+
+  // async _detalBlock (post) {
+  //   if (!think.isEmpty(post.block)) {
+  //     const blockList = await this.model('posts', {appId: this.appId})
+  //       .loadBlock(post.type, JSON.parse(post.block))
+  //     post.block = blockList
+  //   }
+  //   return post
+  //
+  // }
 
 
   /**
@@ -588,6 +768,7 @@ module.exports = class extends BaseRest {
     post.i_like = iLike
     post.likes = likes
   }
+
   async __getPost (post_id) {
     let fields = [
       'id',
@@ -658,7 +839,6 @@ module.exports = class extends BaseRest {
 
       // 获取内容的分类信息
       // const terms = await this.model('taxonomy', {appId: this.appId}).getTermsByObject(query.id)
-      // console.log(JSON.stringify(terms))
     }
     // 处理分类及内容层级
     await this.dealTerms(list)

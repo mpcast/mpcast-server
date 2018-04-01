@@ -81,7 +81,6 @@ module.exports = class extends BaseRest {
     const slug = this.get('slug')
     const taxonomyModel = this.model('taxonomy', {appId: this.appId})
     const data = await taxonomyModel.findTermBySlug('post_tag', slug)
-    console.log(data)
     if (think.isEmpty(data)) {
       return this.fail(404, '分类信息不存在！')
     }

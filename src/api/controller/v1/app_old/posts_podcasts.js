@@ -158,7 +158,6 @@ module.exports = class extends BaseRest {
     }
     // 条件查询
     // let list = await this.modelInstance.where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), 10).countSelect()
-    // console.log(JSON.stringify(list))
     // 处理分类
     // let _taxonomy = this.model('taxonomy', {appId: this.appId})
     // for (let item of list.data) {
@@ -329,7 +328,6 @@ module.exports = class extends BaseRest {
     const pk = this.modelInstance.pk;
     // const pk = await this.modelInstance.getPk();
     const data = this.post();
-    console.log(JSON.stringify(data))
     // Relation.deleteProperty(data, 'pk')
 // eslint-disable-next-line prefer-reflect
     delete data[pk];

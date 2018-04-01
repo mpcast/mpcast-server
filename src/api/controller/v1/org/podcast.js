@@ -8,10 +8,7 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async getAction () {
-    // console.log('lalalala')
-    // console.log(this.ctx.state.user)
     const id = this.get('id')
-    // console.log('lala')
     const type = 'podcast'
     let query = {}
     query.status = ['NOT IN', 'trash']
@@ -41,7 +38,6 @@ module.exports = class extends BaseRest {
         case 'podcast':
           fields.push('content')
           if (!think.isEmpty(id)) {
-            console.log('id not empty' + id)
             // query = {status: ['!=', 'delete'], id: id, parent: id, _logic: 'OR'}
             query = {status: ['!=', 'delete'], _complex: {id: id, parent: id, _logic: 'OR'}}
             return await this.getPodcast(query, fields)
@@ -64,7 +60,6 @@ module.exports = class extends BaseRest {
     }
     // 条件查询
     // let list = await this.modelInstance.where(query).field(fields.join(",")).order('modified DESC').page(this.get('page'), 10).countSelect()
-    // console.log(JSON.stringify(list))
     // 处理分类
     // let _taxonomy = this.model('taxonomy', {orgId: this.orgId})
     // for (let item of list.data) {
@@ -184,7 +179,6 @@ module.exports = class extends BaseRest {
   }
 
   async postAction () {
-    // console.log(this.ctx.state.user)
     // let type = this.get('type')
     const data = this.post()
     if (think.isEmpty(data.type)) {

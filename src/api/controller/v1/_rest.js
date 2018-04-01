@@ -4,13 +4,7 @@ const assert = require('assert');
 
 module.exports = class extends think.Controller {
   constructor(ctx) {
-    // console.log('constructor 1')
-    // console.log(ctx.originalUrl)
     super(ctx);
-    // console.log(ctx.url)
-    // console.log(ctx.origin)
-    // console.log(ctx.host)
-    // console.log(ctx.subdomains)
     // 从缓存中获取机构列表
 
     this.resource = this.getResource();
@@ -25,7 +19,6 @@ module.exports = class extends think.Controller {
     //   return JSON.parse(_orgs)
     // }
     // let orgs = await think.cache('orgs')
-    // console.log(JSON.parse(orgs)['vanq.picker.la'])
     // orgs = JSON.parse(orgs)
     // this.orgId = orgs[this.ctx.host]
     this.orgId = this.get('orgId')
@@ -55,7 +48,6 @@ module.exports = class extends think.Controller {
     return '';
   }
   async getAction() {
-    // console.log('lllget action')
     let data;
     if (this.id) {
       const pk = this.modelInstance.pk;

@@ -15,7 +15,6 @@ let fields = [
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
-    console.log('get all posts')
     const data = await this.getAllFromPage()
     return this.success(data)
   }
@@ -151,19 +150,15 @@ module.exports = class extends BaseRest {
     // }
     // return data
     // return this.success(data)
-    // console.log(JSON.stringify(data))
     // const query = {
     //   status: ['NOT IN', 'trash']
     // }
     // let status = ['NOT IN', 'trash']
-    // console.log('------------------------------')
-    // console.log(this.get('status'))
     // if (!think.isEmpty(this.get('status'))) {
     //   status = 'publish'
     // }
     // const taxonomyModel = this.model('taxonomy', {appId: this.appId})
     // const objects = await taxonomyModel.getObjectsInTermsByPage(termIds, page, this.get('pagesize'))
-    // console.log(JSON.stringify(objects))
     // if (!think.isEmpty(objects) && objects.ids.length > 0) {
     //   const postsModel = this.model('posts', {appId: this.appId})
     //   const podcasts = await postsModel.where({id: ['IN', objects.ids], status}).order('id DESC').select();
@@ -265,7 +260,6 @@ module.exports = class extends BaseRest {
       // list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 100)
       list = await this.model('posts', {appId: this.appId}).findByCategory(category, this.get('page'), 12)
       // return list
-      // console.log(JSON.stringify(list))
     } else if (this.get('sticky') === 'true') {
       const stickys = this.options.stickys
       list = await this.model('posts', {appId: this.appId}).getStickys(stickys)
@@ -278,7 +272,6 @@ module.exports = class extends BaseRest {
         .order('modified ASC')
         .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30)
         .countSelect()
-      console.log(JSON.stringify(list))
     }
     _formatMeta(list.data)
     const metaModel = this.model('postmeta', {appId: this.appId})
@@ -296,7 +289,6 @@ module.exports = class extends BaseRest {
       }
       Reflect.deleteProperty(item.meta, '_items')
 
-      // console.log(JSON.stringify(item.meta))
       item.url = ''
       // 如果有音频
       if (!Object.is(item.meta._audio_id, undefined)) {
@@ -319,7 +311,6 @@ module.exports = class extends BaseRest {
       item.author = await userModel.getById(item.author)
 
       // await this.dealLikes(item)
-      console.log(JSON.stringify(this.ctx.state.user))
       const userId = this.ctx.state.user.id
       item.like_count = await metaModel.getLikedCount(item.id)
 
@@ -498,7 +489,6 @@ module.exports = class extends BaseRest {
   async getPost (post_id) {
     // 获取精选内容列表
     const stickys = this.options.stickys
-    // console.log(stickys)
     const postModel = this.model('posts', {appId: this.appId})
     const metaModel = this.model('postmeta', {appId: this.appId})
     const userModel = this.model('users');

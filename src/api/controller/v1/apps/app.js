@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 
 module.exports = class extends BaseRest {
   async indexAction () {
-    // console.log(this.ctx.header)
     // const appsModel = this.model('apps')
     // const app = await appsModel.get(this.appId)
     // this.app.default = this.options.default
@@ -115,7 +114,6 @@ module.exports = class extends BaseRest {
       */
       let wxUserInfo = await wxService.getUserInfo(encrypted, iv, code)
       wxUserInfo = think.extend({}, wxUserInfo, {appId: this.appId})
-      // console.log(JSON.stringify(wxUserInfo))
       // 验证用户或保存为新用户
       const userModel = this.model('users')
       const token = jwt.sign(wxUserInfo, 'S1BNbRp2b')

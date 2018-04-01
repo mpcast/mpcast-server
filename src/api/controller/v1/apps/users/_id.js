@@ -21,8 +21,6 @@ module.exports = class extends Base {
       if (!think.isEmpty(userId)) {
         const user = await this.model('users').getById(userId)
         _formatOneMeta(user)
-
-        console.log(user)
         if (!Object.is(user.meta[`picker_${appid}_capabilities`], undefined)) {
           user.role = user.meta[`picker_${appid}_capabilities`].role
         }
@@ -39,9 +37,10 @@ module.exports = class extends Base {
           })
           // user.type = 'wechat'
         } else {
-          console.log(user.meta.avatar)
           user.avatarUrl = await this.model('postmeta').getAttachment('file', user.meta.avatar)
-          console.log(user)
+        }
+        if (!Object.is(user.meta.resume, undefined)) {
+          user.resume = user.meta.resume
         }
         Reflect.deleteProperty(user, 'meta')
         return this.success(user)
@@ -202,7 +201,6 @@ module.exports = class extends Base {
    */
   async deleteAction () {
     // TODO: 先要处理用户权限 问题
-    // console.log(this.ctx.state.user)
     const user_id = this.get('id')
     const data = this.post()
     // let reassign = this.options.default.reassign
