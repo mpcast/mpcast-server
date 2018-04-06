@@ -67,7 +67,7 @@ module.exports = class extends Base {
     // post-format-doc
 
     // 1 先取出所有内容，包含内容的 meta 信息
-    let list = await this.field('id, author, status, title, block, content')
+    let list = await this.field('id, author, status, title, date, block, content')
       .where({id: ['IN', blockIds]}).setRelation(true)
       .order(`INSTR (',${blockIds},', CONCAT(',',id,','))`).select()
 
@@ -87,8 +87,9 @@ module.exports = class extends Base {
     // 1 如果仅有一项内容，暂存至数组，后续批量获取
     // 2 如果有多项内容，直接批量获取
     for (let item of list) {
+
       item.type = await taxonomyModel.getFormat(item.id)
-      console.log(item.type)
+      // console.log(item.type)
       if (item.type) {
         item.type = item.type.slug
         await this.getFormatData(item)

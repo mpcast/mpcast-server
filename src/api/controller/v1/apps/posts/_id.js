@@ -90,7 +90,7 @@ module.exports = class extends BaseRest {
       if (!think.isEmpty(postId)) {
         let data = await postModel.getById(postId)
         // console.log(data)
-        // data = await this.decoratorData(data)
+        data = await this._decoratorTerms(data)
         await this._decoratorAuthor(data)
         switch (data.type) {
           case 'page': {
@@ -185,7 +185,7 @@ module.exports = class extends BaseRest {
 
   async _formatData (data) {
     const postModel = this.model('posts', {appId: this.appId})
-    await this._decoratorTerms(data)
+    // await this._decoratorTerms(data)
     data = await postModel.getFormatData(data)
     return data
   }
@@ -263,6 +263,9 @@ module.exports = class extends BaseRest {
       const blockList = await this.model('posts', {appId: this.appId})
         .loadBlock(post.type, JSON.parse(post.block))
       post.block = blockList
+      for (let block of post.block) {
+        block.date = this.ctx.moment(block.date).format('YYYY-MM-DD')
+      }
     }
     return post
 

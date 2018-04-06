@@ -260,6 +260,15 @@ module.exports = class extends BaseRest {
     data.modified = currentTime
 
     if (!think.isEmpty(data.block)) {
+      if (!think._.isArray(data.block)) {
+        return this.fail('资源内容添加错误')
+      }
+      if (think._.isArray(data.block)) {
+        const isNumber = data.block.every(think._.isNumber)
+        if (!isNumber) {
+          return this.fail('资源内容格式错误')
+        }
+      }
       data.block = JSON.stringify(data.block)
     }
 
@@ -268,18 +277,17 @@ module.exports = class extends BaseRest {
     const defaultTerm = Number(this.options.default.term)
     const defaultPostFormat = Number(this.options.default.format)
 
-    /*
-        let categories = []
-        if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
-          categories = categories.concat(defaultTerm)
-        } else {
-          categories = categories.concat(JSON.parse(data.categories))
-        }*/
+    let categories = []
+    if (Object.is(data.categories, undefined) && think.isEmpty(data.categories)) {
+      categories = categories.concat(defaultTerm)
+    } else {
+      categories = categories.concat(JSON.parse(data.categories))
+    }
 
     // 4 获取内容的格式类别
-    // if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
-    //   categories = categories.concat(data.format)
-    // }
+    if (!Object.is(data.format, undefined) && !think.isEmpty(data.format)) {
+      categories = categories.concat(data.format)
+    }
     if (think._.hasIn(this.options, 'default.publish')) {
       const defaultPublish = this.options.default.publish
       // 处理内容默认发布状态

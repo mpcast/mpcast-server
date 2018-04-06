@@ -13,6 +13,7 @@ module.exports = class extends BaseRest {
     const userId = this.ctx.state.user.id
     const commentsModel = this.model('comments', {appId: this.appId})
     const fields = [
+      'id',
       'comment_post_id as post_id',
       'comment_author as author',
       'comment_author_ip as ip',
@@ -24,6 +25,8 @@ module.exports = class extends BaseRest {
     const list = await commentsModel.field(fields).where({
       comment_post_id: post_id
     }).order('date DESC').page(this.get('page'), 20).countSelect()
+    _formatMeta(list.data)
+
     const usersModel = this.model('users')
 
     for (let item of list.data) {
@@ -103,7 +106,17 @@ module.exports = class extends BaseRest {
       comment_type: 'comment',
       comment_approved: 'approved'
     }
-    await commentsModel.add(postData)
+    const commentId = await commentsModel.setRelation(false).add(postData)
+
+    if (think.isEmpty(commentId)) {
+      return this.fail('添加失败')
+    }
+    if (!Object.is(data.meta, undefined)) {
+      const metaModel = this.model('commentmeta', {appId: this.appId})
+      // 保存 meta 信息
+      await metaModel.save(commentId, data.meta)
+    }
+
     let author = await this.model('users').getById(curUser.id)
     _formatOneMeta(author)
     // 取得头像地址

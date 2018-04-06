@@ -22,13 +22,13 @@ module.exports = class extends Base {
     }
   }
 
-  async save (post_id, meta) {
+  async save (commentId, meta) {
     for (const key of Object.keys(meta)) {
       await this.thenUpdate({
-        'post_id': post_id,
+        'comment_id': commentId,
         'meta_key': key,
         'meta_value': meta[key] + ''
-      }, {post_id: post_id, meta_key: key})
+      }, {comment_id: commentId, meta_key: key})
     }
   }
 

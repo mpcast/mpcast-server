@@ -16,6 +16,12 @@ module.exports = class extends Base {
   // }
   get relation () {
     return {
+      metas: {
+        type: think.Model.HAS_MANY,
+        model: 'commentmeta',
+        fKey: 'comment_id',
+        field: "comment_id,meta_key,meta_value"
+      },
       post: {
         model: 'posts',
         type: think.Model.BELONG_TO,
@@ -45,7 +51,7 @@ module.exports = class extends Base {
     let data = await this.field(fields).page(page, pageSize).countSelect()
     // let userIds = []
     for (let item of data.data) {
-      item.author = Object.assign({}, item.author, {meta:{}})
+      item.author = Object.assign({}, item.author, {meta: {}})
       // item.author.meta = {}
       _formatOneMeta(item.author)
       // userIds.push(item.author)
