@@ -52,6 +52,7 @@ module.exports = class extends BaseRest {
    */
   async getAll () {
     const query = this.get()
+    console.log(query)
     // 清除两个固定条件
     Reflect.deleteProperty(query, 'appId')
     if (!think._.has(query, 'status')) {
@@ -88,14 +89,15 @@ module.exports = class extends BaseRest {
             .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand, query.status)
         }
       }
-
-      // } else if (this.get('sticky') === 'true') {
-      //   const stickys = this.options.stickys
-      //   list = await this.model('posts', {appId: this.appId}).getStickies(stickys)
-      //
     } else {
       Reflect.deleteProperty(query, 'page')
       Reflect.deleteProperty(query, 'pagesize')
+      // where({
+      //   't.slug': category,
+      //   'p.status': ['IN', status]
+      // })
+      query.status = 'publish'
+      query.type = 'page'
       list = await this.model('posts', {appId: this.appId})
         .where(query).field(fields.join(","))
         .order('modified DESC')
