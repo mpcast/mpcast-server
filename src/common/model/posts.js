@@ -618,7 +618,7 @@ module.exports = class extends Base {
    * @param status
    * @returns {Promise<Object>}
    */
-  async findByCategory (category, page = 1, pagesize, rand, status) {
+  async findByCategory (query, page = 1, pagesize, rand) {
     const fileds = [
       'p.id',
       'p.name',
@@ -626,10 +626,13 @@ module.exports = class extends Base {
       'p.content',
       'p.author',
       'p.modified',
-      'p.parent',
+      // 'p.parent',
       'p.status'
     ]
     const orderBy = rand === true ? 'rand()' : 'modified DESC'
+    query = Object.assign({}, query, {'t.slug': query.category})
+    Reflect.deleteProperty(query, 'category')
+
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
         join: 'inner',
@@ -646,10 +649,7 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where({
-      't.slug': category,
-      'p.status': ['IN', status]
-    })
+    }).field(fileds).where(query)
       .order(orderBy)
       .page(page, pagesize)
       .setRelation(true).countSelect()

@@ -93,8 +93,9 @@ module.exports = class extends BaseRest {
           if (think.isEmpty(rand)) {
             rand = false
           }
+          // Reflect.deleteProperty(query, 'category')
           list = await this.model('posts', {appId: this.appId})
-            .findByCategory(query.category, this.get('page'), this.get('pagesize'), rand, query.status)
+            .findByCategory(query, this.get('page'), this.get('pagesize'), rand)
         }
       }
     } else {
