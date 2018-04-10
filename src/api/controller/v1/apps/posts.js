@@ -52,6 +52,7 @@ module.exports = class extends BaseRest {
    */
   async getAll () {
     const query = this.get()
+
     // console.log(query)
     // 清除两个固定条件
     Reflect.deleteProperty(query, 'appId')
@@ -103,8 +104,11 @@ module.exports = class extends BaseRest {
       //   't.slug': category,
       //   'p.status': ['IN', status]
       // })
+
       query.status = 'publish'
       query.type = 'page'
+      Reflect.deleteProperty(query, 'page')
+      Reflect.deleteProperty(query, 'pagesize')
       list = await this.model('posts', {appId: this.appId})
         .where(query).field(fields.join(","))
         .order('modified DESC')
