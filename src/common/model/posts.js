@@ -514,8 +514,6 @@ module.exports = class extends Base {
    * @returns {Promise<Object>}
    */
   async getNews (page = 1, pagesize, query) {
-    // console.log('----------------------------')
-    // console.log(pagesize + 'x-x-x-x-x-x-x-x-')
     Reflect.deleteProperty(query, 'page')
     Reflect.deleteProperty(query, 'pagesize')
     const fileds = [
@@ -591,6 +589,8 @@ module.exports = class extends Base {
     query = Object.assign({}, query, {
       'meta_key': '_post_views'
     })
+    Reflect.deleteProperty(query, 'page')
+    Reflect.deleteProperty(query, 'pagesize')
     // query.status = {
     // }
     const data = await this.alias('p').field('id, name, title, content, author, modified, parent, status, JSON_LENGTH(meta_value) as view_count').join({
@@ -636,6 +636,8 @@ module.exports = class extends Base {
     const orderBy = rand === true ? 'rand()' : 'modified DESC'
     query = Object.assign({}, query, {'t.slug': query.category})
     Reflect.deleteProperty(query, 'category')
+    Reflect.deleteProperty(query, 'page')
+    Reflect.deleteProperty(query, 'pagesize')
 
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
