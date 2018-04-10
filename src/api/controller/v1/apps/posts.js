@@ -66,8 +66,7 @@ module.exports = class extends BaseRest {
     //   query.parent = 0
     // }
     query.type = 'page'
-    Reflect.deleteProperty(query, 'page')
-    Reflect.deleteProperty(query, 'pagesize')
+
     let list = []
     // const category = this.get('category')
     if (!think.isEmpty(this.get('category'))) {

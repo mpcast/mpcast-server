@@ -514,6 +514,10 @@ module.exports = class extends Base {
    * @returns {Promise<Object>}
    */
   async getNews (page = 1, pagesize, query) {
+    // console.log('----------------------------')
+    // console.log(pagesize + 'x-x-x-x-x-x-x-x-')
+    Reflect.deleteProperty(query, 'page')
+    Reflect.deleteProperty(query, 'pagesize')
     const fileds = [
       'p.id',
       'p.name',
