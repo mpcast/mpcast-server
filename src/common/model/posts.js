@@ -27,6 +27,7 @@ module.exports = class extends Base {
     _formatOneMeta(info)
     return info
   }
+
   async getFormatData (item) {
     switch (item.type) {
       case 'post-format-audio': {
@@ -54,6 +55,7 @@ module.exports = class extends Base {
 
     return item
   }
+
   async loadBlock (type, blockIds) {
     // page 取一级
     // 附件取全部
@@ -116,6 +118,7 @@ module.exports = class extends Base {
 
     return list
   }
+
   /**
    * 根据 id 批量获取附件内容
    * @param ids
@@ -361,7 +364,7 @@ module.exports = class extends Base {
     // return assetList
     // const list = await this.where({
     //   id: ['IN', assetsArray]
-      // 按 IN 条件的顺序查询出结果
+    // 按 IN 条件的顺序查询出结果
     // }).order(`INSTR (',${assetsArray},', CONCAT(',',id,','))`).page(page, pagesize).countSelect()
     // _formatMeta(list.data)
 
@@ -510,7 +513,7 @@ module.exports = class extends Base {
    * @param status
    * @returns {Promise<Object>}
    */
-  async getNews (page = 1, pagesize, status) {
+  async getNews (page = 1, pagesize, query) {
     const fileds = [
       'p.id',
       'p.name',
@@ -521,6 +524,7 @@ module.exports = class extends Base {
       'p.parent',
       'p.status'
     ]
+    query = Object.assign({}, query, {'tt.taxonomy': 'category'})
     const data = await this.model('terms', {appId: this.appId}).alias('t').join({
       term_taxonomy: {
         join: 'inner',
@@ -537,14 +541,11 @@ module.exports = class extends Base {
         as: 'p',
         on: ['p.id', 'tr.object_id']
       }
-    }).field(fileds).where({
-      'tt.taxonomy': 'category',
-      'p.status': ['IN', status]
-    })
+    }).field(fileds).where(query)
       .order('modified DESC')
       .page(page, pagesize)
       .setRelation(true).countSelect()
-      // `(tt.taxonomy = 'category') AND p.status IN(${status})`
+    // `(tt.taxonomy = 'category') AND p.status IN(${status})`
     const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)
@@ -571,24 +572,30 @@ module.exports = class extends Base {
    * @param pagesize
    * @returns {Promise<Object>}
    */
-  async getPopular (page = 1, pagesize) {
-    const fileds = [
-      'p.id',
-      'p.name',
-      'p.title',
-      'p.content',
-      'p.author',
-      'p.modified',
-      'p.parent',
-      'p.status'
-    ]
+  async getPopular (query, page = 1, pagesize) {
+    // const fileds = [
+    //   'p.id',
+    //   'p.name',
+    //   'p.title',
+    //   'p.content',
+    //   'p.author',
+    //   'p.modified',
+    //   'p.parent',
+    //   'p.status'
+    // ]
+    // `meta_key = '_post_views'`
+    query = Object.assign({}, query, {
+      'meta_key': '_post_views'
+    })
+    // query.status = {
+    // }
     const data = await this.alias('p').field('id, name, title, content, author, modified, parent, status, JSON_LENGTH(meta_value) as view_count').join({
       postmeta: {
         join: 'inner',
         as: 'pm',
         on: ['pm.post_id', 'p.id']
       }
-    }).where(`meta_key = '_post_views'`)
+    }).where(query)
       .page(page, pagesize)
       .setRelation(true).countSelect()
 
@@ -647,7 +654,7 @@ module.exports = class extends Base {
       .page(page, pagesize)
       .setRelation(true).countSelect()
 
-      // `(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`
+    // `(t.slug = '${category}' OR t.name LIKE '%${category}%') AND p.status = '${status}'`
     const postIds = []
     data.data.forEach((item) => {
       postIds.push(item.id)

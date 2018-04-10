@@ -4,12 +4,10 @@ const jwt = require('jsonwebtoken')
 
 module.exports = class extends BaseRest {
   async getAction () {
+    console.log('x0x0x0x0x')
     const appsModel = this.model('apps')
     const app = await appsModel.get(this.appId)
     return this.success(app)
-  }
-
-  async bindWxApp () {
   }
 
   async postAction () {
@@ -18,6 +16,7 @@ module.exports = class extends BaseRest {
 
     switch (action) {
       case 'create': {
+        console.log('x0x0x0x0')
         const orgId = data.org_id
         if (think.isEmpty(orgId)) {
           return this.fail('机构 ID 不能为空!')
@@ -55,7 +54,7 @@ module.exports = class extends BaseRest {
     // 应用数据初始始化
     // 更新应用表信息
     if (think.isEmpty(res)) {
-      const appsModel = this.model('apps')
+      const appsModel = this.model('apps').setRelation(false)
       await appsModel.add({
         id: appId,
         org_id: orgId,

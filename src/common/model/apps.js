@@ -21,7 +21,7 @@ module.exports = class extends think.Model {
     if (think.isEmpty(apps)) {
       apps = await this.list()
     }
-    const app = await think._.find(apps, ['id', appId.toString()])
+    const app = await think._.find(apps, ['id', appId])
 
     if (!think.isEmpty(app)) {
       // _formatOneMeta(app)

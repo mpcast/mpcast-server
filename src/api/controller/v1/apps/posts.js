@@ -52,26 +52,34 @@ module.exports = class extends BaseRest {
    */
   async getAll () {
     const query = this.get()
-    console.log(query)
+    // console.log(query)
     // 清除两个固定条件
     Reflect.deleteProperty(query, 'appId')
     if (!think._.has(query, 'status')) {
-      query.status = ['publish', 'auto-draft', 'draft']
+      // 'p.status': ['IN', status]
+      query.status = ['IN', ['publish', 'auto-draft', 'draft']]
+      // query.status = {
+      //   'status': ['IN', 'publish', 'auto-draft', 'draft']
+      // }
     }
-    if (!think._.has(query, 'parent')) {
-      query.parent = 0
-    }
+    // if (!think._.has(query, 'parent')) {
+    //   query.parent = 0
+    // }
+    query.type = 'page'
+    Reflect.deleteProperty(query, 'page')
+    Reflect.deleteProperty(query, 'pagesize')
     let list = []
-
     // const category = this.get('category')
     if (!think.isEmpty(this.get('category'))) {
       switch (query.category) {
         case 'new' : {
-          list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query.status)
+          Reflect.deleteProperty(query, 'category')
+          list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query)
           break
         }
         case 'popular': {
-          list = await this.model('posts', {appId: this.appId}).getPopular(this.get('page'), this.get('pagesize'))
+          Reflect.deleteProperty(query, 'category')
+          list = await this.model('posts', {appId: this.appId}).getPopular(query, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 6)
           break
         }
         case 'featured': {
@@ -90,8 +98,7 @@ module.exports = class extends BaseRest {
         }
       }
     } else {
-      Reflect.deleteProperty(query, 'page')
-      Reflect.deleteProperty(query, 'pagesize')
+
       // where({
       //   't.slug': category,
       //   'p.status': ['IN', status]
