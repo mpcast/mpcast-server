@@ -574,25 +574,18 @@ module.exports = class extends Base {
    * @param pagesize
    * @returns {Promise<Object>}
    */
-  async getPopular (query, page = 1, pagesize) {
-    // const fileds = [
-    //   'p.id',
-    //   'p.name',
-    //   'p.title',
-    //   'p.content',
-    //   'p.author',
-    //   'p.modified',
-    //   'p.parent',
-    //   'p.status'
-    // ]
-    // `meta_key = '_post_views'`
+  async getPopular (query, page = 1, pagesize, rand) {
+
     query = Object.assign({}, query, {
       'meta_key': '_post_views'
     })
     Reflect.deleteProperty(query, 'page')
     Reflect.deleteProperty(query, 'pagesize')
+    Reflect.deleteProperty(query, 'rand')
     // query.status = {
     // }
+    const orderBy = rand ? 'rand()' : 'view_count DESC'
+    console.log(orderBy)
     const data = await this.alias('p').field('id, name, title, content, author, modified, parent, status, JSON_LENGTH(meta_value) as view_count').join({
       postmeta: {
         join: 'inner',
@@ -600,6 +593,7 @@ module.exports = class extends Base {
         on: ['pm.post_id', 'p.id']
       }
     }).where(query)
+      .order(orderBy)
       .page(page, pagesize)
       .setRelation(true).countSelect()
 

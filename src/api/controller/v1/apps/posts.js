@@ -69,17 +69,23 @@ module.exports = class extends BaseRest {
     query.type = 'page'
 
     let list = []
+    // 用随机方法查询数据
+    let rand = this.get('rand')
+    if (think.isEmpty(rand)) {
+      rand = false
+    }
     // const category = this.get('category')
     if (!think.isEmpty(this.get('category'))) {
       switch (query.category) {
         case 'new' : {
           Reflect.deleteProperty(query, 'category')
+          Reflect.deleteProperty(query, 'rand')
           list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query)
           break
         }
         case 'popular': {
           Reflect.deleteProperty(query, 'category')
-          list = await this.model('posts', {appId: this.appId}).getPopular(query, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 6)
+          list = await this.model('posts', {appId: this.appId}).getPopular(query, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 6, rand)
           break
         }
         case 'featured': {
@@ -88,12 +94,8 @@ module.exports = class extends BaseRest {
           break
         }
         default: {
-          // 用随机方法查询数据
-          let rand = this.get('rand')
-          if (think.isEmpty(rand)) {
-            rand = false
-          }
           // Reflect.deleteProperty(query, 'category')
+          Reflect.deleteProperty(query, 'rand')
           list = await this.model('posts', {appId: this.appId})
             .findByCategory(query, this.get('page'), this.get('pagesize'), rand)
         }
