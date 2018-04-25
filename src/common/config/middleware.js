@@ -89,6 +89,15 @@ module.exports = [
     },
     match: ctx => { // match 为一个函数，将 ctx 传递给这个函数，如果返回结果为 true，则启用该 middleware
       // if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/))) {
+      // if (ctx.url === '')
+      // console.log(ctx.request.header['x-app-id'])
+      // if ()
+      const appId = ctx.request.header['x-app-id']
+      if (!think.isEmpty(appId)) {
+        if (appId === 'B1yDrzqEf') {
+          return false
+        }
+      }
       if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) ||
           ctx.url.match(/^\/v1\/apps\/\w+\/options?/) ||
           ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token|verify?/))) {

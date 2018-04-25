@@ -21,7 +21,7 @@ const isDev = think.env === 'development';
 //     gcInterval: 24 * 60 * 60 * 1000 // gc interval
 //   }
 // }
-
+// exports.redis =
 exports.cache = require('./adapter/cache')
 /**
  * model adapter config
