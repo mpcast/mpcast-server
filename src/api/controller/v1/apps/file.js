@@ -44,7 +44,10 @@ module.exports = class extends BaseRest {
       return this.fail('文件上传失败，请重试')
     }
     // 文件排重，查询附件文件是否存在
-    const attachment = await postModel.field(['id', 'author', 'status', 'title', 'name', 'content', 'date', 'guid as url']).where({name: hashValue}).find()
+    const attachment = await postModel
+      .field(['id', 'author', 'status', 'title', 'name', 'content', 'date', 'guid as url'])
+      .where({name: hashValue})
+      .find()
     // const attachment = await postModel.field(['id', 'guid as url']).where({name: hashValue}).find()
     if (!think.isEmpty(attachment)) {
       return this.success(attachment)
