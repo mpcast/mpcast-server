@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 
 module.exports = class extends BaseRest {
   async getAction () {
+    console.log('x0x0x0x0x')
     const appsModel = this.model('apps')
     const app = await appsModel.get(this.appId)
     return this.success(app)
@@ -15,6 +16,7 @@ module.exports = class extends BaseRest {
 
     switch (action) {
       case 'create': {
+        console.log('x0x0x0x0')
         const orgId = data.org_id
         if (think.isEmpty(orgId)) {
           return this.fail('机构 ID 不能为空!')

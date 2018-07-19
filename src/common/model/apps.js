@@ -16,7 +16,7 @@ module.exports = class extends think.Model {
     return list
   }
 
-  async get (appId) {
+  async get(appId) {
     let apps = await think.cache('apps')
     if (think.isEmpty(apps)) {
       apps = await this.list()
@@ -35,63 +35,16 @@ module.exports = class extends think.Model {
    * 全部应用列表
    * @returns {Promise.<*>}
    */
-  async list () {
+  async list() {
     const apps = await this.select()
     _formatMeta(apps)
-
     for (let app of apps) {
-      let domain = app.domain
-      if (think.isEmpty(domain) && !think.isEmpty(app.subdomain)) {
-        domain = app.subdomain
-      }
       if (!think.isEmpty(app.meta.info)) {
         app = Object.assign(app, app.meta.info)
       }
       Reflect.deleteProperty(app, 'meta')
     }
-
     await think.cache('apps', apps)
     return apps
   }
-
-
-  // async lista () {
-  //   const map = {}
-  //   const list = await this.where(map).field(['id', 'domain', 'subdomain']).select()
-  //
-  //   // _formatMeta(list)
-  //   const obj = {}
-  //   for (let v of list) {
-  //     let domain = v.domain
-  //     if (think.isEmpty(domain) && !think.isEmpty(v.subdomain)) {
-  //       domain = v.subdomain
-  //     }
-  //     // 处理 org 的 meta 信息
-  //     for (let meta of v.metas) {
-  //       if (meta.meta_key === 'basic') {
-  //         v.basic = JSON.parse(meta.meta_value)
-  //         v = Object.assign(v, v.basic)
-  //         Reflect.deleteProperty(v, 'basic')
-  //       }
-  //     }
-  //     Reflect.deleteProperty(v, 'metas')
-  //     obj[domain] = v.id
-  //
-  //     // 处理 机构的 apps meta 信息
-  //     for (let app of v.apps) {
-  //       if (!Object.is(app.metas, undefined)) {
-  //         _formatOneMeta(app)
-  //         app = Object.assign(app, app.meta.info)
-  //         Reflect.deleteProperty(app, 'meta')
-  //       }
-  //     }
-  //     _formatMeta(v.apps)
-  //     await think.cache(domain.toString(), v)
-  //   }
-  //   return obj
-  // }
-
 }
-
-
-

@@ -22,7 +22,8 @@ const isDev = think.env === 'development';
 //   }
 // }
 // exports.redis =
-exports.cache = require('./adapter/cache')
+exports.cache = require('./adapter/redis_cache')
+
 /**
  * model adapter config
  * @type {Object}

@@ -99,8 +99,8 @@ module.exports = [
         }
       }
       if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) ||
-          ctx.url.match(/^\/v1\/apps\/\w+\/options?/) ||
-          ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token|verify?/))) {
+        ctx.url.match(/^\/v1\/apps\/\w+\/options?/) ||
+        ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token|verify?/))) {
 
         return false;
       } else if (ctx.url.match(ctx.url.match(/^\/v1*?/) || ctx.url.match(/^\/v2*?/))) {

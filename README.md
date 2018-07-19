@@ -1,22 +1,49 @@
+# API 服务安装
+    注意：
+    需要 Node 8+、 MySQL5.7+、 Redis、Nginx、PM2 环境的支持，请确保服务器上安装相关环境
+    
+# 基本运行
+## 前置准备
+1. 建立数据库服务
 
-Application created by [ThinkJS](http://www.thinkjs.org)
+    数据库文件存放地址
+    ```bash
+    .res/caixie-picker_v2.zy.sql
+    ```  
+ 
+2. 数据库请求配置
+    ```bash
+    src/common/config/adapter/model.js
+    ```  
+  
+3. 启动 redis
 
-## Install dependencies
+   配置文件在: 
+   
+   ```bash
+   src/common/config/adapter/redis_cache.js
+   ```  
+        
+## 安装依赖
 
 ```
-npm install
+yarn or npm install
 ```
 
-## Start server
+## 运行服务
 
 ```
-npm start
+yarn start or npm start
 ```
 
-## Deploy with pm2
-
-Use pm2 to deploy app on production enviroment.
+## 使用 pm2 部署
 
 ```
 pm2 startOrReload pm2.json
 ```
+
+## nginx 配置
+    参考工程目录下的 nginx.conf
+    
+## 使用 Docker 部署
+    参考工程目录下的 Dockerfile
