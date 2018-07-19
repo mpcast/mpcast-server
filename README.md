@@ -47,3 +47,39 @@ pm2 startOrReload pm2.json
     
 ## 使用 Docker 部署
     参考工程目录下的 Dockerfile
+    
+    
+# 工程目录
+.
+├── Dockerfile
+├── Dockerfile_Local
+├── README.md
+├── development.js
+├── keywords
+├── logs
+├── nginx.conf
+├── package-lock.json
+├── package.json
+├── pm2.json
+├── port
+├── production.js
+├── runtime
+│   └── config
+│       └── development.json
+├── src
+│   ├── admin
+│   │   └── controller              # 包含一个定时器用于定期更新 redis 缓存
+│   ├── api
+│   │   ├── config 
+│   │   ├── controller              # Api Controller
+│   │   ├── logic
+│   │   └── service
+│   └── common
+│       ├── bootstrap               # 系统启动入口
+│       ├── config                  # 系统配置文件目录
+│       ├── extend                  
+│       ├── model                   # 数据表模型
+│       └── service
+├── yarn-error.log
+└── yarn.lock
+
