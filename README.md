@@ -50,6 +50,8 @@ pm2 startOrReload pm2.json
     
     
 # 工程目录
+
+```bash
 .
 ├── Dockerfile
 ├── Dockerfile_Local
@@ -82,4 +84,5 @@ pm2 startOrReload pm2.json
 │       └── service
 ├── yarn-error.log
 └── yarn.lock
+```
 
