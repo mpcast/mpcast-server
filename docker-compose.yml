@@ -59,8 +59,8 @@ services:
       - "traefik.frontend.headers.STSPreload=true"
     volumes:
       - ./:/app
-    command: ["node", "/app/production.js"]
-#    command: ["node", "/app/development.js"]
+#    command: ["node", "/app/production.js"]
+    command: ["node", "/app/development.js"]
     depends_on:
       - mysql
       - redis
