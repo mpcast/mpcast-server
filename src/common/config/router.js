@@ -26,7 +26,12 @@ module.exports = [
   [/\/v1\/apps\/(\w+)\/me\/likes?/, '/api/v1/apps/me/likes?appId=:1', 'get'],
   // V2 版本
   [/\/v2\/apps\/(\w+)\/me\/likes?/, '/api/v2/apps/me/likes?appId=:1', 'get'],
-  [/\/v2\/(\w+)$/, '/api/v2/:1', 'get, post'],
+  [/\/v2\/apps\/(\w+)\/fields\/(\d+)?/, '/api/v2/apps/fields?appId=:1&groupId=:2', 'get'],
+
+  [/\/v2\/fields\/(\d+)?$/, '/api/v2/fields?groupId=:1', 'get, post'],
+  [/\/v2\/(\w+)(?:\/(\w+))?$/, '/api/v2/:1/:2', 'get, post'],
+  [/\/v2\/(\w+)\/(\w+)\/(\d+)$/, '/api/v2/:1/_id&id=:2', 'get, post'],
+
   [/\/v1\/apps\/(\w+)\/me\/posts?/, '/api/v1/apps/me/posts?appId=:1', 'get'],
 
   [/\/v1\/apps\/(\w+)\/users\/login:(\w+)?/, '/api/v1/apps/users/login?appId=:1&user_login=:2', 'get'],

@@ -1,5 +1,6 @@
 /* eslint-disable no-undef,no-return-await,default-case,max-depth,no-warning-comments,comma-spacing */
-const BaseRest = require('./_rest')
+const BaseRest = require('./Base')
+
 let fields = [
   'id',
   'groupId',
@@ -16,8 +17,15 @@ let fields = [
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
-    const query = this.get()
-    const list = await this.model('fields')
+    let query = this.get()
+    // if (think._.has(query, 'appId')) {
+    //   query = think._.omit(['appId'])
+    // }
+    // let object = { appId: 1, 'b': '2', 'c': 3 };
+
+    query = think._.omit(query, ['appId']);
+    // console.log(query)
+    const list = await this.model('fields', {appId: this.appId})
       .where(query)
       .field(fields.join(","))
       .order('dateUpdated ASC')

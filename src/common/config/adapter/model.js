@@ -46,10 +46,12 @@ module.exports = {
     database: 'picker',
     prefix: 'picker_',
     charset: 'UTF8MB4_GENERAL_CI',
-    host: isDev ? '127.0.0.1' : '114.55.230.6',
-    port: isDev ? '3399' : '3377',
+    host: 'mysql',
+    port: '3306',
+    // host: isDev ? '127.0.0.1' : 'mysql',
+    // port: isDev ? '3399' : '3306',
     user: 'root',
-    password: 'ub08JASJQy9s',
+    password: 'abcd1234',
     dateStrings: true
   }
 }

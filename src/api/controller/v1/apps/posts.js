@@ -52,21 +52,17 @@ module.exports = class extends BaseRest {
    */
   async getAll () {
     const query = this.get()
-
     // console.log(query)
     // 清除两个固定条件
     Reflect.deleteProperty(query, 'appId')
     if (!think._.has(query, 'status')) {
-      // 'p.status': ['IN', status]
       query.status = ['IN', ['publish', 'auto-draft', 'draft']]
-      // query.status = {
-      //   'status': ['IN', 'publish', 'auto-draft', 'draft']
-      // }
     }
     // if (!think._.has(query, 'parent')) {
     //   query.parent = 0
     // }
-    query.type = 'page'
+    // query.type = 'page'
+    query.type = 'post_format'
 
     let list = []
     // 用随机方法查询数据

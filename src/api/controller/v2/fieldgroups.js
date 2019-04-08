@@ -2,23 +2,15 @@
 const BaseRest = require('./_rest')
 let fields = [
   'id',
-  'groupId',
   'name',
-  'handle',
-  'context',
-  'instructions',
-  'translatable',
-  'type',
-  'settings',
   'dateCreated',
   'dateUpdated',
   'uid'
 ]
 module.exports = class extends BaseRest {
   async indexAction () {
-    const query = this.get()
-    const list = await this.model('fields')
-      .where(query)
+    const list = await this.model('fieldgroups')
+    // .where(query)
       .field(fields.join(","))
       .order('dateUpdated ASC')
       .page(this.get('page'), this.get('pagesize') ? this.get('pagesize') : 30)
@@ -27,11 +19,25 @@ module.exports = class extends BaseRest {
   }
 
   /**
-   * 新建字段
-   * @returns {Promise<*|boolean>}
+   * 新建字段群组
+   * @returns {Promise<*>}
    */
   async newAction () {
     const data = this.post()
+    if (think.isEmpty(data.name)) {
+      return this.fail('组名不能为空')
+    }
+
+    const res = await this.model('fieldgroups').where({
+      name: data.name
+    }).thenAdd({
+      name: data.name,
+      date: new Date().getTime(),
+      modified: new Date().getTime(),
+      uid: think.uuid(4)
+    })
+
+    return this.success(res)
   }
 }
 

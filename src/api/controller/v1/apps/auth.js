@@ -11,8 +11,10 @@ module.exports = class extends BaseRest {
    * @returns {Promise<*|boolean>}
    */
   async tokenAction () {
+    console.log('my token ....')
     if (this.isGet) {
       const code = this.get('code')
+      console.log('test .....')
       if (!think.isEmpty(code)) {
         try {
           const {user, token} = await this.wxLogin(code)
@@ -80,13 +82,16 @@ module.exports = class extends BaseRest {
    * @returns {Promise.<*>}
    */
   async checkAction () {
+    console.log('che action .....')
     if (this.isPost) {
       const data = this.post()
       // '{"nickName":"请好好说话🌱","gender":1,"language":"en","city":"Chaoyang","province":"Beijing","cy":"China","avatarUrl":"https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83ep0GdQEHK3tYdvq3DTMVhsdiaviaLg6b7CdDBLOYSWDGYOEtS7FFmvhd6CGCuQVfe4Rb0uQUlaq7XoA/0"}',
       //   signature: 'e9dfe22dfb4fbbad0ec359cb498915b84860295d' }
       const signature1 = data.signature
       const rawData = data.rawData
+      console.log(data)
       try {
+        console.log(this.ctx.state.user)
         const redisUserKey = `${this.wechatService.keyPrefix}${this.ctx.state.user.user_login}`
         const wxUser = await this.wechatService.getSessionKey(redisUserKey)
         const sha1 = crypto.createHash('sha1')
@@ -95,7 +100,7 @@ module.exports = class extends BaseRest {
         if (signature1 === signature2) {
           return this.success()
         } else {
-          throw new Error('Signature Error')
+          throw new Error('Signature not eq')
         }
       } catch (e) {
         console.error(e)

@@ -3,6 +3,10 @@ const isDev = think.env === 'development';
 const cors = require('@koa/cors')
 const jwt = require('koa-jwt')
 const payload = require('think-payload');
+const graphql = require('../middlware/graphql')
+const { makeExecutableSchema } = require('graphql-tools');
+// const Reslovers = require('../../graphql/resolvers')
+// const Schema = require('../../graphql/schema')
 // const swaggerParser = require('think-swagger-parser')
 // const swaggerRouter = require('think-swagger-router')
 // const swaggerController = require('think-swagger-controller')
@@ -82,6 +86,16 @@ module.exports = [
     handle: cors,
     options: {}
   },
+  // {
+  //   match: '/graphql',
+  //   handle: graphql,
+  //   options: {
+  //     schema: makeExecutableSchema({
+  //       typeDefs: Schema,
+  //       resolvers: Reslovers
+  //     })
+  //   }
+  // },
   {
     handle: jwt,
     options: {
@@ -92,12 +106,14 @@ module.exports = [
       // if (ctx.url === '')
       // console.log(ctx.request.header['x-app-id'])
       // if ()
-      const appId = ctx.request.header['x-app-id']
-      if (!think.isEmpty(appId)) {
-        if (appId === 'B1yDrzqEf') {
-          return false
-        }
-      }
+      // console.log('show .....')
+      // const appId = ctx.request.header['x-app-id']
+      // console.log('appId + ' + appId)
+      // if (!think.isEmpty(appId)) {
+      //   if (appId === 'B1yDrzqEf') {
+      //     return false
+      //   }
+      // }
       if (ctx.url.match(ctx.url.match(/^\/v1\/org\/\d+\/subdomain_validation|signin|signout?/) ||
         ctx.url.match(/^\/v1\/apps\/\w+\/options?/) ||
         ctx.url.match(/^\/v1\/apps\/\w+\/auth\/token|verify?/))) {
