@@ -163,6 +163,8 @@ module.exports = class extends BaseRest {
     if (think.isEmpty(data.block)) {
       data.block = []
     }
+    console.log('-x-x-x-x-x-x--xx--')
+    console.log(user)
     data.author = user
     Reflect.deleteProperty(user, 'meta')
   }

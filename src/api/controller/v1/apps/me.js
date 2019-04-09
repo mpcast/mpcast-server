@@ -11,6 +11,10 @@ module.exports = class extends Base {
 
   async indexAction () {
     const curUser = this.ctx.state.user
+    if (!curUser || think.isEmpty(curUser)) {
+      return this.fail('no user')
+    }
+    // console.log(curUser)
     // if (!think.isEmpty(curUser)) {
     //   return this.sus
     // }

@@ -36,9 +36,10 @@ services:
     networks:
       - db
   caixie.love_api:
-    tty: true
-    stdin_open: true
-    image: mhart/alpine-node
+#    tty: true
+#    stdin_open: true
+#    image: mhart/alpine-node
+    build: .
     expose:
       - 5000
     networks:
@@ -67,6 +68,7 @@ services:
 volumes:
   mysql_vol:
   redis-vol:
+  app-vol:
 networks:
   db:
   traefik:
