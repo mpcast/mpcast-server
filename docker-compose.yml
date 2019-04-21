@@ -27,43 +27,44 @@ services:
       - 3399:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8MB4;' --sql-mode="NO_ENGINE_SUBSTITUTION" --innodb-flush-log-at-trx-commit=0
     environment:
-      - MYSQL_DATABASE=picker
+      - MYSQL_DATABASE=podcast
       - MYSQL_ROOT_PASSWORD=abcd1234
       - MYSQL_PASSWORD=abcd1234
     volumes:
-      - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+#      - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
       - mysql_vol:/var/lib/mysql
     networks:
       - db
-  caixie.love_api:
-    tty: true
-    stdin_open: true
-    image: mhart/alpine-node
-    expose:
-      - 5000
-    networks:
-      - traefik
-      - db
-    labels:
-      - "traefik.backend=caixie.love_api"
-      - "traefik.docker.network=traefik"
-      - "traefik.enable=true"
-      - "traefik.passHostHeader=true"
-      - "traefik.frontend.priority=11"
-      - "traefik.port=5000"
-      - "traefik.frontend.entryPoints=https,http"
-      - "traefik.frontend.rule=Host:api.caixie.top"
-      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*"
-      - "traefik.frontend.headers.STSSeconds=315360000"
-      - "traefik.frontend.headers.STSIncludeSubdomains=true"
-      - "traefik.frontend.headers.STSPreload=true"
-    volumes:
-      - ./:/app
-#    command: ["node", "/app/production.js"]
-    command: ["node", "/app/development.js"]
-    depends_on:
-      - mysql
-      - redis
+#  caixie.love_api:
+#    tty: true
+#    stdin_open: true
+#    image: mhart/alpine-node
+#    expose:
+#      - 5000
+#    networks:
+#      - traefik
+#      - db
+#    labels:
+#      - "traefik.backend=caixie.love_api"
+#      - "traefik.docker.network=traefik"
+#      - "traefik.enable=true"
+#      - "traefik.passHostHeader=true"
+#      - "traefik.frontend.priority=11"
+#      - "traefik.port=5000"
+#      - "traefik.frontend.entryPoints=https,http"
+#      - "traefik.frontend.rule=Host:api.caixie.top"
+#      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*"
+#      - "traefik.frontend.headers.STSSeconds=315360000"
+#      - "traefik.frontend.headers.STSIncludeSubdomains=true"
+#      - "traefik.frontend.headers.STSPreload=true"
+#    volumes:
+#      - ./:/app
+##    command: ["node", "/app/production.js"]
+##    command: ["node", "/app/development.js"]
+#    command: ["nodemon"]
+#    depends_on:
+#      - mysql
+#      - redis
 volumes:
   mysql_vol:
   redis-vol:
