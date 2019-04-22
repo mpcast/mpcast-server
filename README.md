@@ -17,7 +17,7 @@
 ## Description
 
 **v2.0.0 使用 [Nest](https://github.com/nestjs/nest) 进行重构，当前版本还未完成。
-之前的 nodejs 版本在 [此分支](https://github.com/caixie-ltd/podcast-server/tree/thinkjs。**
+之前的 nodejs 版本在 [此分支](https://github.com/caixie-ltd/podcast-server/tree/thinkjs**
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
