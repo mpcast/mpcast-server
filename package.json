@@ -1,7 +1,7 @@
 {
   "name": "picker-server",
-  "version": "0.0.1",
-  "description": "",
+  "version": "2.0.0",
+  "description": "A Miniprogram podcast server.",
   "author": "",
   "license": "MIT",
   "scripts": {
