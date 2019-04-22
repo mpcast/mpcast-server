@@ -1,0 +1,12 @@
+{
+  "wechatConfig": {
+    "store": "FileStore_/Users/baisheng/Workspace/podcast-server/wechat-info.json"
+  },
+  "globalToken": {
+    "count": 0
+  },
+  "urls": {},
+  "oauth": {},
+  "card": {},
+  "mp": {}
+}
