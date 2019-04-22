@@ -3,7 +3,7 @@ import { PostService } from '@app/modules/posts/post.service';
 import { PostController } from '@app/modules/posts/post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@app/modules/users/user.module';
-import { Post, Users } from '@app/entity';
+import { Post, User } from '@app/entity';
 // import { AuthModule } from '@app/modules/auth/auth.module';
 // import { Users } from '@app/entity';
 
@@ -15,7 +15,7 @@ import { Post, Users } from '@app/entity';
   imports: [
     UserModule,
     TypeOrmModule.forFeature([
-      Users,
+      User,
       Post,
     ]),
   ],

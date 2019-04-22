@@ -1,8 +1,8 @@
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
-import { UserMeta } from '@app/entity';
-import { PostMeta } from '@app/entity/posts/postmeta.entity';
+import { PostMeta } from '@app/entity/posts/post-meta.entity';
+import { Comment } from '@app/entity/comments/comment.entity';
 
 @Index(['name'], { unique: true })
 // @Index(['type', 'status', 'createdDate', 'id'], { unique: true })
@@ -75,15 +75,16 @@ export class Post extends BaseEntity {
     comment: '内容 block',
     nullable: true,
   })
+  @IsArray()
   content: string[];
 
   @Column('json', {
     comment: '内容区块',
   })
+  @IsJSON()
   block: any;
 
   @Column({
-    name: 'allow_comment',
     type: 'boolean',
     comment: '格式',
     default: false,
@@ -96,7 +97,7 @@ export class Post extends BaseEntity {
   commentCount: number;
 
   @Column({
-    name: 'post_parent',
+    name: 'parent',
     comment: '父级内容',
     unsigned: true,
     type: 'int',
@@ -111,7 +112,6 @@ export class Post extends BaseEntity {
   mimeType: string;
 
   @Column({
-    name: 'menu_order',
     comment: '菜单顺序',
     default: 0,
   })
@@ -127,4 +127,9 @@ export class Post extends BaseEntity {
     cascade: true,
   })
   metas?: PostMeta[];
+
+  @OneToMany(type => Comment, comment => comment.post, {
+    cascade: true,
+  })
+  comments?: PostMeta[];
 }

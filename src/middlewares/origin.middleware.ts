@@ -2,7 +2,6 @@
  * Origin middleware.
  * @file Origin 中间件
  * @module middleware/origin
- * @author Surmon <https://github.com/surmon-china>
  */
 
 import { CROSS_DOMAIN } from '@app/app.config';

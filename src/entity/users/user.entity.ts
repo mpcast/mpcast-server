@@ -1,11 +1,11 @@
 import {BaseEntity} from '@app/entity/base.entity';
 import {DeepPartial, Entity, OneToMany} from 'typeorm';
 import {Column} from 'typeorm';
-import {UserMeta} from '@app/entity';
+import {UserMeta, Comment} from '@app/entity';
 
-@Entity()
-export class Users extends BaseEntity {
-    constructor(input?: DeepPartial<Users>) {
+@Entity('users')
+export class User extends BaseEntity {
+    constructor(input?: DeepPartial<User>) {
         super(input);
     }
 
@@ -32,4 +32,9 @@ export class Users extends BaseEntity {
         cascade: true,
     })
     metas?: UserMeta[];
+
+    @OneToMany(type => Comment, comment => comment.user, {
+        cascade: true,
+    })
+    comments?: Comment[];
 }

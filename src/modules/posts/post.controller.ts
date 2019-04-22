@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post } from '@app/entity';
+import { HttpProcessor } from '@app/decorators/http.decorator';
 
 // import { Post } from './post.entity';
 
@@ -26,4 +27,33 @@ export class PostController {
   // findAll(): Promise<Post[]> {
   //   return this.postService.findAll();
   // }
+  @Get('categories/:category')
+  @HttpProcessor.handle('获取类别下的内容')
+  findByCategory(@Param('category') category): Promise<any> {
+    switch (category) {
+      case 'new' : {
+        // Reflect.deleteProperty(query, 'category')
+        // Reflect.deleteProperty(query, 'rand')
+        // list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query)
+        break;
+      }
+      case 'popular': {
+        // Reflect.deleteProperty(query, 'category')
+        // list = await this.model('posts', {appId: this.appId}).getPopular(query, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 6, rand)
+        break;
+      }
+      case 'featured': {
+        // const stickys = this.options.stickys
+        // list = await this.model('posts', {appId: this.appId}).getStickys(stickys, this.get('page'), this.get('pagesize'))
+        break;
+      }
+      default: {
+        // Reflect.deleteProperty(query, 'category')
+        // Reflect.deleteProperty(query, 'rand');
+        // list = await this.model('posts', { appId: this.appId })
+        //   .findByCategory(query, this.get('page'), this.get('pagesize'), rand);
+      }
+    }
+    return null;
+  }
 }

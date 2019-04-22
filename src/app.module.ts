@@ -2,10 +2,10 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+// import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from '@app/entity';
-import { PasswordCiper } from '@app/service/helpers/password-cipher/password-ciper';
+// import { User } from '@app/entity';
+// import { PasswordCiper } from '@app/service/helpers/password-cipher/password-ciper';
 // 拦截器
 import { HttpCacheInterceptor } from '@app/interceptors/cache.interceptor';
 // 中间件
@@ -22,7 +22,7 @@ import { UserModule } from '@app/modules/users/user.module';
 import { WechatModule } from '@app/modules/wechat/wechat.module';
 import { PostModule } from '@app/modules/posts/post.module';
 // import { AuthService } from '@app/modules/auth/auth.service';
-// import { UsersService } from '@app/modules/users/users.service';
+// import { UserService } from '@app/modules/users/users.service';
 
 @Module({
   imports: [

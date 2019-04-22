@@ -2,7 +2,6 @@
  * HttpForbidden error.
  * @file 403 错误生成器
  * @module error/forbidden
- * @author Surmon <https://github.com/surmon-china>
  */
 
 import * as TEXT from '@app/constants/text.constant';

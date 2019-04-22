@@ -2,7 +2,6 @@
  * Helper Ip service.
  * @file Helper Ip 模块服务
  * @module module/helper/ip.service
- * @author Surmon <https://github.com/surmon-china>
  */
 
 import * as geoip from 'geoip-lite';

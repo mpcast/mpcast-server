@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { Code2SessionResponse, MiniProgram, Wechat } from 'wechat-jssdk';
-import { UsersService } from '@app/modules/users/users.service';
+import { UserService } from '@app/modules/users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as APP_CONFIG from '@app/app.config';
 import { HumanizedJwtAuthGuard } from '@app/guards/humanized-auth.guard';
@@ -31,7 +31,7 @@ export class WechatController {
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
     private readonly cacheService: CacheService,
   ) {
     this.wx = new Wechat(this.wechatConfig);

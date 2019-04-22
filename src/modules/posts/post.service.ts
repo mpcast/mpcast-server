@@ -1,16 +1,29 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from '@app/entity';
-import { Repository, In, Any, OrderByCondition } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { HttpException, Injectable } from '@nestjs/common';
-import { Users } from '@app/entity';
+import { User } from '@app/entity';
+
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(Users) private readonly usersRepository: Repository<Users>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
   ) {
+  }
+
+  async getNews(take: number) {
+    // const where: {
+    // }
+    // return await this.postRepository.find({
+    //     where,
+    //     take: take || 10,
+    //     skip: 0,
+    //     cache: true,
+    //   },
+    // );
   }
 
   async findOne(postId: number, name: string): Promise<Post> {

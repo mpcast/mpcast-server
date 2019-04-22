@@ -4,8 +4,8 @@
  * @module module/auth/service
  */
 
-import * as lodash from 'lodash';
-import * as APP_CONFIG from '@app/app.config';
+// import * as lodash from 'lodash';
+// import * as APP_CONFIG from '@app/app.config';
 import { Base64 } from 'js-base64';
 // import { createHash } from 'crypto';
 // import {InjectModel} from 'nestjs-typegoose';
@@ -17,7 +17,7 @@ import { PasswordCiper } from '@app/service/helpers/password-cipher/password-cip
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { ID } from '@app/common/shared-types';
-import { Users } from '@app/entity';
+import { User } from '@app/entity';
 // import { ValidationError } from '@app/errors/validation.error';
 import { HttpUnauthorizedError } from '@app/errors/unauthorized.error';
 
@@ -38,7 +38,7 @@ export class AuthService {
     // const isVerified = lodash.isEqual(payload.data, APP_CONFIG.AUTH.data);
     // IF 是微信，返回唯一标识，一般为用户的 openid
     if (payload.type === 'wechat') {
-      const user = await this.connection.getRepository(Users).findOne({
+      const user = await this.connection.getRepository(User).findOne({
         identifier: payload.identifier,
       });
       if (user) {
@@ -56,7 +56,7 @@ export class AuthService {
    * @param password
    */
   async verifyUserPassword(userId: ID, password: string): Promise<boolean> {
-    const user = await this.connection.getRepository(Users).findOne(userId, {
+    const user = await this.connection.getRepository(User).findOne(userId, {
       select: ['passwordHash'],
     });
     if (!user) {
