@@ -35,7 +35,6 @@ services:
       - mysql_vol:/var/lib/mysql
     networks:
       - db
-<<<<<<< HEAD
   caixie.love_api:
 #    tty: true
 #    stdin_open: true
@@ -66,38 +65,6 @@ services:
     depends_on:
       - mysql
       - redis
-=======
-#  caixie.love_api:
-#    tty: true
-#    stdin_open: true
-#    image: mhart/alpine-node
-#    expose:
-#      - 5000
-#    networks:
-#      - traefik
-#      - db
-#    labels:
-#      - "traefik.backend=caixie.love_api"
-#      - "traefik.docker.network=traefik"
-#      - "traefik.enable=true"
-#      - "traefik.passHostHeader=true"
-#      - "traefik.frontend.priority=11"
-#      - "traefik.port=5000"
-#      - "traefik.frontend.entryPoints=https,http"
-#      - "traefik.frontend.rule=Host:api.caixie.top"
-#      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*"
-#      - "traefik.frontend.headers.STSSeconds=315360000"
-#      - "traefik.frontend.headers.STSIncludeSubdomains=true"
-#      - "traefik.frontend.headers.STSPreload=true"
-#    volumes:
-#      - ./:/app
-##    command: ["node", "/app/production.js"]
-##    command: ["node", "/app/development.js"]
-#    command: ["nodemon"]
-#    depends_on:
-#      - mysql
-#      - redis
->>>>>>> nest
 volumes:
   mysql_vol:
   redis-vol:
