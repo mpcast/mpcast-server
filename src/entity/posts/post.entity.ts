@@ -1,6 +1,8 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
+import { UserMeta } from '@app/entity';
+import { PostMeta } from '@app/entity/posts/postmeta.entity';
 
 @Index(['name'], { unique: true })
 // @Index(['type', 'status', 'createdDate', 'id'], { unique: true })
@@ -9,74 +11,12 @@ import { BaseEntity } from '../base.entity';
 @Entity('posts')
 export class Post extends BaseEntity {
   @Column({
-    type: 'int',
-    comment: '版本',
-    default: 1,
-  })
-  version: number;
-
-  @Column({
-    name: 'last_version',
-    type: 'int',
-    comment: '最终版本',
-    default: 1,
-  })
-  lastVersion: number;
-
-  @Column({
-    name: 'type',
-    default: 'post',
-    comment: '内容类型',
-  })
-  type: string;
-
-  @Column({
     name: 'author',
     type: 'int',
     comment: '作者',
     nullable: true,
   })
-  createdBy: number;
-
-  @Column({
-    type: 'json',
-    comment: '内容属性',
-    nullable: true,
-  })
-  properties: any;
-
-  @Column({
-    type: 'json',
-    comment: '格式',
-    nullable: true,
-  })
-  format: any;
-
-  @Column({
-    name: 'title',
-    type: 'text',
-    comment: '内容标题',
-    nullable: true,
-  })
-  @IsString()
-  title: string;
-
-  @Column('text', {
-    name: 'content',
-    comment: '内容 block',
-    nullable: true,
-  })
-  content: string[];
-
-  @Column('json', {
-    comment: '内容区块',
-  })
-  block: any;
-  @Column({
-    type: 'int',
-  })
-  commentCount: number;
-
+  author: number;
   @Column({
     type: 'varchar',
     length: 20,
@@ -94,12 +34,66 @@ export class Post extends BaseEntity {
   password: string;
 
   @Column({
+    name: 'title',
+    type: 'text',
+    comment: '内容标题',
+    nullable: true,
+  })
+  @IsString()
+  title: string;
+
+  @Column({
     comment: '内容标识',
     type: 'varchar',
     length: 200,
     nullable: true,
   })
   name: string;
+
+  @Column({
+    name: 'guid',
+    comment: '网络唯一地址 Global Unique ID for referencing the post.',
+    nullable: true,
+  })
+  guid: string;
+
+  @Column({
+    comment: '内容摘要',
+    nullable: true,
+  })
+  excerpt: string;
+
+  @Column({
+    name: 'type',
+    default: 'post',
+    comment: '内容类型',
+  })
+  type: string;
+
+  @Column('text', {
+    name: 'content',
+    comment: '内容 block',
+    nullable: true,
+  })
+  content: string[];
+
+  @Column('json', {
+    comment: '内容区块',
+  })
+  block: any;
+
+  @Column({
+    name: 'allow_comment',
+    type: 'boolean',
+    comment: '格式',
+    default: false,
+  })
+  allowComment: boolean;
+
+  @Column({
+    type: 'int',
+  })
+  commentCount: number;
 
   @Column({
     name: 'post_parent',
@@ -110,23 +104,27 @@ export class Post extends BaseEntity {
   })
   parent: number;
 
-  // @Column({
-  //   name: 'guid',
-  //   comment: '网络唯一地址 Global Unique ID for referencing the post.',
-  //   nullable: true,
-  // })
-  // guid: string;
-
   @Column({
     length: 100,
     nullable: true,
   })
   mimeType: string;
 
-  // @Column({
-  //   name: 'menu_order',
-  //   comment: '菜单顺序',
-  //   default: 0,
-  // })
-  // menuOrder: number;
+  @Column({
+    name: 'menu_order',
+    comment: '菜单顺序',
+    default: 0,
+  })
+  menuOrder: number;
+
+  @Column({
+    comment: '排序',
+    default: 0,
+  })
+  sort: number;
+
+  @OneToMany(type => PostMeta, postMeta => postMeta.post, {
+    cascade: true,
+  })
+  metas?: PostMeta[];
 }
