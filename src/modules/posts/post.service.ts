@@ -27,12 +27,19 @@ export class PostService {
   }
 
   async findOne(postId: number, name: string): Promise<Post> {
-    const post: Post | undefined = await this.postRepository.createQueryBuilder('post')
-      .where('post.status = :status AND post.id = :postId OR post.name = :name', {
+    const post: Post = await this.postRepository.findOne({
+      relations: ['metas'],
+      where: {
         status: 'publish',
         postId,
-        name,
-      }).getOne();
+      },
+    });
+    // const post: Post | undefined = await this.postRepository.createQueryBuilder('post')
+    //   .where('post.status = :status AND post.id = :postId OR post.name = :name', {
+    //     status: 'publish',
+    //     postId,
+    //     name,
+    //   }).getOne();
 
     // if (!post) {
     //   throw new HttpException('指定内容' + name + '不存在', 401);

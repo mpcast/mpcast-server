@@ -1,4 +1,4 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany } from 'typeorm';
 import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
 import { PostMeta } from '@app/entity/posts/post-meta.entity';
@@ -126,6 +126,7 @@ export class Post extends BaseEntity {
   @OneToMany(type => PostMeta, postMeta => postMeta.post, {
     cascade: true,
   })
+  @JoinColumn()
   metas?: PostMeta[];
 
   @OneToMany(type => Comment, comment => comment.post, {
