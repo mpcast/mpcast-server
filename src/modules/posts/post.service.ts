@@ -1,8 +1,11 @@
 import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Post, Term, TermRelationships, TermTaxonomy } from '@app/entity';
-import { Repository, In, Connection } from 'typeorm';
+import { Post, PostMeta, Term, TermRelationships, TermTaxonomy } from '@app/entity';
+import { Repository, In, Connection, OrderByCondition } from 'typeorm';
 import { HttpException, Injectable } from '@nestjs/common';
 import { User } from '@app/entity';
+import { ID } from '@app/common/shared-types';
+import { IsNotEmpty } from 'class-validator';
+import * as _ from 'lodash';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
@@ -69,12 +72,63 @@ export class PostService {
   //   .leftJoinAndSelect('variant.facetValues', 'facetValues')
   //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
   //   .getMany();
-  async getNews(limit: number): Promise<any> {
-    return await this.connection.manager
+  /**
+   * 按热度（浏览量）查询
+   * @param isRandom
+   * @param limit
+   */
+  async getPopular(isRandom: boolean = false, limit: number = 10): Promise<any> {
+    let data: any;
+    const orderBy: any = !isRandom ? { viewCount: 'DESC' } : 'rand()';
+    data = await this.connection.manager
       .createQueryBuilder()
-      .select()
+      .select('p.*, JSON_LENGTH(value) as viewCount')
+      .from(Post, 'p')
+      .innerJoin(query => {
+        return query.from(PostMeta, 'meta');
+      }, 'meta', 'meta.postId = p.id')
+      .where('meta.key = :key', { key: '_post_views' })
+      .orderBy(orderBy)
+      .limit(limit)
+      .getRawMany();
+    return data;
+  }
+
+  /**
+   * 获取最新增加的记录
+   * @param limit
+   */
+  async getNews(limit: number): Promise<any> {
+    let data: {
+      id: string;
+      author: ID,
+      status: string,
+      guid?: string,
+      allowComment: number,
+      menuOrder?: number,
+      block?: JSON,
+      sort: number,
+      createdAt: string,
+      updateAt: string,
+      commentNum?: number,
+      parent: number,
+      mimeType?: string
+      password?: string,
+      title: string,
+      name?: string,
+      excerpt?: string,
+      type: string,
+      content: string,
+      category: string,
+      metas?: PostMeta[]
+    }[];
+    data = await this.connection.manager
+      .createQueryBuilder()
+      .select('obj.*, tt.description as category')
       .from(Term, 't')
-      .innerJoin(TermTaxonomy, 'tt')
+      .innerJoin(query => {
+        return query.from(TermTaxonomy, 'tt');
+      }, 'tt', 'tt.id = t.id')
       .innerJoin(query => {
         return query.from(TermRelationships, 'tr');
       }, 'tr', 'tr.taxonomyId = tt.id')
@@ -87,6 +141,21 @@ export class PostService {
       .orderBy('obj.updatedAt', 'DESC')
       .limit(limit)
       .getRawMany();
+
+    // 以下处理元数据
+    const objIds = [];
+    data.forEach(item => {
+      objIds.push(item.id);
+    });
+    if (!_.isEmpty(objIds)) {
+      const metaData = await this.connection.getRepository(PostMeta).find({
+        post: In(objIds),
+      });
+      data.forEach(item => {
+        item.metas = _.filter(metaData, { id: item.id });
+      });
+    }
+    return data;
   }
 
   async findAllByType(postType: any, userId: number, take: number): Promise<Post[]> {
