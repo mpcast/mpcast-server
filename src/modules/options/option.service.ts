@@ -25,18 +25,18 @@ export class OptionService {
     if (flag) {
       await this.cacheService.set(CACHE_KEY.OPTIONS, null);
     }
-    const cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
+    let cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
 
     if (_.isEmpty(cacheOptions)) {
       const data = await this.optionRepository.find();
       const result = {};
       data.forEach(item => {
-        result[item.key] = JSON.parse(item.value);
+        result[item.key] = item.value;
       });
       await this.cacheService.set(CACHE_KEY.OPTIONS, result);
-
-      return await this.cacheService.get(CACHE_KEY.OPTIONS);
+      cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
     }
+    return cacheOptions;
   }
 
   /**
@@ -47,7 +47,6 @@ export class OptionService {
   async updateOptions(optionKey, optionValue) {
     const data = _.isObject(optionKey) ? _.extend({}, optionKey) : { [optionKey]: optionValue };
     let cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
-    // update picker_resume.picker_options set value = json_set(value,'$.current_theme', 'limitless') where `key` = 'site';
     if (_.isEmpty(cacheOptions)) {
       cacheOptions = await this.load();
     }
@@ -70,9 +69,6 @@ export class OptionService {
       .set({ value: jsonSQL })
       .where('key = :key', { key: optionKey })
       .execute();
-    // if (updateResult) {
-    //   await this.cacheService.set(CACHE_KEY.OPTIONS, _.extend(cacheOptions, changedOptions));
-    // }
     if (updateResult) {
       return await this.load(true);
     }

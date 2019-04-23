@@ -9,3 +9,4 @@ export * from './posts/post.entity';
 export * from './posts/post-meta.entity';
 export * from './comments/comment.entity';
 export * from './comments/comment-meta.entity';
+export * from './options/option.entity';

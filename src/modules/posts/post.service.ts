@@ -192,6 +192,21 @@ export class PostService {
     return data;
   }
 
+  /**
+   * 根据置顶 ID 获取推荐内容
+   * @param stickys
+   */
+  async getStickys(stickys: [number]) {
+    const data = await this.connection.manager
+      .createQueryBuilder()
+      .select()
+      .from(Post, 'p')
+      .where('p.id IN (:stickys)', { stickys })
+      .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
+      .getRawMany();
+    return data;
+  }
+
   async findAllByType(postType: any, userId: number, take: number): Promise<Post[]> {
     // const orderBy = order ? [order.orderBy, order.direction] : ['menu_order', 'ASC'];
     // var userInfo: {[index:string]: string} = {}
