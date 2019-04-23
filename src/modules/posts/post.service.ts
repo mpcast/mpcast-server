@@ -1,10 +1,9 @@
 import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
 import { Post, PostMeta, Term, TermRelationships, TermTaxonomy } from '@app/entity';
-import { Repository, In, Connection, OrderByCondition } from 'typeorm';
-import { HttpException, Injectable } from '@nestjs/common';
+import { Repository, In, Connection } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { User } from '@app/entity';
 import { ID } from '@app/common/shared-types';
-import { IsNotEmpty } from 'class-validator';
 import * as _ from 'lodash';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
@@ -72,6 +71,41 @@ export class PostService {
   //   .leftJoinAndSelect('variant.facetValues', 'facetValues')
   //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
   //   .getMany();
+
+  /**
+   * 根据类别分类法的 id 与内容状态获取内容列表
+   * @param categories 多分类ID
+   * @param status 内容状态
+   * @param skip 当前页
+   * @param take 每页的内容量
+   */
+  async getFromCategory(categories: [], status?: string, skip: number = 1, take: number = 12) {
+    let where: string;
+    if (_.isEmpty(status)) {
+      where = `p.status NOT IN ('trash')`;
+    } else {
+      where = `p.status = '${status}'`;
+    }
+    const data = await this.connection.manager
+      .createQueryBuilder()
+      .select('p.*')
+      .from(Post, 'p')
+      .leftJoin(query => {
+        return query.from(TermRelationships, 'tr');
+      }, 'tr', 'p.id = tr.objectId')
+      .innerJoin(query => {
+        return query.from(TermTaxonomy, 'tt');
+      }, 'tt', 'tr.taxonomyId = tt.termId')
+      .where(`tr.taxonomyId IN (${categories})`)
+      .andWhere(`tt.taxonomy = 'category'`)
+      .andWhere(where)
+      .offset(1)
+      .limit(take)
+      .getRawMany();
+
+    return data;
+  }
+
   /**
    * 按热度（浏览量）查询
    * @param isRandom

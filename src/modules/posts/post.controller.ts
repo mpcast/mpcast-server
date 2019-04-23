@@ -41,7 +41,6 @@ export class PostController {
       }
       case 'popular': {
         list = await this.postService.getPopular();
-        // Reflect.deleteProperty(query, 'category')
         // list = await this.model('posts', {appId: this.appId}).getPopular(query, this.get('page'), this.get('pagesize') ? this.get('pagesize') : 6, rand)
         break;
       }
