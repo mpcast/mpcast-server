@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from '../base.entity';
 import { TermMeta } from '@app/entity/terms/term-meta.entity';
 import { TermTaxonomy } from '@app/entity/terms/term-taxonomy.entity';
+import { TermRelationships } from '@app/entity';
 
 // @Index(['name'], { unique: true })
 /**
@@ -38,4 +39,9 @@ export class Term extends BaseEntity {
     cascade: true,
   })
   taxonomy: TermTaxonomy;
+
+  // @OneToOne(type => TermRelationships, termRelationships => termRelationships.taxonomy, {
+  //   cascade: true,
+  // })
+  // termRelationships: TermRelationships;
 }

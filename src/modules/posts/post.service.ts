@@ -1,6 +1,6 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from '@app/entity';
-import { Repository, In } from 'typeorm';
+import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
+import { Post, Term, TermRelationships, TermTaxonomy } from '@app/entity';
+import { Repository, In, Connection } from 'typeorm';
 import { HttpException, Injectable } from '@nestjs/common';
 import { User } from '@app/entity';
 
@@ -9,22 +9,23 @@ import { User } from '@app/entity';
 @Injectable()
 export class PostService {
   constructor(
+    @InjectConnection() private connection: Connection,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
   ) {
   }
 
-  async getNews(take: number) {
-    // const where: {
-    // }
-    // return await this.postRepository.find({
-    //     where,
-    //     take: take || 10,
-    //     skip: 0,
-    //     cache: true,
-    //   },
-    // );
-  }
+  // async getNews(take: number) {
+  // const where: {
+  // }
+  // return await this.postRepository.find({
+  //     where,
+  //     take: take || 10,
+  //     skip: 0,
+  //     cache: true,
+  //   },
+  // );
+  // }
 
   async findOne(postId: number, name: string): Promise<Post> {
     const post: Post = await this.postRepository.findOne({
@@ -47,7 +48,48 @@ export class PostService {
     return post;
   }
 
-  async findAll(postType: any, userId: number, take: number): Promise<Post[]> {
+  /**
+   * 按分类法中的类别项查找
+   */
+  // async findAllByCateory(category: string, take: number): Promise<Post[]> {
+  // const where = {
+  //
+  // }
+  // }
+  // const consumingProducts = await this.connection
+  //   .getRepository(Product)
+  //   .createQueryBuilder('product')
+  //   .leftJoinAndSelect('product.facetValues', 'facetValues')
+  //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
+  //   .getMany();
+  //
+  // const consumingVariants = await this.connection
+  //   .getRepository(ProductVariant)
+  //   .createQueryBuilder('variant')
+  //   .leftJoinAndSelect('variant.facetValues', 'facetValues')
+  //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
+  //   .getMany();
+  async getNews(limit: number): Promise<any> {
+    return await this.connection.manager
+      .createQueryBuilder()
+      .select()
+      .from(Term, 't')
+      .innerJoin(TermTaxonomy, 'tt')
+      .innerJoin(query => {
+        return query.from(TermRelationships, 'tr');
+      }, 'tr', 'tr.taxonomyId = tt.id')
+      .innerJoin(query => {
+        return query.from(Post, 'obj');
+      }, 'obj', 'obj.id = tr.objectId')
+      .where('obj.type = :type', { type: 'page' })
+      .andWhere('obj.status IN (:status)', { status: 'publish' })
+      .andWhere('tt.taxonomy = :category', { category: 'category' })
+      .orderBy('obj.updatedAt', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
+  async findAllByType(postType: any, userId: number, take: number): Promise<Post[]> {
     // const orderBy = order ? [order.orderBy, order.direction] : ['menu_order', 'ASC'];
     // var userInfo: {[index:string]: string} = {}
     const where: { [key: string]: any } = {

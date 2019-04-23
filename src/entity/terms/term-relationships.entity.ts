@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, OneToOne, PrimaryColumn } from 'typeorm';
+import { TermTaxonomy } from '@app/entity';
 
 /**
  * 分类与分类对象关联表
@@ -24,4 +25,9 @@ export class TermRelationships {
     default: 0,
   })
   sort: number;
+
+  // @ManyToOne(type => TermTaxonomy, termTaxonomy => termTaxonomy.term, {
+  //   cascade: true,
+  // })
+  // taxonomy: TermTaxonomy;
 }

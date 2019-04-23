@@ -1,10 +1,11 @@
-import { Column, Entity, Index, JoinColumn, OneToMany } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
 import { PostMeta } from '@app/entity/posts/post-meta.entity';
 import { Comment } from '@app/entity/comments/comment.entity';
+import { User } from '@app/entity';
 
-@Index(['name'], { unique: true })
+// @Index(['name'], { unique: true })
 // @Index(['type', 'status', 'createdDate', 'id'], { unique: true })
 // @Index(['parent'])
 // @Index(['author'])
@@ -17,6 +18,7 @@ export class Post extends BaseEntity {
     nullable: true,
   })
   author: number;
+
   @Column({
     type: 'varchar',
     length: 20,
@@ -39,7 +41,6 @@ export class Post extends BaseEntity {
     comment: '内容标题',
     nullable: true,
   })
-  @IsString()
   title: string;
 
   @Column({
@@ -80,6 +81,7 @@ export class Post extends BaseEntity {
 
   @Column('json', {
     comment: '内容区块',
+    nullable: true,
   })
   @IsJSON()
   block: any;
@@ -94,7 +96,7 @@ export class Post extends BaseEntity {
   @Column({
     type: 'int',
   })
-  commentCount: number;
+  commentNum: number;
 
   @Column({
     name: 'parent',

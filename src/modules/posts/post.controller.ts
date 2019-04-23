@@ -29,9 +29,11 @@ export class PostController {
   // }
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
-  findByCategory(@Param('category') category): Promise<any> {
+  async findByCategory(@Param('category') category): Promise<any> {
+    let list = [];
     switch (category) {
       case 'new' : {
+        list = await this.postService.getNews(10);
         // Reflect.deleteProperty(query, 'category')
         // Reflect.deleteProperty(query, 'rand')
         // list = await this.model('posts', {appId: this.appId}).getNews(this.get('page'), this.get('pagesize'), query)
@@ -54,6 +56,6 @@ export class PostController {
         //   .findByCategory(query, this.get('page'), this.get('pagesize'), rand);
       }
     }
-    return null;
+    return list;
   }
 }
