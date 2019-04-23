@@ -1,10 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post } from '@app/entity';
 import { HttpProcessor } from '@app/decorators/http.decorator';
-import { CacheService } from '@app/processors/cache/cache.service';
-import { CACHE_KEY_METADATA } from '@nestjs/common/cache/cache.constants';
-import * as CACHE_KEY from '@app/constants/cache.constant';
 import { OptionService } from '@app/modules/options/option.service';
 
 // import { Post } from './post.entity';
@@ -30,7 +27,9 @@ export class PostController {
 
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
-  async findByCategory(@Param('category') category): Promise<any> {
+  async findByCategory(@Req() req, @Param('category') category): Promise<any> {
+    const query = req.query;
+    // console.log(query.skip)
     let list = [];
     switch (category) {
       case 'new' : {
@@ -50,10 +49,7 @@ export class PostController {
         break;
       }
       default: {
-        // Reflect.deleteProperty(query, 'category')
-        // Reflect.deleteProperty(query, 'rand');
-        // list = await this.model('posts', { appId: this.appId })
-        //   .findByCategory(query, this.get('page'), this.get('pagesize'), rand);
+        list = await this.postService.getFromCategory(category, null, query);
       }
     }
     return list;

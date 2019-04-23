@@ -49,60 +49,80 @@ export class PostService {
     // }
     return post;
   }
-
-  /**
-   * 按分类法中的类别项查找
-   */
-  // async findAllByCateory(category: string, take: number): Promise<Post[]> {
-  // const where = {
-  //
-  // }
-  // }
-  // const consumingProducts = await this.connection
-  //   .getRepository(Product)
-  //   .createQueryBuilder('product')
-  //   .leftJoinAndSelect('product.facetValues', 'facetValues')
-  //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
-  //   .getMany();
-  //
-  // const consumingVariants = await this.connection
-  //   .getRepository(ProductVariant)
-  //   .createQueryBuilder('variant')
-  //   .leftJoinAndSelect('variant.facetValues', 'facetValues')
-  //   .where('facetValues.id IN (:...facetValueIds)', { facetValueIds })
-  //   .getMany();
-
   /**
    * 根据类别分类法的 id 与内容状态获取内容列表
-   * @param categories 多分类ID
+   * @param categorySlug 类别标识
    * @param status 内容状态
-   * @param skip 当前页
-   * @param take 每页的内容量
+   * @param page 当前页
+   * @param pageSize 每页的内容量
    */
-  async getFromCategory(categories: [], status?: string, skip: number = 1, take: number = 12) {
+  async getFromCategory(categorySlug: string, status?: string, querys?: any) {
+    console.log(querys);
+    const pageSize = querys.pageSize ? querys.pageSize : 10;
+    const page = querys.page ? querys.page * pageSize : 1;
     let where: string;
     if (_.isEmpty(status)) {
-      where = `p.status NOT IN ('trash')`;
+      where = `obj.status NOT IN ('trash')`;
     } else {
-      where = `p.status = '${status}'`;
+      where = `obj.status = '${status}'`;
     }
-    const data = await this.connection.manager
+    let data: {
+      id: string;
+      author: ID,
+      status: string,
+      guid?: string,
+      allowComment: number,
+      menuOrder?: number,
+      block?: JSON,
+      sort: number,
+      createdAt: string,
+      updateAt: string,
+      commentNum?: number,
+      parent: number,
+      mimeType?: string
+      password?: string,
+      title: string,
+      name?: string,
+      excerpt?: string,
+      type: string,
+      content: string,
+      category: string,
+      metas?: PostMeta[]
+    }[];
+    data = await this.connection.manager
       .createQueryBuilder()
-      .select('p.*')
-      .from(Post, 'p')
-      .leftJoin(query => {
-        return query.from(TermRelationships, 'tr');
-      }, 'tr', 'p.id = tr.objectId')
+      .select('obj.*, tt.description as category')
+      .from(Term, 't')
       .innerJoin(query => {
         return query.from(TermTaxonomy, 'tt');
-      }, 'tt', 'tr.taxonomyId = tt.termId')
-      .where(`tr.taxonomyId IN (${categories})`)
-      .andWhere(`tt.taxonomy = 'category'`)
+      }, 'tt', 'tt.id = t.id')
+      .innerJoin(query => {
+        return query.from(TermRelationships, 'tr');
+      }, 'tr', 'tr.taxonomyId = tt.id')
+      .innerJoin(query => {
+        return query.from(Post, 'obj');
+      }, 'obj', 'obj.id = tr.objectId')
+      .where('obj.type = :type', { type: 'page' })
       .andWhere(where)
-      .offset(1)
-      .limit(take)
+      // .andWhere('obj.status IN (:status)', { status: 'publish' })
+      .andWhere('t.slug = :categorySlug', { categorySlug })
+      .orderBy('obj.updatedAt', 'DESC')
+      .offset(page)
+      .limit(pageSize)
       .getRawMany();
-
+    // 以下处理元数据
+    const objIds = [];
+    data.forEach(item => {
+      objIds.push(item.id);
+    });
+    if (!_.isEmpty(objIds)) {
+      const metaData = await this.connection.getRepository(PostMeta).find({
+        post: In(objIds),
+      });
+      data.forEach(item => {
+        item.metas = _.filter(metaData, { id: item.id });
+      });
+    }
     return data;
   }
 
