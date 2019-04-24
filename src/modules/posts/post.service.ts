@@ -17,6 +17,7 @@ enum countType {
   THUMB = '_thumbs',
   LIKE = '_liked',
 }
+
 @Injectable()
 export class PostService {
   constructor(
@@ -229,6 +230,28 @@ export class PostService {
       // .offset(page)
       // .limit(pageSize)
       .getRawMany();
+    // 以下处理元数据
+    const objIds = [];
+    data.forEach(item => {
+      objIds.push(item.id);
+    });
+    if (!_.isEmpty(objIds)) {
+      const metaData = await this.connection.manager
+        .createQueryBuilder()
+        .select()
+        .from(PostMeta, 'pm')
+        .where(`postId IN (:objIds)`, {objIds})
+        .getRawMany();
+      // const metaData = await this.connection.getRepository(PostMeta).find({
+      //   post: In(objIds),
+      // });
+      // console.log(metaData);
+      data.forEach(item => {
+        item.metas = _.filter(metaData, { postId: item.id });
+      });
+    }
+    console.log('-x-x-x--x-xx-x--x-x');
+    console.log(data)
     return data;
   }
 

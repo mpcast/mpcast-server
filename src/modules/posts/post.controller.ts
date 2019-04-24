@@ -18,16 +18,6 @@ export class PostController {
   ) {
   }
 
-  // @Get()
-  // root(): string {
-  //   return 'Hello World!';
-  // }
-
-  // @Get('one')
-  // one(): Promise<Post> {
-  //   return this.postService.findOne(1, 'lala');
-  // }
-
   /**
    * 按分页条件查询全部内容
    * @param page
@@ -146,7 +136,11 @@ export class PostController {
       item.viewCount = await this.postService.countBy(ECountBy.VIEW, item.id);
       // 留言数量
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+      console.log(item.meta);
       if (!Object.is(item.meta._thumbnail_id, undefined) && !_.isEmpty(item.meta._thumbnail_id)) {
+        // item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+        item.featured_image = await this.postService.getAttachment(item.meta._thumbnail_id);
+
         if (_.isEmpty(item.featured_image)) {
           // 随机封面
         } else {
