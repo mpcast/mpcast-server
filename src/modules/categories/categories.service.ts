@@ -1,65 +1,54 @@
 import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Post, PostMeta, Term, TermRelationships, TermTaxonomy } from '@app/entity';
+import { Post, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '@app/entity';
 import { Repository, In, Connection } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { User } from '@app/entity';
+// import { User } from '@app/entity';
 import { ID } from '@app/common/shared-types';
 import * as _ from 'lodash';
-import { rpc } from 'qiniu';
-import post = rpc.post;
-import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { ECountBy } from '@app/interfaces/conditions.interface';
-import { skip } from 'rxjs/operators';
+import { CacheService } from '@app/processors/cache/cache.service';
+import * as CACHE_KEY from '@app/constants/cache.constant';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
-enum countType {
-  VIEW = '_post_views',
-  THUMB = '_thumbs',
-  LIKE = '_liked',
-}
+
 @Injectable()
-export class PostService {
+export class CategoriesService {
   constructor(
     @InjectConnection() private connection: Connection,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    // @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    // @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    private readonly cacheService: CacheService,
   ) {
   }
 
   /**
-   * 分页查询
-   * @param options
+   * 根据分类法与 slug 查询分类信息
+   * @param slug
    */
-  async paginate(options: IPaginationOptions): Promise<Pagination<Post>> {
-    // this.postRepository.findAndCount()
-    return await paginate<Post>(this.postRepository, options, {
-      where: {
-        type: 'page',
-      },
-    });
-    // return await this.postRepository.findAndCount({
-    //   skip: 1,
-    //   take: 10,
-    //   ...({
-    //     type: 'page',
-    //   }),
-    // });
-    // const [items, total] = await repository.findAndCount({
-    //   skip: page * limit,
-    //   take: limit,
-    //   ...(searchOptions as object)
-    // });
+  async findTermBySlug(taxonomy: string, slug: string) {
+    const data = await this.connection.manager
+      .createQueryBuilder()
+      .select()
+      .from(TermTaxonomy, 'tt')
+      .innerJoin(query => {
+        return query.from(Term, 't');
+      }, 't', 'tt.termId = t.id')
+      .where('tt.taxonomy = :taxonomy', { taxonomy })
+      .andWhere('t.slug = :slug', { slug })
+      .getRawOne();
+
+    return data;
   }
 
   /**
-   * 根据类别分类法的 id 与内容状态获取内容列表
+   * 根据类别分类法的 slug 与内容状态获取内容列表
    * @param categorySlug 类别标识
    * @param status 内容状态
    * @param page 当前页
    * @param pageSize 每页的内容量
    */
   async getFromCategory(categorySlug: string, status?: string, querys?: any) {
-    const pageSize = querys.pagesize ? querys.pagesize : 10;
+    console.log(querys);
+    const pageSize = querys.pageSize ? querys.pageSize : 10;
     const page = querys.page ? querys.page * pageSize : 1;
     let where: string;
     if (_.isEmpty(status)) {
@@ -217,36 +206,15 @@ export class PostService {
    * 根据置顶 ID 获取推荐内容
    * @param stickys
    */
-  async getStickys(stickys: [number], querys?: any) {
-    // const pageSize = querys.pagesize ? querys.pagesize : 10;
-    // const page = querys.page ? querys.page * pageSize : 1;
+  async getStickys(stickys: [number]) {
     const data = await this.connection.manager
       .createQueryBuilder()
       .select()
       .from(Post, 'p')
       .where('p.id IN (:stickys)', { stickys })
       .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
-      // .offset(page)
-      // .limit(pageSize)
       .getRawMany();
     return data;
-  }
-
-  async findAllByType(postType: any, userId: number, take: number): Promise<Post[]> {
-    const where: { [key: string]: any } = {
-      status: 'publish',
-      type: In([postType]),
-    };
-    if (userId) {
-      where.author = userId;
-    }
-    return await this.postRepository.find({
-        where,
-        take: take || 10,
-        skip: 0,
-        cache: true,
-      },
-    );
   }
 
   // async createPost(post): Promise<Post> {
@@ -254,63 +222,80 @@ export class PostService {
   // }
 
   /**
-   * 从元数据中提取附件信息
-   * @param type 附件类型
-   * @param postId 对象 id
+   * 根据分类法获取分类项列表
+   * @param taxonomy
    */
-  async getAttachment(postId: number, type: string = 'file') {
-    let where = {
-      postId,
-    };
-    switch (type) {
-      case 'file': {
-        where = _.extend({ key: '_attachment_file' }, where);
-        const attachment = await this.connection.getRepository(PostMeta)
-          .findOne({
-            where,
-          });
-        if (!_.isEmpty(attachment)) {
-          return attachment.value;
-        }
-        return '';
+  async getTermsByTaxonomy(taxonomy: string) {
+    const allTerms = await this.loadAllTerms();
+    return allTerms.filter(term => {
+      return term.taxonomy === taxonomy;
+    }).map(t => Object.assign({}, t));
+  }
+
+  /**
+   * 加载全部分类信息
+   * @param flag
+   */
+  async loadAllTerms(flag?: boolean): Promise<any> {
+    if (flag) {
+      await this.cacheService.set(CACHE_KEY.TERMS, null);
+    }
+    let ret = await this.cacheService.get(CACHE_KEY.TERMS);
+    if (_.isEmpty(ret)) {
+      const data: any[] = await this.connection.manager
+        .createQueryBuilder()
+        .select()
+        .from(Term, 't')
+        .innerJoin(query => {
+          return query.from(TermTaxonomy, 'tt');
+        }, 'tt', 't.id = tt.termId')
+        .orderBy('tt.id', 'ASC')
+        .getRawMany();
+      // 以下处理 meta 信息
+      // IN 查询处理 ids
+      const ids = [];
+      for (const item of data) {
+        ids.push(item.termId);
       }
-      case 'meta':
-        break;
+      // 查询 meta 数据
+      const metaList = await this.connection.manager
+        .createQueryBuilder()
+        .select('tm.*')
+        .from(TermMeta, 'tm')
+        .where('termId IN (:ids)', { ids })
+        .getRawMany();
+      // 数据分组
+      const metaGroup = _.groupBy(metaList, 'termId');
+      for (const key of Object.keys(metaGroup)) {
+        for (const item of data) {
+          if (item.termId.toString() === key.toString()) {
+            item.metas = metaGroup[key];
+          }
+        }
+      }
+
+      // 格式化 meta
+      this.formatMeta(data);
+      // 数据排序
+      // 设置缓存
+      await this.cacheService.set(CACHE_KEY.TERMS, data);
+      ret = await this.cacheService.get(CACHE_KEY.TERMS);
     }
+    return ret;
   }
 
-  /**
-   * 根据 id 列表批量获取附件
-   * @param ids
-   */
-  async getAttachments(ids: number[]) {
-    let where = {
-      postId: In(ids),
-    };
-    where = _.extend({ key: '_attachment_file' }, where);
-    const list = await this.connection.getRepository(PostMeta)
-      .find({
-        where,
-      });
-
-    return list;
-  }
-
-  /**
-   * 统计浏览量、喜欢、点赞
-   * @param type
-   * @param postId
-   */
-  async countBy(type: ECountBy, postId: ID) {
-    const data = await this.connection.manager.createQueryBuilder()
-      .select(`JSON_LENGTH(pm.value) as count`)
-      .from(PostMeta, 'pm')
-      .where(`pm.postId = :postId AND pm.key = :key`, { postId, key: type })
-      .getRawOne();
-
-    if (!_.isEmpty(data)) {
-      return data.count;
+  private formatMeta(list: any[]) {
+    const items = [];
+    for (const item of list) {
+      item.meta = {};
+      if (_.has(item, 'metas') && item.metas.length > 0) {
+        for (const meta of item.metas) {
+          item.meta[meta.key] = meta.value;
+        }
+      }
+      Reflect.deleteProperty(item, 'metas');
+      items.push(item);
     }
-    return 0;
+    return items;
   }
 }

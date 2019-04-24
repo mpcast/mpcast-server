@@ -22,6 +22,7 @@ import { UserModule } from '@app/modules/users/user.module';
 import { WechatModule } from '@app/modules/wechat/wechat.module';
 import { PostModule } from '@app/modules/posts/post.module';
 import { OptionModule } from '@app/modules/options/option.module';
+import { CategoriesModule } from '@app/modules/categories/categories.module';
 // import { AuthService } from '@app/modules/auth/auth.service';
 // import { UserService } from '@app/modules/users/users.service';
 
@@ -47,6 +48,7 @@ import { OptionModule } from '@app/modules/options/option.module';
     WechatModule,
     // 内容模块
     OptionModule,
+    CategoriesModule,
     PostModule,
   ],
   controllers: [AppController],

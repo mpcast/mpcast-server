@@ -3947,6 +3947,11 @@ neo-async@^2.6.0:
   resolved "http://registry.npm.taobao.org/neo-async/download/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
   integrity sha1-udFeTXHGdikIZUtRg+04t1M0CDU=
 
+nestjs-typeorm-paginate@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.npm.taobao.org/nestjs-typeorm-paginate/download/nestjs-typeorm-paginate-0.1.1.tgz#29d3feac233da44089334bc459fa010bab917803"
+  integrity sha1-KdP+rCM9pECJM0vEWfoBC6uReAM=
+
 next-tick@1, next-tick@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/next-tick/download/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"

@@ -10,5 +10,6 @@ export const WECHAT = CACHE_PERFIX + 'WECHAT:';
 export const WECHAT_SESSION_KEY = WECHAT + 'SESSION_KEY:';
 export const INFO = CACHE_PERFIX + 'info';
 export const OPTIONS = CACHE_PERFIX + 'OPTIONS';
+export const TERMS = CACHE_PERFIX + 'TERMS';
 // export const TAGS = CACHE_PERFIX + 'tags';
 // export const CONSTANTS = CACHE_PERFIX + 'constants';

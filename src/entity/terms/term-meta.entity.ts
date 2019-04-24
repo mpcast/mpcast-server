@@ -17,7 +17,7 @@ export class TermMeta extends BaseEntity {
 
   @Column({
     nullable: true,
-    type: 'json',
+    type: 'text',
     comment: '元信息值',
   })
   value?: any;
@@ -26,5 +26,5 @@ export class TermMeta extends BaseEntity {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  term?: Term;
+  term: Term;
 }

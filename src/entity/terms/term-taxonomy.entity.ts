@@ -9,7 +9,11 @@ import { ID } from '@app/common/shared-types';
 @Entity()
 export class TermTaxonomy extends BaseEntity {
   @OneToOne(type => Term, term => term.taxonomy)
-  term: Term;
+  @Column({
+    type: 'int',
+    comment: '分类 id',
+  })
+  termId: Term;
 
   @Column({
     type: 'varchar',
