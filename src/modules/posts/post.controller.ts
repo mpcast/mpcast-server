@@ -120,12 +120,18 @@ export class PostController {
       item.authorInfo = await this.userService.getDetailById(item.author);
       this.formatOneMeta(item.authorInfo);
       if (_.has(item.authorInfo, 'meta')) {
-        if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
-          item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
-        } else {
+        if (_.has(item.authorInfo.meta, 'avatar')) {
           item.authorInfo.avatarUrl = await this.postService.getAttachment(item.authorInfo.meta.avatar);
         }
-        Reflect.deleteProperty(item.authorInfo, 'meta');
+        if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
+          item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
+        }
+        // if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
+        //   item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
+        // } else {
+        //   item.authorInfo.avatarUrl = await this.postService.getAttachment(51);
+        // }
+        // Reflect.deleteProperty(item.authorInfo, 'meta');
       }
       // Liked
       if (_.has(item.authorInfo, 'liked')) {
@@ -136,7 +142,6 @@ export class PostController {
       item.viewCount = await this.postService.countBy(ECountBy.VIEW, item.id);
       // 留言数量
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      console.log(item.meta);
       if (!Object.is(item.meta._thumbnail_id, undefined) && !_.isEmpty(item.meta._thumbnail_id)) {
         // item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
         item.featured_image = await this.postService.getAttachment(item.meta._thumbnail_id);

@@ -240,7 +240,7 @@ export class PostService {
         .createQueryBuilder()
         .select()
         .from(PostMeta, 'pm')
-        .where(`postId IN (:objIds)`, {objIds})
+        .where(`postId IN (:objIds)`, { objIds })
         .getRawMany();
       // const metaData = await this.connection.getRepository(PostMeta).find({
       //   post: In(objIds),
@@ -250,8 +250,6 @@ export class PostService {
         item.metas = _.filter(metaData, { postId: item.id });
       });
     }
-    console.log('-x-x-x--x-xx-x--x-x');
-    console.log(data)
     return data;
   }
 
@@ -288,12 +286,19 @@ export class PostService {
     switch (type) {
       case 'file': {
         where = _.extend({ key: '_attachment_file' }, where);
-        const attachment = await this.connection.getRepository(PostMeta)
-          .findOne({
-            where,
-          });
+        // const attachment = await this.connection.getRepository(PostMeta)
+        //   .findOne({
+        //     where: {
+        //       postId,
+        //     },
+        //   });
+        const attachment = await this.connection.manager.createQueryBuilder()
+          .select()
+          .from(PostMeta, 'pm')
+          .where(`pm.key = :key AND pm.postId = :postId`, { key: '_attachment_file', postId })
+          .getRawOne();
         if (!_.isEmpty(attachment)) {
-          return attachment.value;
+          return JSON.parse(attachment.value);
         }
         return '';
       }
