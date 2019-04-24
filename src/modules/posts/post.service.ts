@@ -1,22 +1,15 @@
-import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Post, PostMeta, Term, TermRelationships, TermTaxonomy } from '@app/entity';
-import { Repository, In, Connection } from 'typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { Post, PostMeta, Term, TermRelationships, TermTaxonomy, User } from '@app/entity';
+import { Connection, In, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { User } from '@app/entity';
 import { ID } from '@app/common/shared-types';
 import * as _ from 'lodash';
-import { rpc } from 'qiniu';
-import post = rpc.post;
-import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { ECountBy } from '@app/interfaces/conditions.interface';
-import { skip } from 'rxjs/operators';
+// import { rpc } from 'qiniu';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { EBlockFormatType, ECountBy } from '@app/interfaces/conditions.interface';
+import { formatAllMeta } from '@app/common/utils';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
-enum countType {
-  VIEW = '_post_views',
-  THUMB = '_thumbs',
-  LIKE = '_liked',
-}
 
 @Injectable()
 export class PostService {
@@ -27,6 +20,71 @@ export class PostService {
   ) {
   }
 
+  // async findById(id: ID) {
+  //   let data = await this.postRepository.findOne({
+  //     id,
+  //   });
+  // }
+
+  /**
+   * 根据 ID 查找
+   * @param id
+   */
+  async findById(id: ID) {
+    return await  this.postRepository.findOne({
+      relations: ['metas'],
+      where: {
+        id,
+      },
+    });
+  }
+  async loadBLock(type: EBlockFormatType = EBlockFormatType.ALBUM, blocks: number[]) {
+    // 1 取出 BLOCK 的所有内容，包含内容的 meta 信息
+    const dataList = await this.connection.manager.createQueryBuilder()
+      .select()
+      .from(Post, 'p')
+      .where(`id IN (:blocks)`, { blocks })
+      // 保持数组顺序
+      .orderBy(`INSTR (',${blocks},', CONCAT(',',id,','))`)
+      .getRawMany();
+    formatAllMeta(dataList);
+
+    // 1 查出 block list
+    // 2 查出 block post format
+    // 3 处理 post format
+    // for (let item of dataList) {
+    // }
+  }
+
+  private async getFormatData(item: Post) {
+    switch (item.type) {
+      case 'post-format-audio': {
+        if (!_.isEmpty(item.block)) {
+        }
+      }
+    }
+  }
+
+  /**
+   * 根据附件 id 列表获取附件内容
+   * @param ids
+   */
+  private async getAudios(ids: number[]) {
+    this.connection.manager
+      .createQueryBuilder(Post, 'post')
+      .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
+      // .addOrderBy(`INSTR (',${ids},', CONCAT(',',id,','))`, {})
+    // let list = await this.postRepository.createQueryBuilder('p')
+    // let list = await this.postRepository.find({
+    //   relations: ['metas'],
+    //   where: {
+    //     id: In(ids),
+    //   },
+    // })
+      // .then(a => {
+    // });
+  }
+  // private async getAttachmentInfo(item.block[0]) {}
   /**
    * 分页查询
    * @param options
@@ -38,18 +96,6 @@ export class PostService {
         type: 'page',
       },
     });
-    // return await this.postRepository.findAndCount({
-    //   skip: 1,
-    //   take: 10,
-    //   ...({
-    //     type: 'page',
-    //   }),
-    // });
-    // const [items, total] = await repository.findAndCount({
-    //   skip: page * limit,
-    //   take: limit,
-    //   ...(searchOptions as object)
-    // });
   }
 
   /**

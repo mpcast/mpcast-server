@@ -5,6 +5,8 @@ import { OptionService } from '@app/modules/options/option.service';
 import * as _ from 'lodash';
 import { UserService } from '@app/modules/users/user.service';
 import { ECountBy } from '@app/interfaces/conditions.interface';
+import { Post } from '@app/entity';
+import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 
 // import { Post } from './post.entity';
 
@@ -36,6 +38,11 @@ export class PostController {
     return data;
   }
 
+  @Get(':id')
+  @HttpProcessor.handle('获取单个内容数据')
+  async one(@Param('id') id: number) {
+    // this.postService.
+  }
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
   async findByCategory(@Req() req, @Param('category') category): Promise<any> {
@@ -67,44 +74,47 @@ export class PostController {
     return list;
   }
 
-  private formatMeta(list: any[]) {
-    const items = [];
-    for (const item of list) {
-      item.meta = {};
-      if (_.has(item, 'metas') && item.metas.length > 0) {
-        for (const meta of item.metas) {
-          item.meta[meta.key] = meta.value;
-        }
-      }
-      Reflect.deleteProperty(item, 'metas');
-      items.push(item);
-    }
-    return items;
-  }
-
+  // private formatMeta(list: any[]) {
+  //   const items = [];
+  //   for (const item of list) {
+  //     item.meta = {};
+  //     if (_.has(item, 'metas') && item.metas.length > 0) {
+  //       for (const meta of item.metas) {
+  //         item.meta[meta.key] = meta.value;
+  //       }
+  //     }
+  //     Reflect.deleteProperty(item, 'metas');
+  //     items.push(item);
+  //   }
+  //   return items;
+  // }
+  //
+  // Private methods
+  //
   /**
    * 格式化单个对象的元数据信息
    * @param item
    */
-  private formatOneMeta(item: any) {
-    item.meta = {};
-    if (!_.isEmpty(item.metas) && item.metas.length > 0) {
-      for (const meta of item.metas) {
-        if (meta.key.includes('_liked_posts')) {
-          item.liked = meta.value;
-          // item.liked = JSON.parse(meta.meta_value);
-          // Object.assign(item, JSON.parse(meta.meta_value))
-        }
-        // item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
-        item.meta[meta.key] = meta.value;
-      }
-    }
-    Reflect.deleteProperty(item, 'metas');
-    return item;
-  }
+  // private formatOneMeta(item: any) {
+  //   item.meta = {};
+  //   if (!_.isEmpty(item.metas) && item.metas.length > 0) {
+  //     for (const meta of item.metas) {
+  //       if (meta.key.includes('_liked_posts')) {
+  //         item.liked = meta.value;
+  //         // item.liked = JSON.parse(meta.meta_value);
+  //         // Object.assign(item, JSON.parse(meta.meta_value))
+  //       }
+  //       // item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
+  //       item.meta[meta.key] = meta.value;
+  //     }
+  //   }
+  //   Reflect.deleteProperty(item, 'metas');
+  //   return item;
+  // }
 
   private async dealData(data) {
-    this.formatMeta(data);
+    formatAllMeta(data);
+    // this.formatMeta(data);
     for (const item of data) {
       if (_.has(item.meta, '_items')) {
         item.items = item.meta._items;
@@ -118,7 +128,8 @@ export class PostController {
       }
       // 作者信息
       item.authorInfo = await this.userService.getDetailById(item.author);
-      this.formatOneMeta(item.authorInfo);
+      formatOneMeta(item.authorInfo);
+      // this.formatOneMeta(item.authorInfo);
       if (_.has(item.authorInfo, 'meta')) {
         if (_.has(item.authorInfo.meta, 'avatar')) {
           item.authorInfo.avatarUrl = await this.postService.getAttachment(item.authorInfo.meta.avatar);
@@ -126,11 +137,6 @@ export class PostController {
         if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
           item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
         }
-        // if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
-        //   item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
-        // } else {
-        //   item.authorInfo.avatarUrl = await this.postService.getAttachment(51);
-        // }
         // Reflect.deleteProperty(item.authorInfo, 'meta');
       }
       // Liked
@@ -154,6 +160,21 @@ export class PostController {
     }
   }
 
+  /**
+   * 为查询结果添加分类信息
+   * @param obj
+   */
+  private decoratorTerms(obj: Post) {
+  }
+
+  /**
+   * 处理区块列表数据
+   * @param obj
+   */
+  private dealBlock(obj: Post) {
+    if (!_.isEmpty(obj.block)) {
+    }
+  }
   private formatData() {
   }
 }
