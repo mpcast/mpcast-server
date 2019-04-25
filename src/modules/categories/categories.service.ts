@@ -1,5 +1,5 @@
 import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Post, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '@app/entity';
+import { PostEntity, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '@app/entity';
 import { Repository, In, Connection } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 // import { User } from '@app/entity';
@@ -138,7 +138,7 @@ export class CategoriesService {
         return query.from(TermRelationships, 'tr');
       }, 'tr', 'tr.taxonomyId = tt.id')
       .innerJoin(query => {
-        return query.from(Post, 'obj');
+        return query.from(PostEntity, 'obj');
       }, 'obj', 'obj.id = tr.objectId')
       .where('obj.type = :type', { type: 'page' })
       .andWhere(where)
@@ -175,7 +175,7 @@ export class CategoriesService {
     data = await this.connection.manager
       .createQueryBuilder()
       .select('p.*, JSON_LENGTH(value) as viewCount')
-      .from(Post, 'p')
+      .from(PostEntity, 'p')
       .innerJoin(query => {
         return query.from(PostMeta, 'meta');
       }, 'meta', 'meta.postId = p.id')
@@ -225,7 +225,7 @@ export class CategoriesService {
         return query.from(TermRelationships, 'tr');
       }, 'tr', 'tr.taxonomyId = tt.id')
       .innerJoin(query => {
-        return query.from(Post, 'obj');
+        return query.from(PostEntity, 'obj');
       }, 'obj', 'obj.id = tr.objectId')
       .where('obj.type = :type', { type: 'page' })
       .andWhere('obj.status IN (:status)', { status: 'publish' })
@@ -258,7 +258,7 @@ export class CategoriesService {
     const data = await this.connection.manager
       .createQueryBuilder()
       .select()
-      .from(Post, 'p')
+      .from(PostEntity, 'p')
       .where('p.id IN (:stickys)', { stickys })
       .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
       .getRawMany();
@@ -278,6 +278,17 @@ export class CategoriesService {
     return allTerms.filter(term => {
       return term.taxonomy === taxonomy;
     }).map(t => Object.assign({}, t));
+  }
+
+  async getTagsByObject(objectId: ID) {
+    const taxonomy = 'post_tag';
+    const allTerms = await this.loadAllTerms();
+    // const _terms = [];
+    // taxonomies.forEach((item) => {
+    //   _terms.push(think._.filter(all_terms, {term_id: item.term_id, taxonomy: taxonomy}));
+    // });
+    //
+    // return await think._.flattenDeep(_terms);
   }
 
   /**

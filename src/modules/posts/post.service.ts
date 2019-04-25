@@ -10,6 +10,7 @@ import { EBlockFormatType, EUserPostsBehavior } from '@app/interfaces/conditions
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 import { OptionService } from '@app/modules/options/option.service';
 import { BaseEntity } from '@app/entity/base.entity';
+import { CategoriesService } from '@app/modules/categories/categories.service';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
@@ -20,6 +21,7 @@ export class PostService {
     @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
     @InjectRepository(PostEntity) private readonly postRepository: Repository<PostEntity>,
     // private optionsService
+    private readonly categoriesService: CategoriesService,
     private readonly optionService: OptionService,
   ) {
   }
@@ -47,7 +49,7 @@ export class PostService {
   // private async typeIsPage(data: Post) {
   // const stickys = this.opti
   // }
-  async loadBLock(type: EBlockFormatType = EBlockFormatType.ALBUM, blocks: number[]) {
+  async loadBLock(blocks: number[]) {
     // 1 取出 BLOCK 的所有内容，包含内容的 meta 信息
     const dataList = await this.connection.manager.createQueryBuilder()
       .select()
@@ -58,25 +60,41 @@ export class PostService {
       .getRawMany();
     formatAllMeta(dataList);
 
+    // return dataList;
     // 1 查出 block list
     // 2 查出 block post format
     // 3 处理 post format
-    // for (let item of dataList) {
-    // }
+
+    // 用于一次性处理
+    // let singleIds = []
+    // 处理资源附件
+    // 1 如果仅有一项内容，暂存至数组，后续批量获取
+    // 2 如果有多项内容，直接批量获取
+    for (const item of dataList) {
+      const typeObject = await this.categoriesService.formatTermForObject(item.id);
+      if (!_.isEmpty(typeObject)) {
+        item.type = typeObject.slug;
+        await this.getFormatData(item);
+      }
+    }
+    return dataList;
   }
 
   async getFormatData(item: PostEntity) {
+    // let resultData: any;
     switch (item.type) {
       case 'post-format-audio': {
         // 查询附件信息
         // post-format 为 audio 的数据 block 只有一项对应的音频内容
         // page 类型的内容才为列表
         if (!_.isEmpty(item.block)) {
-          const block = await this.getAttachmentInfo(item.block[0]);
-          // console.log('block ids .....');
-          // console.log(block);
+          // console.log(JSON.parse(item.block)[0]);
+          // console.log(item.block[0]);
+          const postId = JSON.parse(item.block)[0];
+          const block = await this.getAttachmentInfo(postId);
           if (!Object.is(block.meta._attachment_file, undefined)) {
             item.guid = block.meta._attachment_file;
+            // resultData = item;
           }
           if (!Object.is(block.meta._attachment_metadata, undefined)) {
             if (block.meta._attachment_metadata !== '{}') {
@@ -88,9 +106,10 @@ export class PostService {
         break;
       }
       default:
-        Reflect.deleteProperty(item, 'meta');
+        // Reflect.deleteProperty(item, 'meta');
         break;
     }
+    // return resultData;
     return item;
   }
 
@@ -99,10 +118,10 @@ export class PostService {
    */
   private async getAttachmentInfo(id: ID): Promise<any> {
     const data = await this.findById(id);
-    formatOneMeta(data);
-    console.log('get AttachmentInfo ');
-    console.log(data);
-    return data;
+    return formatOneMeta(data);
+    // console.log('get AttachmentInfo ');
+    // console.log(data);
+    // return data;
   }
 
   /**

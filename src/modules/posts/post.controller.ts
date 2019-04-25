@@ -153,6 +153,8 @@ export class PostController {
       default:
         break;
     }
+    data = await this.dealBlock(data);
+    Reflect.deleteProperty(data, 'meta');
     return data;
   }
 
@@ -184,6 +186,7 @@ export class PostController {
       }
     }
     await this.dealData(list);
+
     return list;
   }
 
@@ -249,13 +252,21 @@ export class PostController {
     return Object.assign({}, post, PostEntity);
   }
 
+  private async decoratorTags(data: any) {
+    // post.tags
+    data.tags = await this.categoriesService.getTagsByObject(data.id);
+  }
+
   /**
    * 处理区块列表数据
    * @param obj
    */
-  private dealBlock(obj: PostEntity) {
-    if (!_.isEmpty(obj.block)) {
+  private async dealBlock(post: any) {
+    if (!_.isEmpty(post.block)) {
+      const blockList = await this.postService.loadBLock(post.block);
+      post.block = blockList;
     }
+    return post;
   }
 
   /**
@@ -290,6 +301,11 @@ export class PostController {
     }
     return data;
   }
+
+  // 处理标签信息
+  // private async decoratorTags() {}
+  // private async dealBlock() {
+  // }
 
   // @Get('views')
   // async views() {
