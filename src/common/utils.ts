@@ -69,10 +69,19 @@ export function normalizeEmailAddress(input: string): string {
  */
 export function formatAllMeta(list: any[]) {
   const items = [];
-  for (const item of list) {
+  for (let item of list) {
     item.meta = {};
     if (_.has(item, 'metas') && item.metas.length > 0) {
       for (const meta of item.metas) {
+        if (meta.key.includes('_capabilities')) {
+          item = Object.assign(item, meta.value);
+        }
+        if (meta.key.includes('_wechat')) {
+          const wechat = meta.value;
+          item = Object.assign(item, {
+            avatarUrl: wechat.avatarUrl,
+          });
+        }
         item.meta[meta.key] = meta.value;
       }
     }

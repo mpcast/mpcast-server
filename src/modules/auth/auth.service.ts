@@ -17,7 +17,7 @@ import { PasswordCiper } from '@app/service/helpers/password-cipher/password-cip
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { ID } from '@app/common/shared-types';
-import { User } from '@app/entity';
+import { UserEntity } from '@app/entity';
 // import { ValidationError } from '@app/errors/validation.error';
 import { HttpUnauthorizedError } from '@app/errors/unauthorized.error';
 
@@ -38,11 +38,12 @@ export class AuthService {
     // const isVerified = lodash.isEqual(payload.data, APP_CONFIG.AUTH.data);
     // IF 是微信，返回唯一标识，一般为用户的 openid
     if (payload.type === 'wechat') {
-      const user = await this.connection.getRepository(User).findOne({
+      const user = await this.connection.getRepository(UserEntity).findOne({
         identifier: payload.identifier,
       });
       if (user) {
-        return payload.identifier;
+        return payload;
+        // return payload.identifier;
       }
       return null;
     }
@@ -56,7 +57,7 @@ export class AuthService {
    * @param password
    */
   async verifyUserPassword(userId: ID, password: string): Promise<boolean> {
-    const user = await this.connection.getRepository(User).findOne(userId, {
+    const user = await this.connection.getRepository(UserEntity).findOne(userId, {
       select: ['passwordHash'],
     });
     if (!user) {

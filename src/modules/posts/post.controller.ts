@@ -1,18 +1,21 @@
-import { Controller, Get, Param, Query, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, Post, UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
 import { HttpProcessor } from '@app/decorators/http.decorator';
 import { OptionService } from '@app/modules/options/option.service';
 import * as _ from 'lodash';
 import { UserService } from '@app/modules/users/user.service';
-import { ECountBy } from '@app/interfaces/conditions.interface';
-import { Post } from '@app/entity';
+import { EUserPostsBehavior } from '@app/interfaces/conditions.interface';
+import { PostEntity } from '@app/entity';
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 import { ID } from '@app/common/shared-types';
 import { CategoriesService } from '@app/modules/categories/categories.service';
+import { JwtAuthGuard } from '@app/guards/auth.guard';
+import { QueryParams } from '@app/decorators/query-params.decorator';
 
 // import { Post } from './post.entity';
 
 @Controller('posts')
+@UseGuards(JwtAuthGuard)
 export class PostController {
   constructor(
     private readonly userService: UserService,
@@ -39,6 +42,91 @@ export class PostController {
     // 处理 meta 数据
     await this.dealData(data.items);
     return data;
+  }
+
+  /**
+   * 获取浏览此内容的用户列表
+   * TODO: 待做分页处理
+   * @param postId
+   * @param req
+   */
+  @Get(':id/views')
+  @HttpProcessor.handle('获取单个内容数据')
+  async getViews(@Param('id') postId: ID, @Req() req) {
+    const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
+    let iView = false;
+    let found = 0;
+    const views = [];
+    if (!_.isEmpty(result)) {
+      if (!_.isEmpty(result.value)) {
+        const list = JSON.parse(result.value);
+        const exists = _.find(list, ['id', req.user.id]);
+        if (exists) {
+          iView = true;
+        }
+        found = list.length;
+        const users = await this.userService.getUsersDetailByIds(_.filter(list, 'id'));
+        views.push(...users);
+      }
+    }
+    if (views.length > 0) {
+      formatAllMeta(views);
+      for (const user of views) {
+        Reflect.deleteProperty(user, 'meta');
+      }
+    }
+    return {
+      found,
+      iView,
+      postId,
+      views,
+    };
+  }
+
+  /**
+   * 增加或更新新浏览者
+   * @param postId
+   * @param req
+   * @param ip
+   */
+  @Post(':id/views/new')
+  async newViewer(@Param('id') postId: ID, @Req() req, @QueryParams() { visitors: { ip } }) {
+    const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
+    let iView = false;
+    let viewCount = 0;
+    let updateResult: any;
+    if (!_.isEmpty(result)) {
+      if (!_.isEmpty(result.value)) {
+        const list = JSON.parse(result.value);
+        viewCount = list.length;
+        iView = _.find(list, item => {
+          // 由于 mysql json search 函数仅支持字符查询，如果 id 为数字存储查询时会需要做特殊处理
+          return item.id.toString() === req.user.id.toString();
+        });
+        if (!iView) {
+          // 如果当前用户未普浏览过，即增加。
+          // 新增加浏览者
+          updateResult = await this.postService.newViewer(req.user.id, postId, ip);
+          if (updateResult) {
+            viewCount++;
+          }
+        } else {
+          // 更新浏览者信息
+          await this.postService.updateViewer(req.user.id, postId, ip);
+        }
+      }
+    } else {
+      // 增加新浏览者
+      updateResult = await this.postService.newViewer(req.user.id, postId, ip);
+      if (updateResult) {
+        viewCount++;
+      }
+    }
+    return {
+      iView: true,
+      viewCount,
+      postId,
+    };
   }
 
   @Get(':id')
@@ -99,8 +187,6 @@ export class PostController {
     return list;
   }
 
-  // }
-
   private async dealData(data) {
     formatAllMeta(data);
     // this.formatMeta(data);
@@ -118,7 +204,6 @@ export class PostController {
       // 作者信息
       item.authorInfo = await this.userService.getDetailById(item.author);
       formatOneMeta(item.authorInfo);
-      // this.formatOneMeta(item.authorInfo);
       if (_.has(item.authorInfo, 'meta')) {
         if (_.has(item.authorInfo.meta, 'avatar')) {
           item.authorInfo.avatarUrl = await this.postService.getAttachment(item.authorInfo.meta.avatar);
@@ -132,9 +217,9 @@ export class PostController {
       if (_.has(item.authorInfo, 'liked')) {
         Reflect.deleteProperty(item.authorInfo, 'liked');
       }
-      item.likeCount = await this.postService.countBy(ECountBy.LIKE, item.id);
-      // item.thumbCount = await this.postService.countBy(ECountBy.THUMB, item.id);
-      item.viewCount = await this.postService.countBy(ECountBy.VIEW, item.id);
+      item.likeCount = await this.postService.countByBehavior(EUserPostsBehavior.LIKE, item.id);
+      // item.thumbCount = await this.postService.countBy(EInteractionBy.THUMB, item.id);
+      item.viewCount = await this.postService.countByBehavior(EUserPostsBehavior.VIEW, item.id);
       // 留言数量
       // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
       if (!Object.is(item.meta._thumbnail_id, undefined) && !_.isEmpty(item.meta._thumbnail_id)) {
@@ -153,7 +238,7 @@ export class PostController {
    * 为查询结果添加分类信息
    * @param post Post
    */
-  private async decoratorTerms(post: Post) {
+  private async decoratorTerms(post: PostEntity) {
     const data: any = {};
     data.categories = _.map(await this.categoriesService.findCategoriesByObject(post.id), 'taxonomyId');
     // 查询 post-format 是何种类型的格式分类, 比如是 audio、doc 等
@@ -161,14 +246,14 @@ export class PostController {
     if (!_.isEmpty(postTermFormat)) {
       post.type = postTermFormat.slug;
     }
-    return Object.assign({}, post, data);
+    return Object.assign({}, post, PostEntity);
   }
 
   /**
    * 处理区块列表数据
    * @param obj
    */
-  private dealBlock(obj: Post) {
+  private dealBlock(obj: PostEntity) {
     if (!_.isEmpty(obj.block)) {
     }
   }
@@ -176,7 +261,7 @@ export class PostController {
   /**
    * 格式化数据
    */
-  private async formatData(post: Post): Promise<any> {
+  private async formatData(post: PostEntity): Promise<any> {
     return await this.postService.getFormatData(post);
   }
 
@@ -184,7 +269,7 @@ export class PostController {
    * 装饰类型为 page 的数据
    * @param post
    */
-  private async decoratorIsPage(post: Post) {
+  private async decoratorIsPage(post: PostEntity) {
     const options = await this.optionService.load();
     const stickys: {
       [key: string]: [number];
@@ -205,4 +290,8 @@ export class PostController {
     }
     return data;
   }
+
+  // @Get('views')
+  // async views() {
+  // }
 }

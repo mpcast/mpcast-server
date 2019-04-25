@@ -1,14 +1,15 @@
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Post, PostMeta, Term, TermRelationships, TermTaxonomy, User } from '@app/entity';
+import { PostEntity, PostMeta, Term, TermRelationships, TermTaxonomy, UserEntity } from '@app/entity';
 import { Connection, In, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { ID } from '@app/common/shared-types';
 import * as _ from 'lodash';
 // import { rpc } from 'qiniu';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { EBlockFormatType, ECountBy } from '@app/interfaces/conditions.interface';
+import { EBlockFormatType, EUserPostsBehavior } from '@app/interfaces/conditions.interface';
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 import { OptionService } from '@app/modules/options/option.service';
+import { BaseEntity } from '@app/entity/base.entity';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
@@ -16,8 +17,8 @@ import { OptionService } from '@app/modules/options/option.service';
 export class PostService {
   constructor(
     @InjectConnection() private connection: Connection,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(PostEntity) private readonly postRepository: Repository<PostEntity>,
     // private optionsService
     private readonly optionService: OptionService,
   ) {
@@ -50,7 +51,7 @@ export class PostService {
     // 1 取出 BLOCK 的所有内容，包含内容的 meta 信息
     const dataList = await this.connection.manager.createQueryBuilder()
       .select()
-      .from(Post, 'p')
+      .from(PostEntity, 'p')
       .where(`id IN (:blocks)`, { blocks })
       // 保持数组顺序
       .orderBy(`INSTR (',${blocks},', CONCAT(',',id,','))`)
@@ -64,7 +65,7 @@ export class PostService {
     // }
   }
 
-  async getFormatData(item: Post) {
+  async getFormatData(item: PostEntity) {
     switch (item.type) {
       case 'post-format-audio': {
         // 查询附件信息
@@ -72,8 +73,8 @@ export class PostService {
         // page 类型的内容才为列表
         if (!_.isEmpty(item.block)) {
           const block = await this.getAttachmentInfo(item.block[0]);
-          console.log('block ids .....');
-          console.log(block);
+          // console.log('block ids .....');
+          // console.log(block);
           if (!Object.is(block.meta._attachment_file, undefined)) {
             item.guid = block.meta._attachment_file;
           }
@@ -110,7 +111,7 @@ export class PostService {
    */
   private async getAudios(ids: number[]) {
     this.connection.manager
-      .createQueryBuilder(Post, 'post')
+      .createQueryBuilder(PostEntity, 'post')
       .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
     // .addOrderBy(`INSTR (',${ids},', CONCAT(',',id,','))`, {})
     // let list = await this.postRepository.createQueryBuilder('p')
@@ -129,9 +130,9 @@ export class PostService {
    * 分页查询
    * @param options
    */
-  async paginate(options: IPaginationOptions): Promise<Pagination<Post>> {
+  async paginate(options: IPaginationOptions): Promise<Pagination<PostEntity>> {
     // this.postRepository.findAndCount()
-    return await paginate<Post>(this.postRepository, options, {
+    return await paginate<PostEntity>(this.postRepository, options, {
       where: {
         type: 'page',
       },
@@ -188,7 +189,7 @@ export class PostService {
         return query.from(TermRelationships, 'tr');
       }, 'tr', 'tr.taxonomyId = tt.id')
       .innerJoin(query => {
-        return query.from(Post, 'obj');
+        return query.from(PostEntity, 'obj');
       }, 'obj', 'obj.id = tr.objectId')
       .where('obj.type = :type', { type: 'page' })
       .andWhere(where)
@@ -225,7 +226,7 @@ export class PostService {
     data = await this.connection.manager
       .createQueryBuilder()
       .select('p.*, JSON_LENGTH(value) as viewCount')
-      .from(Post, 'p')
+      .from(PostEntity, 'p')
       .innerJoin(query => {
         return query.from(PostMeta, 'meta');
       }, 'meta', 'meta.postId = p.id')
@@ -275,7 +276,7 @@ export class PostService {
         return query.from(TermRelationships, 'tr');
       }, 'tr', 'tr.taxonomyId = tt.id')
       .innerJoin(query => {
-        return query.from(Post, 'obj');
+        return query.from(PostEntity, 'obj');
       }, 'obj', 'obj.id = tr.objectId')
       .where('obj.type = :type', { type: 'page' })
       .andWhere('obj.status IN (:status)', { status: 'publish' })
@@ -310,7 +311,7 @@ export class PostService {
     const data = await this.connection.manager
       .createQueryBuilder()
       .select()
-      .from(Post, 'p')
+      .from(PostEntity, 'p')
       .where('p.id IN (:stickys)', { stickys })
       .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
       // .offset(page)
@@ -339,7 +340,7 @@ export class PostService {
     return data;
   }
 
-  async findAllByType(postType: any, userId: number, take: number): Promise<Post[]> {
+  async findAllByType(postType: any, userId: number, take: number): Promise<PostEntity[]> {
     const where: { [key: string]: any } = {
       status: 'publish',
       type: In([postType]),
@@ -411,20 +412,131 @@ export class PostService {
   }
 
   /**
-   * 统计浏览量、喜欢、点赞
-   * @param type
+   * 根据用户行为统计浏览量、喜欢、点赞
+   * @param behavior
    * @param postId
    */
-  async countBy(type: ECountBy, postId: ID) {
+  async countByBehavior(behavior: EUserPostsBehavior, postId: ID) {
     const data = await this.connection.manager.createQueryBuilder()
       .select(`JSON_LENGTH(pm.value) as count`)
       .from(PostMeta, 'pm')
-      .where(`pm.postId = :postId AND pm.key = :key`, { postId, key: type })
+      .where(`pm.postId = :postId AND pm.key = :key`, { postId, key: behavior })
       .getRawOne();
 
     if (!_.isEmpty(data)) {
       return data.count;
     }
     return 0;
+  }
+
+  /**
+   * 根据用户的内容交互行为类型返回用户列表
+   */
+  async getUsersByBehavior(behavior: EUserPostsBehavior, postId: ID) {
+    const data = await this.connection.manager.createQueryBuilder()
+    // .select(`JSON_LENGTH(pm.value) as count`)
+      .select()
+      .from(PostMeta, 'pm')
+      .where(`pm.postId = :postId AND pm.key = :key`, { postId, key: behavior })
+      .getRawOne();
+    return data;
+  }
+
+  // async getViewers(postId: ID) {
+  //   const data = await this.connection.manager.createQueryBuilder()
+  //     .select()
+  //     .from(PostMeta, 'pm')
+  //     .where(`pm.postId = :postId AND pm.key = :key`, { postId, key: type })
+  //     .getRawOne();
+  // }
+
+  async createViewBehaviior() {
+  }
+
+  /**
+   * 新增浏览者
+   * @param userId
+   * @param postId
+   * @param ip
+   */
+  async newViewer(userId: ID, postId: ID, ip: any) {
+    const hasViewer = await this.connection.getRepository(PostMeta)
+      .findOne({
+        post: { id: postId },
+        key: EUserPostsBehavior.VIEW,
+      });
+    if (!hasViewer) {
+      await this.connection.getRepository(PostMeta)
+        .save({
+          post: { id: postId },
+          key: EUserPostsBehavior.VIEW,
+          value: [],
+        }).then(entity => {
+          // console.log(entity);
+          // 创新 view 行为数据
+        });
+    }
+
+    const updateResult = await this.connection.createQueryBuilder()
+      .update(PostMeta)
+      .set({
+        post: { id: postId },
+        key: '_post_views',
+        value: () => `JSON_ARRAY_APPEND(value, '$', JSON_OBJECT('id', '${userId}','ip', '${ip}', 'date', '${new Date().getTime()}'))`,
+      })
+      .where('postId = :postId AND `key` = :key', { postId, key: EUserPostsBehavior.VIEW })
+      .execute();
+
+    return updateResult;
+  }
+
+  /**
+   * 更新浏览者信息`
+   * @param userId
+   * @param postId
+   * @param ip
+   */
+  async updateViewer(userId: ID, postId: ID, ip: any) {
+    // # JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
+    // https://dev.mysql.com/doc/refman/8.0/en/json-search-functions.html#function_json-search
+    const updateResult = await this.connection.createQueryBuilder()
+      .update(PostMeta)
+      .set({
+        // 处理包含数字类型值的 json，使期在 json_search 中有效
+        // # 1 JSON_SEARCH 查找键值的路径
+        // # 2 去掉已查询出的路径键
+        // # 3 拼接要处理的路径键
+        // # 4 用新值替换掉旧值
+        value: () => {
+          return `
+            JSON_REPLACE(
+              value,
+                CONCAT(
+                    SUBSTRING_INDEX(
+                        REPLACE(
+                            JSON_SEARCH(value, 'one', '${userId}', NULL, '$**.id'),
+                            '"', ''
+                        ),
+                    '.', 1),
+                  '.date'
+                ),
+                '${new Date().getTime()}',
+                CONCAT(
+                    SUBSTRING_INDEX(
+                        REPLACE(
+                            JSON_SEARCH(value, 'one', '${userId}', NULL, '$**.id'),
+                            '"', ''
+                        ),
+                    '.', 1),
+                  '.ip'
+              ),
+             '${ip}'
+            )`;
+        },
+      })
+      .where('postId = :postId AND `key` = :key', { postId, key: EUserPostsBehavior.VIEW })
+      .execute();
+
+    return updateResult;
   }
 }

@@ -13,7 +13,7 @@ export class TermTaxonomy extends BaseEntity {
     type: 'int',
     comment: '分类 id',
   })
-  termId: Term;
+  term: Term;
 
   @Column({
     type: 'varchar',

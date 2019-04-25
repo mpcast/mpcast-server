@@ -3,14 +3,14 @@ import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
 import { PostMeta } from '@app/entity/posts/post-meta.entity';
 import { Comment } from '@app/entity/comments/comment.entity';
-import { User } from '@app/entity';
+// import { User } from '@app/entity';
 
 // @Index(['name'], { unique: true })
 // @Index(['type', 'status', 'createdDate', 'id'], { unique: true })
 // @Index(['parent'])
 // @Index(['author'])
 @Entity('posts')
-export class Post extends BaseEntity {
+export class PostEntity extends BaseEntity {
   @Column({
     name: 'author',
     type: 'int',

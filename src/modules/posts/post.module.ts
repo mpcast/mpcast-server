@@ -3,7 +3,7 @@ import { PostService } from '@app/modules/posts/post.service';
 import { PostController } from '@app/modules/posts/post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@app/modules/users/user.module';
-import { Post, User } from '@app/entity';
+import { PostEntity, UserEntity } from '@app/entity';
 import { OptionModule } from '@app/modules/options/option.module';
 import { CacheModule } from '@app/processors/cache/cache.module';
 import { CategoriesModule } from '@app/modules/categories/categories.module';
@@ -21,8 +21,8 @@ import { CategoriesModule } from '@app/modules/categories/categories.module';
     CategoriesModule,
     CacheModule,
     TypeOrmModule.forFeature([
-      User,
-      Post,
+      UserEntity,
+      PostEntity,
     ]),
   ],
   providers: [PostService],

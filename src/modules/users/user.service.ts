@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { User } from '@app/entity';
+import { UserEntity } from '@app/entity';
 import { Connection, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 // import {CreateUserInput} from '@app/modules/users/user.interface';
@@ -12,18 +12,18 @@ import { ID } from '@app/common/shared-types';
 export class UserService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {
   }
 
-  public create(newUser: CreateUserDto): Promise<User> {
+  public create(newUser: CreateUserDto): Promise<UserEntity> {
     return this.userRepository.save(newUser).then(user => {
       return user;
     });
   }
 
-  async createOrUpdate(input: Partial<CreateUserDto>): Promise<User> {
-    let user: User;
+  async createOrUpdate(input: Partial<CreateUserDto>): Promise<UserEntity> {
+    let user: UserEntity;
     const existing = await this.userRepository.findOne({
       where: {
         identifier: input.identifier,
@@ -33,7 +33,7 @@ export class UserService {
       user = patchEntity(existing, input);
       // user = new Users(input);
     } else {
-      user = new User(input);
+      user = new UserEntity(input);
     }
 
     return this.userRepository.save(user);
@@ -52,12 +52,12 @@ export class UserService {
 //   photo.filename = "photo-with-bears.jpg";
 //   photo.albums = [album1, album2];
 //   await connection.manager.save(photo);
-  async updateUser(user: User): Promise<User> {
+  async updateUser(user: UserEntity): Promise<UserEntity> {
     return await this.userRepository.save(user);
     // this.connection.getRepository(UserMeta).save()
   }
 
-  public getDetailById(id: number): Promise<User> {
+  public getDetailById(id: number): Promise<UserEntity> {
     return this.userRepository.findOne({
       relations: ['metas'],
       where: {
@@ -66,7 +66,15 @@ export class UserService {
     });
   }
 
-  findByIdentifier(identifier: string): Promise<User> {
+  /**
+   * 根据 ids 批量返回数据
+   * @param ids
+   */
+  getUsersDetailByIds(ids: ID[]) {
+    return this.userRepository.findByIds(ids);
+  }
+
+  findByIdentifier(identifier: string): Promise<UserEntity> {
     return this.userRepository.findOne({
       relations: ['metas'],
       where: {

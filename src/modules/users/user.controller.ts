@@ -1,4 +1,4 @@
-import { User } from '@app/entity';
+import { UserEntity } from '@app/entity';
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from '@app/modules/users/user.service';
 import { CreateUserDto } from '@app/modules/users/user.dto';
@@ -13,7 +13,7 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() userInput: CreateUserDto): Promise<User> {
+  createUser(@Body() userInput: CreateUserDto): Promise<UserEntity> {
     return this.userService.create({
       identifier: userInput.identifier,
       passwordHash: userInput.passwordHash,
@@ -26,7 +26,7 @@ export class UserController {
   // }
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async oneself(@Req() request): Promise<User> {
+  async oneself(@Req() request): Promise<UserEntity> {
     const user = await this.userService.findByIdentifier(request.user);
     if (user) {
       return user;
@@ -35,7 +35,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<User> {
+  findOne(@Param('id') id: number): Promise<UserEntity> {
     return this.userService.getDetailById(id);
   }
 }

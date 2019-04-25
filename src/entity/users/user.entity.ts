@@ -4,8 +4,8 @@ import { Column } from 'typeorm';
 import { UserMeta, Comment } from '@app/entity';
 
 @Entity('users')
-export class User extends BaseEntity {
-  constructor(input?: DeepPartial<User>) {
+export class UserEntity extends BaseEntity {
+  constructor(input?: DeepPartial<UserEntity>) {
     super(input);
   }
 
@@ -36,6 +36,7 @@ export class User extends BaseEntity {
 
   @OneToMany(type => UserMeta, userMeta => userMeta.user, {
     cascade: true,
+    eager: true,
   })
   metas?: UserMeta[];
 

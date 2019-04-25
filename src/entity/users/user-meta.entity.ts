@@ -1,6 +1,6 @@
 import { BaseEntity } from '@app/entity/base.entity';
 import { DeepPartial, JoinColumn, Entity, Column, ManyToOne } from 'typeorm';
-import { User } from '@app/entity/users/user.entity';
+import { UserEntity } from '@app/entity/users/user.entity';
 
 @Entity()
 export class UserMeta extends BaseEntity {
@@ -18,9 +18,9 @@ export class UserMeta extends BaseEntity {
   })
   value?: any;
 
-  @ManyToOne(type => User, user => user.metas, {
+  @ManyToOne(type => UserEntity, user => user.metas, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  user?: User;
+  user?: UserEntity;
 }

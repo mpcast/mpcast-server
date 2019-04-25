@@ -1,6 +1,6 @@
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../base.entity';
-import { Post, User } from '@app/entity';
+import { PostEntity, UserEntity } from '@app/entity';
 import { CommentMeta } from '@app/entity/comments/comment-meta.entity';
 
 @Entity('comments')
@@ -44,9 +44,9 @@ export class Comment extends BaseEntity {
   })
   metas?: CommentMeta[];
 
-  @ManyToOne(type => Post, post => post.comments)
-  post: Post;
+  @ManyToOne(type => PostEntity, post => post.comments)
+  post: PostEntity;
 
-  @ManyToOne(type => User, user => user.comments)
-  user: User;
+  @ManyToOne(type => UserEntity, user => user.comments)
+  user: UserEntity;
 }

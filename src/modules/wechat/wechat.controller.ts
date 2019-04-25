@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { Code2SessionResponse, MiniProgram, Wechat } from 'wechat-jssdk';
+import { MiniProgram, Wechat } from 'wechat-jssdk';
 import { UserService } from '@app/modules/users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as APP_CONFIG from '@app/app.config';
@@ -58,6 +58,8 @@ export class WechatController {
       const user = await this.usersService.createOrUpdate({
         identifier: openid,
       });
+      console.log('login ......');
+      console.log(user);
       // 存储 session_key
       // REDIS OR FILES
       await this.cacheService.set(`${CACHE_KEY.WECHAT_SESSION_KEY}${openid}`, session_key);
@@ -108,7 +110,7 @@ export class WechatController {
       }
     }
     const newUser = await this.usersService.updateUser(user);
-    const resData: object = {}
+    const resData: object = {};
     for (const meta of newUser.metas) {
       if (meta.key === '_wechat') {
         Object.assign(resData, {

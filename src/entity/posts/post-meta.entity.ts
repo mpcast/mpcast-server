@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from '../base.entity';
-import { Post } from '@app/entity';
+import { PostEntity } from '@app/entity';
 
 @Entity()
 export class PostMeta extends BaseEntity {
@@ -18,9 +18,9 @@ export class PostMeta extends BaseEntity {
   })
   value: any;
 
-  @ManyToOne(type => Post, post => post.metas, {
+  @ManyToOne(type => PostEntity, post => post.metas, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  post?: Post;
+  post?: PostEntity;
 }
