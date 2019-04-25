@@ -7,6 +7,8 @@ import { UserService } from '@app/modules/users/user.service';
 import { ECountBy } from '@app/interfaces/conditions.interface';
 import { Post } from '@app/entity';
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
+import { ID } from '@app/common/shared-types';
+import { CategoriesService } from '@app/modules/categories/categories.service';
 
 // import { Post } from './post.entity';
 
@@ -16,6 +18,7 @@ export class PostController {
     private readonly userService: UserService,
     private readonly postService: PostService,
     private readonly optionService: OptionService,
+    private readonly categoriesService: CategoriesService,
     // private readonly cacheService: CacheService,
   ) {
   }
@@ -40,9 +43,31 @@ export class PostController {
 
   @Get(':id')
   @HttpProcessor.handle('获取单个内容数据')
-  async one(@Param('id') id: number) {
+  async one(@Param('id') id: ID) {
     // this.postService.
+    // return await this.postService.findById(id);
+    const post = await this.postService.findById(id);
+    let data: any;
+    // 装饰类别
+    data = await this.decoratorTerms(post);
+    // 装饰作者
+    switch (post.type) {
+      case 'page': {
+        // 处理页面类型数据
+        data = await this.decoratorIsPage(data);
+        break;
+      }
+      case 'post_format': {
+        // 处理内容格式化数据
+        data = await this.formatData(data);
+        break;
+      }
+      default:
+        break;
+    }
+    return data;
   }
+
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
   async findByCategory(@Req() req, @Param('category') category): Promise<any> {
@@ -74,42 +99,6 @@ export class PostController {
     return list;
   }
 
-  // private formatMeta(list: any[]) {
-  //   const items = [];
-  //   for (const item of list) {
-  //     item.meta = {};
-  //     if (_.has(item, 'metas') && item.metas.length > 0) {
-  //       for (const meta of item.metas) {
-  //         item.meta[meta.key] = meta.value;
-  //       }
-  //     }
-  //     Reflect.deleteProperty(item, 'metas');
-  //     items.push(item);
-  //   }
-  //   return items;
-  // }
-  //
-  // Private methods
-  //
-  /**
-   * 格式化单个对象的元数据信息
-   * @param item
-   */
-  // private formatOneMeta(item: any) {
-  //   item.meta = {};
-  //   if (!_.isEmpty(item.metas) && item.metas.length > 0) {
-  //     for (const meta of item.metas) {
-  //       if (meta.key.includes('_liked_posts')) {
-  //         item.liked = meta.value;
-  //         // item.liked = JSON.parse(meta.meta_value);
-  //         // Object.assign(item, JSON.parse(meta.meta_value))
-  //       }
-  //       // item.meta[meta.meta_key] = JSON.parse(meta.meta_value)
-  //       item.meta[meta.key] = meta.value;
-  //     }
-  //   }
-  //   Reflect.deleteProperty(item, 'metas');
-  //   return item;
   // }
 
   private async dealData(data) {
@@ -162,9 +151,17 @@ export class PostController {
 
   /**
    * 为查询结果添加分类信息
-   * @param obj
+   * @param post Post
    */
-  private decoratorTerms(obj: Post) {
+  private async decoratorTerms(post: Post) {
+    const data: any = {};
+    data.categories = _.map(await this.categoriesService.findCategoriesByObject(post.id), 'taxonomyId');
+    // 查询 post-format 是何种类型的格式分类, 比如是 audio、doc 等
+    const postTermFormat = await this.categoriesService.formatTermForObject(post.id);
+    if (!_.isEmpty(postTermFormat)) {
+      post.type = postTermFormat.slug;
+    }
+    return Object.assign({}, post, data);
   }
 
   /**
@@ -175,6 +172,37 @@ export class PostController {
     if (!_.isEmpty(obj.block)) {
     }
   }
-  private formatData() {
+
+  /**
+   * 格式化数据
+   */
+  private async formatData(post: Post): Promise<any> {
+    return await this.postService.getFormatData(post);
+  }
+
+  /**
+   * 装饰类型为 page 的数据
+   * @param post
+   */
+  private async decoratorIsPage(post: Post) {
+    const options = await this.optionService.load();
+    const stickys: {
+      [key: string]: [number];
+    } = options.stickys;
+    // 精选内容标记
+    const isSticky = _.find(stickys.default, id => {
+      return post.id === id;
+    });
+    let data: any;
+    if (isSticky) {
+      data = Object.assign({}, post, {
+        isSticky: true,
+      });
+    } else {
+      data = Object.assign({}, post, {
+        isSticky: false,
+      });
+    }
+    return data;
   }
 }

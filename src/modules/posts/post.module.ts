@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@app/modules/users/user.module';
 import { Post, User } from '@app/entity';
 import { OptionModule } from '@app/modules/options/option.module';
+import { CacheModule } from '@app/processors/cache/cache.module';
+import { CategoriesModule } from '@app/modules/categories/categories.module';
 // import { AuthModule } from '@app/modules/auth/auth.module';
 // import { Users } from '@app/entity';
 
@@ -16,6 +18,8 @@ import { OptionModule } from '@app/modules/options/option.module';
   imports: [
     UserModule,
     OptionModule,
+    CategoriesModule,
+    CacheModule,
     TypeOrmModule.forFeature([
       User,
       Post,

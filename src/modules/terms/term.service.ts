@@ -11,7 +11,7 @@ import * as CACHE_KEY from '@app/constants/cache.constant';
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
 @Injectable()
-export class CategoriesService {
+export class TermService {
   constructor(
     @InjectConnection() private connection: Connection,
     // @InjectRepository(User) private readonly usersRepository: Repository<User>,
@@ -37,54 +37,6 @@ export class CategoriesService {
       .getRawOne();
 
     return data;
-  }
-
-  /**
-   * 根据对象 id 查询对象的类别信息
-   * @param objectId
-   */
-  async findCategoriesByObject(objectId: ID) {
-    const taxonomy = 'category';
-    // 从缓存中提取所有 term
-    const allTerms: Term[] = await this.cacheService.get(CACHE_KEY.TERMS);
-    // 查询内容关联的分类法 id == termId
-    const taxonomies = await this.connection.manager
-      .createQueryBuilder(TermRelationships, 'tt')
-      .where(`objectId = :objectId`, { objectId })
-      .getRawMany();
-
-    // 按 termId 查询 term
-    const terms = [];
-    taxonomies.forEach(item => {
-      terms.push(_.filter(allTerms, {
-        taxonomyId: item.taxonomyId,
-        taxonomy,
-      }));
-    });
-    return _.flattenDeep(terms);
-  }
-
-  /**
-   * 处理 post-format 格式对象
-   */
-  async formatTermForObject(objectId: ID) {
-    const allTerms: Term[] = await this.cacheService.get(CACHE_KEY.TERMS);
-    // 此处的 taxonomyId 设置别名为 termId 将会与全部分类别的 termId 进行比对
-    const taxonomies = await this.connection.manager
-      .createQueryBuilder(TermRelationships, 'tt')
-      .select(`taxonomyId as termId`)
-      .where(`objectId = :objectId`, { objectId })
-      .getRawMany();
-    // 交叉比对类别 ID 并合并
-    const curPostHasTerms = _.intersectionBy(allTerms, taxonomies, 'termId');
-    // console.log(curPostHasTerms);
-    // 处理包含 post-format 格式
-    const postFormat = _.findLast(curPostHasTerms, (o) => {
-      // console.log(o.slug);
-      return (o.slug.toString().indexOf('post-format') >= 0);
-    });
-    // console.log(postFormat);
-    return postFormat;
   }
 
   /**

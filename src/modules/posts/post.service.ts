@@ -7,7 +7,8 @@ import * as _ from 'lodash';
 // import { rpc } from 'qiniu';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { EBlockFormatType, ECountBy } from '@app/interfaces/conditions.interface';
-import { formatAllMeta } from '@app/common/utils';
+import { formatAllMeta, formatOneMeta } from '@app/common/utils';
+import { OptionService } from '@app/modules/options/option.service';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
@@ -17,6 +18,8 @@ export class PostService {
     @InjectConnection() private connection: Connection,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    // private optionsService
+    private readonly optionService: OptionService,
   ) {
   }
 
@@ -31,13 +34,18 @@ export class PostService {
    * @param id
    */
   async findById(id: ID) {
-    return await  this.postRepository.findOne({
-      relations: ['metas'],
+    const data = await this.postRepository.findOne({
       where: {
         id,
       },
     });
+
+    return data;
   }
+
+  // private async typeIsPage(data: Post) {
+  // const stickys = this.opti
+  // }
   async loadBLock(type: EBlockFormatType = EBlockFormatType.ALBUM, blocks: number[]) {
     // 1 取出 BLOCK 的所有内容，包含内容的 meta 信息
     const dataList = await this.connection.manager.createQueryBuilder()
@@ -56,13 +64,44 @@ export class PostService {
     // }
   }
 
-  private async getFormatData(item: Post) {
+  async getFormatData(item: Post) {
     switch (item.type) {
       case 'post-format-audio': {
+        // 查询附件信息
+        // post-format 为 audio 的数据 block 只有一项对应的音频内容
+        // page 类型的内容才为列表
         if (!_.isEmpty(item.block)) {
+          const block = await this.getAttachmentInfo(item.block[0]);
+          console.log('block ids .....');
+          console.log(block);
+          if (!Object.is(block.meta._attachment_file, undefined)) {
+            item.guid = block.meta._attachment_file;
+          }
+          if (!Object.is(block.meta._attachment_metadata, undefined)) {
+            if (block.meta._attachment_metadata !== '{}') {
+              item = _.extend(item, block.meta._attachment_metadata);
+            }
+          }
         }
+        Reflect.deleteProperty(item, 'meta');
+        break;
       }
+      default:
+        Reflect.deleteProperty(item, 'meta');
+        break;
     }
+    return item;
+  }
+
+  /**
+   * @param id
+   */
+  private async getAttachmentInfo(id: ID): Promise<any> {
+    const data = await this.findById(id);
+    formatOneMeta(data);
+    console.log('get AttachmentInfo ');
+    console.log(data);
+    return data;
   }
 
   /**
@@ -73,7 +112,7 @@ export class PostService {
     this.connection.manager
       .createQueryBuilder(Post, 'post')
       .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
-      // .addOrderBy(`INSTR (',${ids},', CONCAT(',',id,','))`, {})
+    // .addOrderBy(`INSTR (',${ids},', CONCAT(',',id,','))`, {})
     // let list = await this.postRepository.createQueryBuilder('p')
     // let list = await this.postRepository.find({
     //   relations: ['metas'],
@@ -81,9 +120,10 @@ export class PostService {
     //     id: In(ids),
     //   },
     // })
-      // .then(a => {
+    // .then(a => {
     // });
   }
+
   // private async getAttachmentInfo(item.block[0]) {}
   /**
    * 分页查询

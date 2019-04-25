@@ -127,6 +127,7 @@ export class Post extends BaseEntity {
 
   @OneToMany(type => PostMeta, postMeta => postMeta.post, {
     cascade: true,
+    eager: true,
   })
   @JoinColumn()
   metas?: PostMeta[];
