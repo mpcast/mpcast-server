@@ -12,6 +12,7 @@ import { CategoriesService } from '@app/modules/categories/categories.service';
 import { JwtAuthGuard } from '@app/guards/auth.guard';
 import { QueryParams } from '@app/decorators/query-params.decorator';
 import { Pagination } from '@app/libs/paginate';
+import { AttachmentService } from '@app/modules/attachments/attachment.service';
 
 // import { Post } from './post.entity';
 
@@ -23,6 +24,7 @@ export class PostController {
     private readonly postService: PostService,
     private readonly optionService: OptionService,
     private readonly categoriesService: CategoriesService,
+    private readonly attachmentService: AttachmentService,
     // private readonly cacheService: CacheService,
   ) {
   }
@@ -41,7 +43,7 @@ export class PostController {
       route: 'posts',
     });
     // 处理 meta 数据
-    await this.dealData(data.items);
+    await this.dealDataList(data.items);
     return data;
   }
 
@@ -77,7 +79,7 @@ export class PostController {
       }
     }
     // await this.dealData(list.items);
-    await this.dealData(list);
+    list = await this.dealDataList(list);
 
     return list;
   }
@@ -192,55 +194,81 @@ export class PostController {
         break;
     }
     data = await this.dealBlock(data);
+    data = await this.decoratorSingleData(data);
     Reflect.deleteProperty(data, 'meta');
     return data;
   }
 
-  private async dealData(data) {
-    formatAllMeta(data);
+  private async decoratorSingleData(data: object) {
+    data = formatOneMeta(data);
+    return await this._formatOneData(data);
+  }
+
+  private async dealDataList(list) {
+    formatAllMeta(list);
     // this.formatMeta(data);
-    for (const item of data) {
-      if (_.has(item.meta, '_items')) {
-        item.items = item.meta._items;
-      }
-      item.url = '';
-
-      // 如果有音频
-      if (!Object.is(item.meta._audio_id, undefined)) {
-        // 音频播放地址
-        item.url = await this.postService.getAttachment(item.meta._audio_id);
-      }
-      // 作者信息
-      item.authorInfo = await this.userService.getDetailById(item.author);
-      formatOneMeta(item.authorInfo);
-      if (_.has(item.authorInfo, 'meta')) {
-        if (_.has(item.authorInfo.meta, 'avatar')) {
-          item.authorInfo.avatarUrl = await this.postService.getAttachment(item.authorInfo.meta.avatar);
-        }
-        if (!Object.is(item.authorInfo.meta[`_wechat`], undefined)) {
-          item.authorInfo.avatarUrl = item.authorInfo.meta[`_wechat`].avatarUrl;
-        }
-        // Reflect.deleteProperty(item.authorInfo, 'meta');
-      }
-      // Liked
-      if (_.has(item.authorInfo, 'liked')) {
-        Reflect.deleteProperty(item.authorInfo, 'liked');
-      }
-      item.likeCount = await this.postService.countByBehavior(EUserPostsBehavior.LIKE, item.id);
-      // item.thumbCount = await this.postService.countBy(EInteractionBy.THUMB, item.id);
-      item.viewCount = await this.postService.countByBehavior(EUserPostsBehavior.VIEW, item.id);
-      // 留言数量
-      // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
-      if (!Object.is(item.meta._thumbnail_id, undefined) && !_.isEmpty(item.meta._thumbnail_id)) {
-        // item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
-        item.featured_image = await this.postService.getAttachment(item.meta._thumbnail_id);
-
-        if (_.isEmpty(item.featured_image)) {
-          // 随机封面
-        } else {
-        }
-      }
+    // const items = [];
+    for (const item of list) {
+      await this._formatOneData(item);
     }
+    return list;
+  }
+
+  private async _formatOneData(item) {
+    if (_.has(item.meta, '_items')) {
+      // 用于处理标注 block 数据状态
+      // item.items = JSON.parse(item.meta._items);
+      item.blockStatus = item.meta._items;
+    }
+    let result = { ...item };
+    result.url = '';
+    // 如果有音频
+    if (!Object.is(result.meta._audio_id, undefined)) {
+      // 音频播放地址
+      result.url = await this.attachmentService.getAttachment(result.meta._audio_id);
+    }
+    // if (_.has(result.meta, 'items')) {
+    //   result.items = JSON.parse(result.meta.items);
+    // }
+    // 作者信息
+    result.authorInfo = await this.userService.getDetailById(result.author);
+    formatOneMeta(result.authorInfo);
+    if (_.has(result.authorInfo, 'meta')) {
+      if (_.has(result.authorInfo.meta, 'avatar')) {
+        result.authorInfo.avatarUrl = await this.attachmentService.getAttachment(result.authorInfo.meta.avatar);
+      }
+      if (!Object.is(result.authorInfo.meta[`_wechat`], undefined)) {
+        result.authorInfo.avatarUrl = result.authorInfo.meta[`_wechat`].avatarUrl;
+      }
+      // 作者简历
+      if (_.has(result.authorInfo.meta, 'resume')) {
+        // if (!Object.is(item.author.meta.resume, undefined)) {
+        result.authorInfo.resume = result.authorInfo.meta.resume;
+      }
+      Reflect.deleteProperty(result.authorInfo, 'meta');
+    }
+    // Liked
+    if (_.has(result.authorInfo, 'liked')) {
+      Reflect.deleteProperty(result.authorInfo, 'liked');
+    }
+    result.likeCount = await this.postService.countByBehavior(EUserPostsBehavior.LIKE, result.id);
+    // item.thumbCount = await this.postService.countBy(EInteractionBy.THUMB, item.id);
+    result.viewCount = await this.postService.countByBehavior(EUserPostsBehavior.VIEW, result.id);
+    // 留言数量
+    // 如果有封面 默认是 thumbnail 缩略图，如果是 podcast 就是封面特色图片 featured_image
+    if (_.has(result.meta, '_thumbnail_id')) {
+      // item.featured_image = await metaModel.getAttachment('file', item.meta._thumbnail_id)
+      const featured_image = await this.attachmentService.getAttachment(result.meta._thumbnail_id);
+      result = Object.assign(result, { featured_image });
+      // if (_.isEmpty(featured_image)) {
+      // 随机封面
+      // } else {
+      // }
+    }
+    // console.log(result);
+    item = Object.assign(item, result);
+    Reflect.deleteProperty(item, 'meta');
+    return item;
   }
 
   /**

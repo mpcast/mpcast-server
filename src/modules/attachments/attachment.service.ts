@@ -117,7 +117,7 @@ export class AttachmentService {
         if (!_.isEmpty(attachment)) {
           return JSON.parse(attachment.value);
         }
-        return '';
+        break;
       }
       case 'meta':
         break;

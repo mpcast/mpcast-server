@@ -7,6 +7,7 @@ import { PostEntity, UserEntity } from '@app/entity';
 import { OptionModule } from '@app/modules/options/option.module';
 import { CacheModule } from '@app/processors/cache/cache.module';
 import { CategoriesModule } from '@app/modules/categories/categories.module';
+import { AttachmentModule } from '@app/modules/attachments/attachment.module';
 // import { AuthModule } from '@app/modules/auth/auth.module';
 // import { Users } from '@app/entity';
 
@@ -16,6 +17,7 @@ import { CategoriesModule } from '@app/modules/categories/categories.module';
   //   AuthModule,
   // ],
   imports: [
+    AttachmentModule,
     UserModule,
     OptionModule,
     CategoriesModule,
