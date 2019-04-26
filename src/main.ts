@@ -36,10 +36,10 @@ async function bootstrap() {
     new LoggingInterceptor(),
   );
   const options = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .addTag('cats')
+    .setTitle('播客系统服务端')
+    .setDescription('The Podcast API')
+    .setVersion('2.0')
+    .addTag('Podcast Server')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
