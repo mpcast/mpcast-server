@@ -24,6 +24,9 @@
 ## 基于 2.0.0 版本的管理系统即将更新上线
 <img src="https://caixie.top/assets/projects/podcast/case-podcast-4.png" width="640" alt="管理系统 "/>
 
+## API
+<img src="https://github.com/caixie-ltd/podcast-server/blob/master/doc/screenshot/swagger?raw=true" title="Landing 页" width="640">
+
 ## 开发命令
 
 ### Installation
