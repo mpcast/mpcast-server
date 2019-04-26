@@ -25,7 +25,7 @@
 <img src="https://caixie.top/assets/projects/podcast/case-podcast-4.png" width="640" alt="管理系统 "/>
 
 ## API
-<img src="https://github.com/caixie-ltd/podcast-server/blob/master/doc/screenshot/swagger?raw=true" title="Landing 页" width="640">
+<img src="https://github.com/caixie-ltd/podcast-server/blob/master/doc/screenshot/swagger.png?raw=true" title="Landing 页" width="640">
 
 ## 开发命令
 
