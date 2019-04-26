@@ -1,5 +1,6 @@
 // import { ID } from '@vendure/common/lib/shared-types';
 import * as _ from 'lodash';
+import { ID } from '@app/common/shared-types';
 
 /**
  * Takes a predicate function and returns a negated version.
@@ -63,51 +64,59 @@ export function normalizeEmailAddress(input: string): string {
   return input.trim().toLowerCase();
 }
 
+// 内部参数类型
+export interface IFilterConfig {
+  filterKey?: any;
+  cleanMeta?: boolean;
+}
+
 /**
  * Format and transform meta list to meta Object
  * @param list
+ * @param config IFilterConfig
  */
-export function formatAllMeta(list: any[]) {
+export function formatAllMeta(list: any[], config?: IFilterConfig) {
   const items = [];
-  for (let item of list) {
+  for (const item of (config && config.filterKey ? _.map(list, config.filterKey) : list)) {
     item.meta = {};
     if (_.has(item, 'metas') && item.metas.length > 0) {
-      for (const meta of item.metas) {
-        if (meta.key.includes('_capabilities')) {
-          item = Object.assign(item, meta.value);
-        }
-        if (meta.key.includes('_wechat')) {
-          const wechat = meta.value;
-          item = Object.assign(item, {
-            avatarUrl: wechat.avatarUrl,
-          });
-        }
-        item.meta[meta.key] = meta.value;
-      }
+      _formatMeta(item, config && config.cleanMeta);
     }
-    Reflect.deleteProperty(item, 'metas');
     items.push(item);
   }
   return items;
 }
 
-//
-// Private methods
-//
 /**
  * 格式化单个对象的元数据信息
  * @param item
+ * @param config
  */
-export function formatOneMeta(item: any) {
+export function formatOneMeta(item: any, config?: IFilterConfig) {
+  item = config && config.filterKey ? _.get(item, config.filterKey) : item;
   item.meta = {};
-  if (!_.isEmpty(item.metas) && item.metas.length > 0) {
-    for (const meta of item.metas) {
-      if (meta.key.includes('_liked_posts')) {
-        item.liked = meta.value;
-      }
-      item.meta[meta.key] = meta.value;
+  if (_.has(item, 'metas') && item.metas.length > 0) {
+    _formatMeta(item, config && config.cleanMeta);
+  }
+  return item;
+}
+
+function _formatMeta(item: any, clean?: boolean) {
+  for (const meta of item.metas) {
+    if (meta.key.includes('_capabilities')) {
+      item = Object.assign(item, meta.value);
     }
+    if (meta.key.includes('_wechat')) {
+      const wechat = meta.value;
+      item = Object.assign(item, {
+        avatarUrl: wechat.avatarUrl,
+      });
+    }
+    if (meta.key.includes('_liked_posts')) {
+      item.liked = meta.value;
+    }
+    item.meta[meta.key] = meta.value;
   }
   Reflect.deleteProperty(item, 'metas');
-  return item;
+  clean && Reflect.deleteProperty(item, 'meta');
 }

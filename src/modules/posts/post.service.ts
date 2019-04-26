@@ -26,12 +26,6 @@ export class PostService {
   ) {
   }
 
-  // async findById(id: ID) {
-  //   let data = await this.postRepository.findOne({
-  //     id,
-  //   });
-  // }
-
   /**
    * 根据 ID 查找
    * @param id

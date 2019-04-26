@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../base.entity';
-import { Comment } from '@app/entity';
+import { CommentEntity } from '@app/entity';
 
 @Entity()
 export class CommentMeta extends BaseEntity {
@@ -18,9 +18,9 @@ export class CommentMeta extends BaseEntity {
   })
   value: any;
 
-  @ManyToOne(type => Comment, comment => comment.metas, {
+  @ManyToOne(type => CommentEntity, comment => comment.metas, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  comment?: Comment;
+  comment?: CommentEntity;
 }

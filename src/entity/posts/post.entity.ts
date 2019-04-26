@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm
 import { IsString, IsArray, IsJSON } from 'class-validator';
 import { BaseEntity } from '../base.entity';
 import { PostMeta } from '@app/entity/posts/post-meta.entity';
-import { Comment } from '@app/entity/comments/comment.entity';
+import { CommentEntity } from '@app/entity/comments/comment.entity';
 // import { User } from '@app/entity';
 
 // @Index(['name'], { unique: true })
@@ -132,8 +132,8 @@ export class PostEntity extends BaseEntity {
   @JoinColumn()
   metas?: PostMeta[];
 
-  @OneToMany(type => Comment, comment => comment.post, {
+  @OneToMany(type => CommentEntity, comment => comment.post, {
     cascade: true,
   })
-  comments?: PostMeta[];
+  comments?: CommentEntity[];
 }

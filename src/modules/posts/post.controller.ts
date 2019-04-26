@@ -1,11 +1,11 @@
-import { Controller, Get, Param, Query, Req, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, Post, UseGuards, Body } from '@nestjs/common';
 import { PostService } from './post.service';
 import { HttpProcessor } from '@app/decorators/http.decorator';
 import { OptionService } from '@app/modules/options/option.service';
 import * as _ from 'lodash';
 import { UserService } from '@app/modules/users/user.service';
 import { EUserPostsBehavior } from '@app/interfaces/conditions.interface';
-import { PostEntity } from '@app/entity';
+import { CommentEntity, PostEntity } from '@app/entity';
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 import { ID } from '@app/common/shared-types';
 import { CategoriesService } from '@app/modules/categories/categories.service';
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '@app/guards/auth.guard';
 import { QueryParams } from '@app/decorators/query-params.decorator';
 import { Pagination } from '@app/libs/paginate';
 import { AttachmentService } from '@app/modules/attachments/attachment.service';
+import { CommentService } from '@app/modules/comments/comment.service';
 
 // import { Post } from './post.entity';
 
@@ -25,6 +26,7 @@ export class PostController {
     private readonly optionService: OptionService,
     private readonly categoriesService: CategoriesService,
     private readonly attachmentService: AttachmentService,
+    private readonly commentService: CommentService,
     // private readonly cacheService: CacheService,
   ) {
   }
@@ -167,6 +169,53 @@ export class PostController {
       viewCount,
       postId,
     };
+  }
+
+  /**
+   * 获取当前内容的评论数据
+   * @param postId
+   * @param req
+   * @param page
+   * @param limit
+   */
+  @Get(':id/replies')
+  async getComments(
+    @Param('id') postId: ID,
+    @Req() req,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    limit = limit > 100 ? 100 : limit;
+    const data = await this.commentService.paginate({
+      page,
+      limit,
+      route: 'posts',
+    });
+    return data;
+  }
+
+  /**
+   * 新评论
+   */
+  @Post(':id/replies/new')
+  async newComment(
+    @Param('id') postId: ID,
+    @Req() req,
+    @QueryParams() { visitors: { ip } },
+    @Body() comment: CommentEntity,
+  ) {
+    const commentInput = new CommentEntity({
+      user: {
+        id: req.user.id,
+      },
+      post: {
+        id: postId,
+      },
+      ip,
+      ...comment,
+    });
+    const data = await this.commentService.create(commentInput);
+    return data;
   }
 
   @Get(':id')

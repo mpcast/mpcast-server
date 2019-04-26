@@ -1,38 +1,30 @@
 import { Module} from '@nestjs/common';
-import { PostService } from '@app/modules/posts/post.service';
-import { PostController } from '@app/modules/posts/post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@app/modules/users/user.module';
-import { PostEntity, UserEntity } from '@app/entity';
+import { CommentEntity, UserEntity } from '@app/entity';
 import { OptionModule } from '@app/modules/options/option.module';
 import { CacheModule } from '@app/processors/cache/cache.module';
 import { CategoriesModule } from '@app/modules/categories/categories.module';
 import { AttachmentModule } from '@app/modules/attachments/attachment.module';
-import { CommentModule } from '@app/modules/comments/comment.module';
-// import { AuthModule } from '@app/modules/auth/auth.module';
-// import { Users } from '@app/entity';
+import { CommentController } from '@app/modules/comments/comment.controller';
+import { CommentService } from '@app/modules/comments/comment.service';
 
 @Module({
-  // imports: [
-  //   TypeOrmModule.forFeature([Post]),
-  //   AuthModule,
-  // ],
   imports: [
     AttachmentModule,
     UserModule,
     OptionModule,
     CategoriesModule,
     CacheModule,
-    CommentModule,
     TypeOrmModule.forFeature([
       UserEntity,
-      PostEntity,
+      CommentEntity,
     ]),
   ],
-  providers: [PostService],
-  controllers: [PostController],
-  exports: [PostService],
+  providers: [CommentService],
+  controllers: [CommentController],
+  exports: [CommentService],
 })
-export class PostModule {
+export class CommentModule {
 
 }

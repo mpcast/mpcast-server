@@ -1,7 +1,7 @@
 import { BaseEntity } from '@app/entity/base.entity';
 import { DeepPartial, Entity, JoinColumn, OneToMany } from 'typeorm';
 import { Column } from 'typeorm';
-import { UserMeta, Comment } from '@app/entity';
+import { UserMeta, CommentEntity } from '@app/entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -40,8 +40,8 @@ export class UserEntity extends BaseEntity {
   })
   metas?: UserMeta[];
 
-  @OneToMany(type => Comment, comment => comment.user, {
+  @OneToMany(type => CommentEntity, comment => comment.user, {
     cascade: true,
   })
-  comments?: Comment[];
+  comments?: CommentEntity[];
 }

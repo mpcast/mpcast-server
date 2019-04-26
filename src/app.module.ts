@@ -24,6 +24,7 @@ import { PostModule } from '@app/modules/posts/post.module';
 import { OptionModule } from '@app/modules/options/option.module';
 import { CategoriesModule } from '@app/modules/categories/categories.module';
 import { AttachmentModule } from '@app/modules/attachments/attachment.module';
+import { CommentModule } from '@app/modules/comments/comment.module';
 // import { AuthService } from '@app/modules/auth/auth.service';
 // import { UserService } from '@app/modules/users/users.service';
 
@@ -52,6 +53,7 @@ import { AttachmentModule } from '@app/modules/attachments/attachment.module';
     OptionModule,
     CategoriesModule,
     PostModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [

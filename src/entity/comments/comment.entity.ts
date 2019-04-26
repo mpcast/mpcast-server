@@ -2,10 +2,13 @@ import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../base.entity';
 import { PostEntity, UserEntity } from '@app/entity';
 import { CommentMeta } from '@app/entity/comments/comment-meta.entity';
+import { DeepPartial } from '@app/common/shared-types';
 
 @Entity('comments')
-export class Comment extends BaseEntity {
-
+export class CommentEntity extends BaseEntity {
+  constructor(input?: DeepPartial<CommentEntity>) {
+    super(input);
+  }
   @Column({
     type: 'varchar',
     length: 20,
@@ -44,9 +47,11 @@ export class Comment extends BaseEntity {
   })
   metas?: CommentMeta[];
 
-  @ManyToOne(type => PostEntity, post => post.comments)
+  @ManyToOne(type => PostEntity, post => post.comments, {
+  })
   post: PostEntity;
 
-  @ManyToOne(type => UserEntity, user => user.comments)
+  @ManyToOne(type => UserEntity, user => user.comments, {
+  })
   user: UserEntity;
 }
