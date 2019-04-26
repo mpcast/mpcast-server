@@ -178,7 +178,7 @@ export class PostController {
    * @param page
    * @param limit
    */
-  @Get(':id/replies')
+  @Get(':id/comments')
   async getComments(
     @Param('id') postId: ID,
     @Req() req,
@@ -197,7 +197,7 @@ export class PostController {
   /**
    * 新评论
    */
-  @Post(':id/replies/new')
+  @Post(':id/comments/new')
   async newComment(
     @Param('id') postId: ID,
     @Req() req,

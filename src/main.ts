@@ -1,5 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { isProdMode, isDevMode } from '@app/app.environment';
 import * as appConfig from '@app/app.config';
 import * as bodyParser from 'body-parser';
@@ -34,6 +35,14 @@ async function bootstrap() {
     new ErrorInterceptor(new Reflector()),
     new LoggingInterceptor(),
   );
+  const options = new DocumentBuilder()
+    .setTitle('Cats example')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document);
   return await app.listen(appConfig.APP.PORT);
 }
 

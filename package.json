@@ -25,6 +25,7 @@
     "@nestjs/jwt": "^6.0.0",
     "@nestjs/passport": "^6.0.0",
     "@nestjs/platform-express": "^6.0.0",
+    "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.0.0",
     "akismet-api": "^4.2.0",
     "bcrypt": "^3.0.6",
@@ -48,6 +49,7 @@
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
+    "swagger-ui-express": "^4.0.2",
     "typeorm": "^0.2.16",
     "wechat-jssdk": "^4.1.0",
     "yargs": "^13.2.2"

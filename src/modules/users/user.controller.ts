@@ -3,8 +3,9 @@ import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/comm
 import { UserService } from '@app/modules/users/user.service';
 import { CreateUserDto } from '@app/modules/users/user.dto';
 import { JwtAuthGuard } from '@app/guards/auth.guard';
+import { formatOneMeta } from '@app/common/utils';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
 
   constructor(
@@ -27,8 +28,9 @@ export class UserController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async oneself(@Req() request): Promise<UserEntity> {
-    const user = await this.userService.findByIdentifier(request.user);
+    const user = await this.userService.findByIdentifier(request.user.identifier);
     if (user) {
+      formatOneMeta(user);
       return user;
     }
     return null;
