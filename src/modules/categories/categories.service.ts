@@ -7,6 +7,7 @@ import { ID } from '@app/common/shared-types';
 import * as _ from 'lodash';
 import { CacheService } from '@app/processors/cache/cache.service';
 import * as CACHE_KEY from '@app/constants/cache.constant';
+import { AttachmentService } from '@app/modules/attachments/attachment.service';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
 
@@ -17,6 +18,7 @@ export class CategoriesService {
     // @InjectRepository(User) private readonly usersRepository: Repository<User>,
     // @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly cacheService: CacheService,
+    private readonly attachmentService: AttachmentService,
   ) {
   }
 
@@ -275,9 +277,22 @@ export class CategoriesService {
    */
   async getTermsByTaxonomy(taxonomy: string) {
     const allTerms = await this.loadAllTerms();
-    return allTerms.filter(term => {
+    const terms = allTerms.filter(term => {
       return term.taxonomy === taxonomy;
     }).map(t => Object.assign({}, t));
+    for (const item of terms) {
+      // item.url = '';
+      // 如果有封面 默认是 thumbnail 缩略图，分类封面特色图片 featured_image
+      if (!Object.is(item.meta, undefined)) {
+        if (!Object.is(item.meta._thumbnail_id, undefined)) {
+          item.featured_image = await this.attachmentService.getAttachment(item.meta._thumbnail_id);
+        }
+        // 清理 meta
+        Reflect.deleteProperty(item, 'meta');
+      }
+    }
+
+    return terms;
   }
 
   async getTagsByObject(objectId: ID) {

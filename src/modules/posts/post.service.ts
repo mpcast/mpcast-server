@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { ID } from '@app/common/shared-types';
 import * as _ from 'lodash';
 // import { rpc } from 'qiniu';
-import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { IPaginationOptions, paginate, Pagination } from 'libs/paginate';
 import { EBlockFormatType, EUserPostsBehavior } from '@app/interfaces/conditions.interface';
 import { formatAllMeta, formatOneMeta } from '@app/common/utils';
 import { OptionService } from '@app/modules/options/option.service';
@@ -152,9 +152,7 @@ export class PostService {
   async paginate(options: IPaginationOptions): Promise<Pagination<PostEntity>> {
     // this.postRepository.findAndCount()
     return await paginate<PostEntity>(this.postRepository, options, {
-      where: {
-        type: 'page',
-      },
+      type: 'page',
     });
   }
 
@@ -218,6 +216,9 @@ export class PostService {
       .offset(page)
       .limit(pageSize)
       .getRawMany();
+
+    // return new pagination_1.Pagination(items, items.length, total, Math.round(total / limit), routes.next, routes.previous);
+
     // 以下处理元数据
     const objIds = [];
     data.forEach(item => {
@@ -231,6 +232,7 @@ export class PostService {
         item.metas = _.filter(metaData, { id: item.id });
       });
     }
+    // return new Pagination(it);
     return data;
   }
 
@@ -303,7 +305,11 @@ export class PostService {
       .orderBy('obj.updatedAt', 'DESC')
       .limit(limit)
       .getRawMany();
-
+    // return await paginate<PostEntity>(this.postRepository, options, {
+    //   where: {
+    //     type: 'page',
+    //   },
+    // });
     // 以下处理元数据
     const objIds = [];
     data.forEach(item => {
@@ -317,6 +323,8 @@ export class PostService {
         item.metas = _.filter(metaData, { id: item.id });
       });
     }
+  //   const pageData = new Pagination(data, data.length, data.length, limit);
+  //   return pageData;
     return data;
   }
 

@@ -11,6 +11,7 @@ import { ID } from '@app/common/shared-types';
 import { CategoriesService } from '@app/modules/categories/categories.service';
 import { JwtAuthGuard } from '@app/guards/auth.guard';
 import { QueryParams } from '@app/decorators/query-params.decorator';
+import { Pagination } from '@app/libs/paginate';
 
 // import { Post } from './post.entity';
 
@@ -42,6 +43,43 @@ export class PostController {
     // 处理 meta 数据
     await this.dealData(data.items);
     return data;
+  }
+
+  @Get('categories/:category')
+  @HttpProcessor.handle('获取类别下的内容')
+  async findByCategory(
+    @Req() req,
+    @Param('category') category,
+    @Query('page') page: number = 0, @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    const query = req.query;
+    // console.log(query.skip)
+    let list: any;
+    switch (category) {
+      case 'new' : {
+        list = await this.postService.getNews(10);
+        break;
+      }
+      case 'popular': {
+        list = await this.postService.getPopular();
+        break;
+      }
+      case 'featured': {
+        const options = await this.optionService.load(true);
+        const stickys: {
+          [key: string]: [number];
+        } = options.stickys;
+        list = await this.postService.getStickys(stickys.default);
+        break;
+      }
+      default: {
+        list = await this.postService.getFromCategory(category, null, query);
+      }
+    }
+    // await this.dealData(list.items);
+    await this.dealData(list);
+
+    return list;
   }
 
   /**
@@ -156,38 +194,6 @@ export class PostController {
     data = await this.dealBlock(data);
     Reflect.deleteProperty(data, 'meta');
     return data;
-  }
-
-  @Get('categories/:category')
-  @HttpProcessor.handle('获取类别下的内容')
-  async findByCategory(@Req() req, @Param('category') category): Promise<any> {
-    const query = req.query;
-    // console.log(query.skip)
-    let list = [];
-    switch (category) {
-      case 'new' : {
-        list = await this.postService.getNews(10);
-        break;
-      }
-      case 'popular': {
-        list = await this.postService.getPopular();
-        break;
-      }
-      case 'featured': {
-        const options = await this.optionService.load(true);
-        const stickys: {
-          [key: string]: [number];
-        } = options.stickys;
-        list = await this.postService.getStickys(stickys.default);
-        break;
-      }
-      default: {
-        list = await this.postService.getFromCategory(category, null, query);
-      }
-    }
-    await this.dealData(list);
-
-    return list;
   }
 
   private async dealData(data) {

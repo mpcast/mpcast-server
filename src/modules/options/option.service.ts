@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Option, User } from '@app/entity';
+import { Option, UserEntity } from '@app/entity';
 import { Connection, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CacheService } from '@app/processors/cache/cache.service';

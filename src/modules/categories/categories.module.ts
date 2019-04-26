@@ -6,12 +6,14 @@ import { OptionModule } from '@app/modules/options/option.module';
 import { CategoriesService } from '@app/modules/categories/categories.service';
 import { CategoriesController } from '@app/modules/categories/categories.controller';
 import { CacheModule } from '@app/processors/cache/cache.module';
+import { AttachmentModule } from '@app/modules/attachments/attachment.module';
 
 @Module({
   imports: [
     UserModule,
     OptionModule,
     CacheModule,
+    AttachmentModule,
     TypeOrmModule.forFeature([
       Term,
       TermMeta,
