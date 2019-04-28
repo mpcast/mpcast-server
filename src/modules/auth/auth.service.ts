@@ -22,6 +22,7 @@ import { UserEntity } from '@app/entity';
 import { HttpUnauthorizedError } from '@app/errors/unauthorized.error';
 import { ITokenResult } from '@app/modules/auth/auth.interface';
 import * as APP_CONFIG from '@app/app.config';
+import { formatOneMeta } from '@app/common/utils';
 
 @Injectable()
 export class AuthService {
@@ -39,13 +40,16 @@ export class AuthService {
   async validateAuthData(payload: any): Promise<any> {
     // const isVerified = lodash.isEqual(payload.data, APP_CONFIG.AUTH.data);
     // IF 是微信，返回唯一标识，一般为用户的 openid
-    if (payload.type === 'wechat') {
+    // IF Member 成员，会处理权限等，暂时未处理
+    console.log('apaoaoaoa.a.a.a..a.aa.a..a.a.a.')
+    console.log(payload);
+    if (payload.type === 'wechat' || payload.type === 'member') {
+      console.log('ddd-d-d--d-d-d--d-');
       const user = await this.connection.getRepository(UserEntity).findOne({
         identifier: payload.identifier,
       });
       if (user) {
         return payload;
-        // return payload.identifier;
       }
       return null;
     }
@@ -78,8 +82,10 @@ export class AuthService {
     const user = await this.getUserFromIdentifier(identifier);
     // console.log(user);
     await this.verifyUserPassword(user.id, password);
+    const userObj: any = formatOneMeta(user, { cleanMeta: true });
+    console.log(user);
     const token = this.jwtService.sign({
-      type: '',
+      type: userObj.type,
       identifier,
       id: user.id,
     });
