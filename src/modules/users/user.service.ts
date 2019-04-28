@@ -74,6 +74,10 @@ export class UserService {
     return this.userRepository.findByIds(ids);
   }
 
+  /**
+   * 按用户唯一标识查询用户是否存在
+   * @param identifier
+   */
   findByIdentifier(identifier: string): Promise<UserEntity> {
     return this.userRepository.findOne({
       relations: ['metas'],

@@ -58,8 +58,6 @@ export class WechatController {
       const user = await this.usersService.createOrUpdate({
         identifier: openid,
       });
-      console.log('login ......');
-      console.log(user);
       // 存储 session_key
       // REDIS OR FILES
       await this.cacheService.set(`${CACHE_KEY.WECHAT_SESSION_KEY}${openid}`, session_key);

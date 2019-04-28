@@ -20,6 +20,8 @@ import { ID } from '@app/common/shared-types';
 import { UserEntity } from '@app/entity';
 // import { ValidationError } from '@app/errors/validation.error';
 import { HttpUnauthorizedError } from '@app/errors/unauthorized.error';
+import { ITokenResult } from '@app/modules/auth/auth.interface';
+import * as APP_CONFIG from '@app/app.config';
 
 @Injectable()
 export class AuthService {
@@ -51,18 +53,69 @@ export class AuthService {
     // WIP
   }
 
+  // 登陆/创建 Token
+  // public createToken(password: string): Promise<ITokenResult> {
+  //   return this.authModel.findOne(null, 'password').exec().then(auth => {
+  //     const extantAuthPwd = auth && auth.password;
+  //     const extantPassword = extantAuthPwd || this.decodeMd5(APP_CONFIG.AUTH.defaultPassword);
+  //     const submittedPassword = this.decodeMd5(this.decodeBase64(password));
+  //     if (submittedPassword === extantPassword) {
+  //       const access_token = this.jwtService.sign({data: APP_CONFIG.AUTH.data});
+  //       return Promise.resolve({access_token, expires_in: APP_CONFIG.AUTH.expiresIn});
+  //     } else {
+  //       return Promise.reject('密码不匹配');
+  //     }
+  //   });
+  // }
+  /**
+   * Authenticates a user's credentials and if okay, creates a new session.
+   * 验证用户的凭据，如果正确，则创建一个新会话。
+   */
+  async authenticate(
+    identifier: string,
+    password: string,
+  ): Promise<ITokenResult> {
+    const user = await this.getUserFromIdentifier(identifier);
+    // console.log(user);
+    await this.verifyUserPassword(user.id, password);
+    const token = this.jwtService.sign({
+      type: '',
+      identifier,
+      id: user.id,
+    });
+    return Promise.resolve({
+      token,
+      expiresIn: APP_CONFIG.AUTH.expiresIn,
+    });
+    // 处理用户是否需要验证与用户是否已经验证
+    // if (this.configService.authOptions.requireVerification && !user.verified) {
+    //   throw new NotVerifiedError();
+    // }
+    // const user = await
+    // :TODO 可以处理用户 Session， 将 session 存储至数据库中
+  }
+
   /**
    * 根据给定用户的密码验证所提供的密码
    * @param userId
    * @param password
    */
   async verifyUserPassword(userId: ID, password: string): Promise<boolean> {
-    const user = await this.connection.getRepository(UserEntity).findOne(userId, {
+    // const user = await this.connection.getRepository(UserEntity).findOne(userId);
+    const user = await this.connection.getRepository(UserEntity).findOne({
+      loadEagerRelations: false,
+      where: {
+        id: userId,
+      },
       select: ['passwordHash'],
     });
+    console.log('password verify');
+    console.log(user);
+
     if (!user) {
       throw new HttpUnauthorizedError();
     }
+    // const pwd = await this.passwordCipher.hash('abcd1234');
     const passwordMathces = await this.passwordCipher.check(password, user.passwordHash);
     if (!passwordMathces) {
       throw new HttpUnauthorizedError();
@@ -70,26 +123,23 @@ export class AuthService {
     return true;
   }
 
-  // 密码编码
-  // private decodeBase64(password) {
-  //     return password ? Base64.decode(password) : password;
-  // }
-
-  // md5 编码
-  // private decodeMd5(password) {
-  //     return createHash('md5').update(password).digest('hex');
-  // }
-
-  // 验证 Auth 数据
-  // public validateAuthData(payload: any): Promise<any> {
-  //     const isVerified = lodash.isEqual(payload.data, APP_CONFIG.AUTH.data);
-  //     return isVerified ? payload.data : null;
-  // }
-
-  // 获取管理员信息
-  // public getAdminInfo(): Promise<Auth> {
-  //     return this.authModel.findOne(null, '-_id name slogan gravatar').exec();
-  // }
+  /**
+   * 根据用户唯一标识查找用户
+   * @param identifier
+   */
+  async getUserFromIdentifier(identifier) {
+    const user = await this.connection.getRepository(UserEntity).findOne({
+      where: {
+        identifier,
+      },
+    });
+    // TODO: 处理 metas 并查询 _capabilities 以换取权限列表
+    if (!user) {
+      // throw new UnauthorizedError();
+      throw new HttpUnauthorizedError();
+    }
+    return user;
+  }
 
   /*    // 修改管理员信息
       public putAdminInfo(auth: Auth): Promise<Auth> {

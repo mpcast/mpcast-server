@@ -18,6 +18,7 @@ export class UserEntity extends BaseEntity {
     nullable: true,
   })
   displayName: string;
+
   @Column({ select: false, nullable: true })
   passwordHash: string;
 

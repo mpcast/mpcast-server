@@ -1,4 +1,4 @@
 export interface ITokenResult {
-    accessToken: string;
+    token: string;
     expiresIn: number;
 }
