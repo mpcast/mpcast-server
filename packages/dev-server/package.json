@@ -1,0 +1,10 @@
+{
+  "name": "dev-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --config nodemon-debug.json index.ts"
+  }
+}

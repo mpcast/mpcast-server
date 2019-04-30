@@ -4,54 +4,53 @@
     "tslint:recommended"
   ],
   "jsRules": {
-    "no-unused-expression": true
+    "no-unused-expression": true,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false
   },
   "rules": {
-    "no-var-requires": false,
+    "interface-over-type-literal": false,
     "no-console": [false],
-    "eofline": false,
     "quotemark": [
       true,
       "single"
     ],
     "indent": false,
-    "member-access": [
-      false
-    ],
     "ordered-imports": [
-      false
+      true,
+      {
+        "grouped-imports": true
+      }
+    ],
+    "jsdoc-format": false,
+    "no-inferrable-types": [
+      true,
+      "ignore-params"
     ],
     "max-line-length": [
       true,
-      280
+      150
     ],
-    "member-ordering": [
-      false
-    ],
-    "curly": false,
-    "interface-name": [
-      false
-    ],
+    "member-access": false,
+    "member-ordering": false,
+    "interface-name": false,
     "array-type": [
-      false
+      true,
+      "array-simple"
     ],
+    "no-non-null-assertion": true,
     "no-empty-interface": false,
-    "no-empty": false,
+    "no-switch-case-fall-through": true,
     "arrow-parens": false,
     "object-literal-sort-keys": false,
-    "no-unused-expression": false,
+    "no-unused-expression": true,
     "max-classes-per-file": [
       false
     ],
     "variable-name": [
       false
     ],
-    "one-line": [
-      false
-    ],
-    "one-variable-per-declaration": [
-      false
-    ]
+    "no-floating-promises": true
   },
   "rulesDirectory": []
 }
