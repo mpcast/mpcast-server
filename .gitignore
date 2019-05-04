@@ -36,3 +36,6 @@ runtime/
 config.development.js
 adapter.development.js
 port
+docs
+docs.bak
+docs.old

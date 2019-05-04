@@ -4,9 +4,10 @@
  * @module processor/cache/config.service
  */
 
-import * as APP_CONFIG from '../app.config';
-import * as redisStore from 'cache-manager-redis-store';
 import { CacheModuleOptions, CacheOptionsFactory, Injectable } from '@nestjs/common';
+import * as redisStore from 'cache-manager-redis-store';
+
+import * as APP_CONFIG from '../app.config';
 
 @Injectable()
 export class CacheConfigService implements CacheOptionsFactory {

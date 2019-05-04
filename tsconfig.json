@@ -1,47 +1,16 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "moduleResolution": "node",
-    "declaration": true,
-    "noImplicitAny": false,
-    "removeComments": true,
-    "lib": [
-      "dom",
-      "es2015",
-      "es2016",
-      "es2017"
-    ],
+    "noLib": false,
+    "skipLibCheck": true,
+    "lib": ["es2017", "esnext.asynciterable"],
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "downlevelIteration": true,
-    "strictNullChecks": false,
-    "target": "es6",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./packages/core/src",
-    "paths": {
-      "@app": [
-        "./"
-      ],
-      "@app/*": [
-        "./*"
-      ]
-    }
-  },
-  "typeAcquisition": {
-    "include": [
-      "jest"
-    ]
-  },
-  "include": [
-    "packages/core/src/**/*",
-    "index.d.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "typeRoots": [
-    "node_modules/@types"
-  ]
+    "target": "es2017",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "sourceMap": false
+  }
 }
