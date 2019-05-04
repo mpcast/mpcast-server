@@ -21,9 +21,7 @@
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## 基于 2.0.0 版本的管理系统即将更新上线
-<img src="https://github.com/mpcast/cx-podcast-server/blob/master/doc/screenshot/mpcast.png?raw=trueg?raw=true" title="Landing 页" width="720">
-
-<img src="https://caixie.top/assets/projects/podcast/case-podcast-4.png" width="640" alt="管理系统 "/>
+<img src="https://github.com/mpcast/cx-podcast-server/blob/master/doc/screenshot/mpcast.png?raw=trueg?raw=true" title="Landing 页" width="1440">
 
 ## API
 <img src="https://github.com/caixie-ltd/podcast-server/blob/master/doc/screenshot/swagger.png?raw=true" title="Landing 页" width="640">
