@@ -71,5 +71,6 @@
     "typescript": "^3.2.4"
   },
   "main": "index.js",
-  "repository": "git@github.com:caixie-ltd/podcast-server.git"
+  "repository": "git@github.com:caixie-ltd/podcast-server.git",
+  "gitHead": "b53387205e28493f9cfa99e7c51e6fbcaa8f561e"
 }
