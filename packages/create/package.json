@@ -1,6 +1,6 @@
 {
   "name": "@mpcast/create",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0",
   "license": "MIT",
   "bin": {
     "create": "./index.js"

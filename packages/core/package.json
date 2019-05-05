@@ -1,6 +1,6 @@
 {
   "name": "@mpcast/core",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0",
   "description": "A Mini Program cast server.",
   "author": "Baisheng <baisheng@gmail.com>",
   "license": "MIT",
