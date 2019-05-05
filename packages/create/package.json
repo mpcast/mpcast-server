@@ -1,5 +1,5 @@
 {
-  "name": "create",
+  "name": "@mpcast/create",
   "version": "0.1.0-alpha.0",
   "license": "MIT",
   "bin": {
@@ -29,5 +29,5 @@
     "rxjs": "^6.5.1",
     "semver": "^6.0.0"
   },
-  "gitHead": "1de3b5823d508bc08e155f6be610023b534fdab1"
+  "gitHead": "61d081995bba6f3008de88259840fbe3b8a7b5ea"
 }
