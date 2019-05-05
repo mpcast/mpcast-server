@@ -12,7 +12,7 @@
     "dev-server:postgres": "cd packages/dev-server && yarn start --db=postgres",
     "dev-server:sqlite": "cd packages/dev-server && yarn start --db=sqlite",
     "build": "lerna run build",
-    "publish:packages": "yarn build && lerna publish --exact -m \"chore: Publish %s release\" --no-git-tag-version"
+    "publish:packages": "lerna publish --exact -m \"chore: Publish %s release\" --no-git-tag-version"
   },
   "devDependencies": {
     "@types/graphql": "^14.0.5",
