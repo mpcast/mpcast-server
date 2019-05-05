@@ -1,4 +1,4 @@
-import { BaseEvent } from './base-event';
+import { MpcastEvent } from './mpcast-event';
 import { EventBus } from './event-bus';
 
 describe('EventBus', () => {
@@ -120,13 +120,13 @@ describe('EventBus', () => {
   });
 });
 
-class TestEvent extends BaseEvent {
+class TestEvent extends MpcastEvent {
   constructor(public payload: string) {
     super();
   }
 }
 
-class OtherTestEvent extends BaseEvent {
+class OtherTestEvent extends MpcastEvent {
   constructor(public payload: string) {
     super();
   }

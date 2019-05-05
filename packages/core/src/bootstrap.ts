@@ -2,25 +2,25 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import * as compression from 'compression';
-import * as helmet from 'helmet';
-import { EntitySubscriberInterface } from 'typeorm';
+import compression from 'compression';
+import helmet from 'helmet';
+// import { EntitySubscriberInterface } from 'typeorm';
 
 import { Type } from './common/shared-types';
 import { ReadOnlyRequired } from './common/types/common-types';
-import { BaseConfig } from './config/base-config';
 import { getConfig, setConfig } from './config/config-helpers';
-import { Logger } from './config/logger/base-logger';
-import { DefaultLogger } from './config/logger/default-logger';
+import { Logger } from './config/logger/mpcast-logger';
+// import { DefaultLogger } from './config/logger/default-logger';
+import { MpcastConfig } from './config/mpcast-config';
 import { HttpExceptionFilter } from './filters/error.filter';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { ValidationPipe } from './pipes/validation.pipe';
 
-export type BootstrapFunction = (config: BaseConfig) => Promise<INestApplication>;
+export type BootstrapFunction = (config: MpcastConfig) => Promise<INestApplication>;
 
-export async function bootstrap(userConfig: Partial<BaseConfig>): Promise<INestApplication> {
+export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INestApplication> {
   const config = await preBootstrapConfig(userConfig);
   Logger.info(`Bootstrapping Podcast Server...`);
 
@@ -67,8 +67,8 @@ export async function bootstrap(userConfig: Partial<BaseConfig>): Promise<INestA
  * Setting the global config must be done prior to loading the AppModule.
  */
 export async function preBootstrapConfig(
-  userConfig: Partial<BaseConfig>,
-): Promise<ReadOnlyRequired<BaseConfig>> {
+  userConfig: Partial<MpcastConfig>,
+): Promise<ReadOnlyRequired<MpcastConfig>> {
   if (userConfig) {
     setConfig(userConfig);
   }
@@ -105,7 +105,7 @@ export async function preBootstrapConfig(
 /**
  * Returns an array of core entities and any additional entities defined in plugins.
  */
-async function getAllEntities(userConfig: Partial<BaseConfig>): Promise<Array<Type<any>>> {
+async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<Array<Type<any>>> {
   const { coreEntitiesMap } = await import('./entity/entities');
   const coreEntities = Object.values(coreEntitiesMap) as Array<Type<any>>;
   console.log(coreEntities);
@@ -113,8 +113,8 @@ async function getAllEntities(userConfig: Partial<BaseConfig>): Promise<Array<Ty
   return [...coreEntities];
 }
 
-function logWelcomeMessage(config: BaseConfig) {
-  console.log('welcome...')
+function logWelcomeMessage(config: MpcastConfig) {
+  console.log('welcome...');
   let version: string;
   // Logger.info(`${label}: http://${config.hostname || 'localhost'}:${config.port}/${route}/ -> http://${hostname || 'localhost'}:${port}`);
 
@@ -124,6 +124,6 @@ function logWelcomeMessage(config: BaseConfig) {
     version = ' unknown';
   }
   Logger.info(`=================================================`);
-  Logger.info(`Podcast server (v${version}) now running on port ${config.port}`);
+  Logger.info(`Mpcast server (v${version}) now running on port ${config.port}`);
   Logger.info(`=================================================`);
 }

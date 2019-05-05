@@ -5,7 +5,7 @@
  * @docsCategory events
  * @docsWeight 1
  */
-export abstract class BaseEvent {
+export abstract class MpcastEvent {
   public readonly createdAt: Date;
   protected constructor() {
     this.createdAt = new Date();

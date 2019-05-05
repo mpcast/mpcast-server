@@ -6,5 +6,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon --config nodemon-debug.json index.ts"
+  },
+  "dependencies": {
+    "typescript": "^3.4.5"
   }
 }

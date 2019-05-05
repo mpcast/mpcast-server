@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 import { Type } from '../common/shared-types';
 
-import { BaseEvent } from './base-event';
+import { MpcastEvent } from './mpcast-event';
 
-export type EventHandler<T extends BaseEvent> = (event: T) => void;
+export type EventHandler<T extends MpcastEvent> = (event: T) => void;
 export type UnsubscribeFn = () => void;
 
 /**
@@ -16,13 +16,13 @@ export type UnsubscribeFn = () => void;
  */
 @Injectable()
 export class EventBus {
-  private subscriberMap = new Map<Type<BaseEvent>, Array<EventHandler<any>>>();
+  private subscriberMap = new Map<Type<MpcastEvent>, Array<EventHandler<any>>>();
 
   /**
    * @description
    * Publish an event which any subscribers can react to.
    */
-  publish(event: BaseEvent): void {
+  publish(event: MpcastEvent): void {
     const eventType = (event as any).constructor;
     const handlers = this.subscriberMap.get(eventType);
     if (handlers) {
@@ -38,7 +38,7 @@ export class EventBus {
    * Subscribe to the given event type. Returns an unsubscribe function which can be used
    * to unsubscribe the handler from the event.
    */
-  subscribe<T extends BaseEvent>(type: Type<T>, handler: EventHandler<T>): UnsubscribeFn {
+  subscribe<T extends MpcastEvent>(type: Type<T>, handler: EventHandler<T>): UnsubscribeFn {
     const handlers = this.subscriberMap.get(type) || [];
     if (!handlers.includes(handler)) {
       handlers.push(handler);

@@ -1102,6 +1102,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/compression@^0.0.36":
+  version "0.0.36"
+  resolved "https://registry.npm.taobao.org/@types/compression/download/@types/compression-0.0.36.tgz#7646602ffbfc43ea48a8bf0b2f1d5e5f9d75c0d0"
+  integrity sha1-dkZgL/v8Q+pIqL8LLx1eX511wNA=
+  dependencies:
+    "@types/express" "*"
+
 "@types/connect@*":
   version "3.4.32"
   resolved "http://registry.npm.taobao.org/@types/connect/download/@types/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
@@ -1122,7 +1129,7 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express@^4.16.0":
+"@types/express@*", "@types/express@^4.16.0":
   version "4.16.1"
   resolved "http://registry.npm.taobao.org/@types/express/download/@types/express-4.16.1.tgz#d756bd1a85c34d87eaf44c888bad27ba8a4b7cf0"
   integrity sha1-11a9GoXDTYfq9EyIi60nuopLfPA=
@@ -1150,6 +1157,13 @@
   dependencies:
     handlebars "*"
 
+"@types/helmet@^0.0.43":
+  version "0.0.43"
+  resolved "https://registry.npm.taobao.org/@types/helmet/download/@types/helmet-0.0.43.tgz#2a3f7da435088501f2901f68c3e402f79e5b2a9b"
+  integrity sha1-Kj99pDUIhQHykB9ow+QC955bKps=
+  dependencies:
+    "@types/express" "*"
+
 "@types/is-glob@4.0.0":
   version "4.0.0"
   resolved "https://registry.npm.taobao.org/@types/is-glob/download/@types/is-glob-4.0.0.tgz#fb8a2bff539025d4dcd6d5efe7689e03341b876d"
@@ -1160,10 +1174,22 @@
   resolved "https://registry.npm.taobao.org/@types/istanbul-lib-coverage/download/@types/istanbul-lib-coverage-2.0.1.tgz#42995b446db9a48a11a07ec083499a860e9138ff"
   integrity sha1-QplbRG25pIoRoH7Ag0mahg6ROP8=
 
+"@types/jest-diff@*":
+  version "20.0.1"
+  resolved "https://registry.npm.taobao.org/@types/jest-diff/download/@types/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
+  integrity sha1-NcwVucTzChjvIYUuJV/bAvbVm4k=
+
 "@types/jest@^23.3.13":
   version "23.3.14"
   resolved "http://registry.npm.taobao.org/@types/jest/download/@types/jest-23.3.14.tgz#37daaf78069e7948520474c87b80092ea912520a"
   integrity sha1-N9qveAaeeUhSBHTIe4AJLqkSUgo=
+
+"@types/jest@^24.0.12":
+  version "24.0.12"
+  resolved "https://registry.npm.taobao.org/@types/jest/download/@types/jest-24.0.12.tgz#0553dd0a5ac744e7dc4e8700da6d3baedbde3e8f"
+  integrity sha1-BVPdClrHROfcTocA2m07rtvePo8=
+  dependencies:
+    "@types/jest-diff" "*"
 
 "@types/json5@^0.0.29":
   version "0.0.29"
@@ -1200,6 +1226,13 @@
   version "2.0.1"
   resolved "http://registry.npm.taobao.org/@types/mime/download/@types/mime-2.0.1.tgz#dc488842312a7f075149312905b5e3c0b054c79d"
   integrity sha1-3EiIQjEqfwdRSTEpBbXjwLBUx50=
+
+"@types/nanoid@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.npm.taobao.org/@types/nanoid/download/@types/nanoid-1.2.1.tgz#995bd0538ef04c4751d88d2fa15a97f0b85dd848"
+  integrity sha1-mVvQU47wTEdR2I0voVqX8Lhd2Eg=
+  dependencies:
+    "@types/node" "*"
 
 "@types/node@*":
   version "11.13.5"
@@ -7236,9 +7269,9 @@ mute-stream@~0.0.4:
   resolved "https://registry.npm.taobao.org/mute-stream/download/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha1-FjDEKyJR/4HiooPelqVJfqkuXg0=
 
-mysql@^2.17.0:
+mysql@^2.17.1:
   version "2.17.1"
-  resolved "https://registry.npm.taobao.org/mysql/download/mysql-2.17.1.tgz#62bba4a039a9b2f73638cd1652ce50fc6f682899"
+  resolved "https://registry.npm.taobao.org/mysql/download/mysql-2.17.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fmysql%2Fdownload%2Fmysql-2.17.1.tgz#62bba4a039a9b2f73638cd1652ce50fc6f682899"
   integrity sha1-YrukoDmpsvc2OM0WUs5Q/G9oKJk=
   dependencies:
     bignumber.js "7.2.1"
@@ -7259,6 +7292,11 @@ nan@2.13.2, nan@^2.12.1:
   version "2.13.2"
   resolved "http://registry.npm.taobao.org/nan/download/nan-2.13.2.tgz#f51dc7ae66ba7d5d55e1e6d4d8092e802c9aefe7"
   integrity sha1-9R3Hrma6fV1V4ebU2AkugCya7+c=
+
+nanoid@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npm.taobao.org/nanoid/download/nanoid-2.0.1.tgz#deb55cac196e3f138071911dabbc3726eb048864"
+  integrity sha1-3rVcrBluPxOAcZEdq7w3JusEiGQ=
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -8818,7 +8856,7 @@ retry@^0.10.0:
 
 rimraf@2, rimraf@^2.5.2, rimraf@^2.5.4, rimraf@^2.6.1, rimraf@^2.6.2, rimraf@^2.6.3:
   version "2.6.3"
-  resolved "http://registry.npm.taobao.org/rimraf/download/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
+  resolved "https://registry.npm.taobao.org/rimraf/download/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
   integrity sha1-stEE/g2Psnz54KHNqCYt04M8bKs=
   dependencies:
     glob "^7.1.3"

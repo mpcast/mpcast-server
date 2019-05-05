@@ -1,7 +1,7 @@
 import { DeepPartial } from '../common/shared-types';
 import { ReadOnlyRequired } from '../common/types/common-types';
 
-import { BaseConfig } from './base-config';
+import { MpcastConfig } from './mpcast-config';
 import { defaultConfig } from './default-config';
 import { mergeConfig } from './merge-config';
 
@@ -11,7 +11,7 @@ let activeConfig = defaultConfig;
  * Override the default config by merging in the supplied values. Should only be used prior to
  * bootstrapping the app.
  */
-export function setConfig(userConfig: DeepPartial<BaseConfig>): void {
+export function setConfig(userConfig: DeepPartial<MpcastConfig>): void {
   activeConfig = mergeConfig(activeConfig, userConfig);
 }
 
@@ -20,6 +20,6 @@ export function setConfig(userConfig: DeepPartial<BaseConfig>): void {
  * used before bootstrapping the app. In all other contexts, the {@link ConfigService}
  * should be used to access config settings.
  */
-export function getConfig(): ReadOnlyRequired<BaseConfig> {
+export function getConfig(): ReadOnlyRequired<MpcastConfig> {
   return activeConfig;
 }

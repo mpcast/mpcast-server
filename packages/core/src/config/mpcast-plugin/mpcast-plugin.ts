@@ -1,15 +1,14 @@
-
 /**
  * @description
- * A function which allows any injectable provider to be injected into the `onBootstrap` method of a {@link PodcastPlugin}.
+ * A function which allows any injectable provider to be injected into the `onBootstrap` method of a {@link MpcastPlugin}.
  *
  * @docsCategory plugin
  */
 import { Provider } from '@nestjs/common';
 
-import { Type } from '../common/shared-types';
+import { Type } from '../../common/shared-types';
+import { MpcastConfig } from '../mpcast-config';
 
-import { BaseConfig } from './base-config';
 // import { DocumentNode } from 'graphql';
 
 export type InjectorFn = <T>(type: Type<T>) => T;
@@ -53,13 +52,13 @@ export interface APIExtensionDefinition {
  *
  * @docsCategory plugin
  */
-export interface PodcastPlugin {
+export interface MpcastPlugin {
   /**
    * @description
    * This method is called before the app bootstraps, and can modify the PodcastConfig object and perform
    * other (potentially async) tasks needed.
    */
-  configure?(config: Required<BaseConfig>): Required<BaseConfig> | Promise<Required<BaseConfig>>;
+  configure?(config: Required<MpcastConfig>): Required<MpcastConfig> | Promise<Required<MpcastConfig>>;
 
   /**
    * @description

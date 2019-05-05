@@ -25,7 +25,7 @@ export enum LogLevel {
  *
  * @docsCategory Logger
  */
-export interface BaseLogger {
+export interface MpcastLogger {
   error(message: string, context?: string, trace?: string): void;
   warn(message: string, context?: string): void;
   info(message: string, context?: string): void;
@@ -33,7 +33,7 @@ export interface BaseLogger {
   debug(message: string, context?: string): void;
 }
 
-const noopLogger: BaseLogger = {
+const noopLogger: MpcastLogger = {
   error() { /* */ },
   warn() { /* */ },
   info() { /* */ },
@@ -54,14 +54,14 @@ const noopLogger: BaseLogger = {
  * Logger.info(`Some log message`, 'My Base Plugin');
  * ```
  *
- * The actual implementation - where the logs are written to - is defined by the {@link BaseLogger}
- * instance configured in the {@link BaseConfig}. By default, the {@link DefaultLogger} is used, which
+ * The actual implementation - where the logs are written to - is defined by the {@link MpcastLogger}
+ * instance configured in the {@link MpcastConfig}. By default, the {@link DefaultLogger} is used, which
  * logs to the console.
  *
  * ## Implementing a custom logger
  *
  * A custom logger can be passed to the `logger` config option by creating a class which implements the
- * {@link BaseLogger} interface. For example, here is how you might go about implementing a logger which
+ * {@link MpcastLogger} interface. For example, here is how you might go about implementing a logger which
  * logs to a file:
  *
  * @example
@@ -105,9 +105,9 @@ const noopLogger: BaseLogger = {
  */
 export class Logger implements LoggerService {
   private static _instance: typeof Logger = Logger;
-  private static _logger: BaseLogger;
+  private static _logger: MpcastLogger;
 
-  static get logger(): BaseLogger {
+  static get logger(): MpcastLogger {
     return this._logger || noopLogger;
   }
 
@@ -117,7 +117,7 @@ export class Logger implements LoggerService {
   }
 
   /** @internal */
-  static useLogger(logger: BaseLogger) {
+  static useLogger(logger: MpcastLogger) {
     Logger._logger = logger;
   }
 

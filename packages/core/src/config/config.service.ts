@@ -4,13 +4,13 @@ import { ConnectionOptions } from 'typeorm';
 
 import { ReadOnlyRequired } from '../common/types/common-types';
 
-import { AuthOptions, BaseConfig } from './base-config';
+import { AuthOptions, MpcastConfig } from './mpcast-config';
 import { getConfig } from './config-helpers';
-import { BaseLogger } from './logger/base-logger';
-import { PodcastPlugin } from './podcast-plugin';
+import { MpcastLogger } from './logger/mpcast-logger';
+import { MpcastPlugin } from './mpcast-plugin/mpcast-plugin';
 
-export class ConfigService implements BaseConfig {
-  private activeConfig: ReadOnlyRequired<BaseConfig>;
+export class ConfigService implements MpcastConfig {
+  private activeConfig: ReadOnlyRequired<MpcastConfig>;
 
   constructor() {
     this.activeConfig = getConfig();
@@ -24,7 +24,7 @@ export class ConfigService implements BaseConfig {
     return this.activeConfig.hostname;
   }
 
-  get logger(): BaseLogger {
+  get logger(): MpcastLogger {
     return this.activeConfig.logger;
   }
 
@@ -32,7 +32,7 @@ export class ConfigService implements BaseConfig {
     return this.activeConfig.middleware;
   }
 
-  get plugins(): PodcastPlugin[] {
+  get plugins(): MpcastPlugin[] {
     return this.activeConfig.plugins;
   }
 

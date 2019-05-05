@@ -5,6 +5,7 @@
  */
 
 import { CacheModuleOptions, CacheOptionsFactory, Injectable } from '@nestjs/common';
+// @ts-ignore
 import * as redisStore from 'cache-manager-redis-store';
 
 import * as APP_CONFIG from '../app.config';
@@ -33,6 +34,7 @@ export class CacheConfigService implements CacheOptionsFactory {
 
   // 缓存配置
   public createCacheOptions(): CacheModuleOptions {
+    // @ts-ignore
     return { store: redisStore, ...APP_CONFIG.REDIS };
   }
 }

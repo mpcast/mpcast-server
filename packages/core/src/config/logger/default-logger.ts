@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { BaseLogger, Logger, LogLevel } from './base-logger';
+import { MpcastLogger, Logger, LogLevel } from './mpcast-logger';
 
 const DEFAULT_CONTEXT = 'Podcast Server';
 
@@ -20,7 +20,7 @@ const DEFAULT_CONTEXT = 'Podcast Server';
  *
  * @docsCategory Logger
  */
-export class DefaultLogger implements BaseLogger {
+export class DefaultLogger implements MpcastLogger {
   /** @internal */
   level: LogLevel = LogLevel.Info;
   private readonly timestamp: boolean;

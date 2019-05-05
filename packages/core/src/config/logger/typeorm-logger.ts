@@ -1,6 +1,6 @@
 import { Logger as TypeOrmLoggerInterface, QueryRunner } from 'typeorm';
 
-import { Logger } from './base-logger';
+import { Logger } from './mpcast-logger';
 
 const context = 'TypeORM';
 

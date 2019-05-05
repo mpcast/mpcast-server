@@ -1,5 +1,5 @@
 {
-  "name": "podcast",
+  "name": "mpcast",
   "version": "0.1.0-alpha.1",
   "private": true,
   "scripts": {
@@ -8,6 +8,9 @@
     "docs:watch": "concurrently -n docgen,hugo,webpack -c green,blue,cyan \"cd docs && hugo server\" \"cd docs && yarn webpack -w\"",
     "docs:build": "cd docs && yarn webpack --prod && node build.js && hugo",
     "docs:deploy": "cd docs && yarn && cd .. && yarn docs:build",
+    "dev-server:mysql": "cd packages/dev-server && yarn start --db=mysql",
+    "dev-server:postgres": "cd packages/dev-server && yarn start --db=postgres",
+    "dev-server:sqlite": "cd packages/dev-server && yarn start --db=sqlite",
     "build": "lerna run build",
     "publish:packages": "yarn build && lerna publish --exact -m \"chore: Publish %s release\" --no-git-tag-version"
   },
@@ -36,5 +39,7 @@
     "typescript": "^3.2.4"
   },
   "repository": "git@github.com:caixie-ltd/podcast-server.git",
-  "workspaces": ["packages/*"]
+  "workspaces": [
+    "packages/*"
+  ]
 }

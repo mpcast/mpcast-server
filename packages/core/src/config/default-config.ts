@@ -1,10 +1,10 @@
 import { ReadOnlyRequired } from '../common/types/common-types';
 
-import { BaseConfig } from './base-config';
+import { MpcastConfig } from './mpcast-config';
 import { DefaultLogger } from './logger/default-logger';
 import { TypeOrmLogger } from './logger/typeorm-logger';
 
-export const defaultConfig: ReadOnlyRequired<BaseConfig> = {
+export const defaultConfig: ReadOnlyRequired<MpcastConfig> = {
   hostname: '',
   port: 5000,
   dbConnectionOptions: {

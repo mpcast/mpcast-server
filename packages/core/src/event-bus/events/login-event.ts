@@ -1,4 +1,4 @@
-import { BaseEvent } from '../base-event';
+import { MpcastEvent } from '../mpcast-event';
 
-export class LoginEvent extends BaseEvent {
+export class LoginEvent extends MpcastEvent {
 }

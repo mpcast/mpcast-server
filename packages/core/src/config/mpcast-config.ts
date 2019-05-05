@@ -2,8 +2,8 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 import { RequestHandler } from 'express';
 import { ConnectionOptions } from 'typeorm';
 
-import { BaseLogger } from './logger/base-logger';
-import { PodcastPlugin } from './podcast-plugin';
+import { MpcastLogger } from './logger/mpcast-logger';
+import { MpcastPlugin } from './mpcast-plugin/mpcast-plugin';
 
 export interface AuthOptions {
   /**
@@ -35,7 +35,7 @@ export interface AuthOptions {
   expiresIn?: string | number;
 }
 
-export interface BaseConfig {
+export interface MpcastConfig {
   /**
    * @description
    * The connection options used by TypeORM to connect to the database.
@@ -56,7 +56,7 @@ export interface BaseConfig {
    *
    * @default []
    */
-  plugins?: PodcastPlugin[];
+  plugins?: MpcastPlugin[];
 
   /**
    * @description
@@ -85,9 +85,9 @@ export interface BaseConfig {
   authOptions: AuthOptions;
   /**
    * @description
-   * Provide a logging service which implements the {@link BaseLogger} interface.
+   * Provide a logging service which implements the {@link MpcastLogger} interface.
    * 实现 BaseLogger 接口的一个默认日志服务
    * @default DefaultLogger
    */
-  logger?: BaseLogger;
+  logger?: MpcastLogger;
 }

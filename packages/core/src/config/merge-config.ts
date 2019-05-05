@@ -1,6 +1,6 @@
 import { DeepPartial } from '../common/shared-types';
 
-import { BaseConfig } from './base-config';
+import { MpcastConfig } from './mpcast-config';
 
 /**
  * Simple object check.
@@ -19,7 +19,7 @@ function isClassInstance(item: any): boolean {
  * but modified so that it does not overwrite fields of class instances, rather it overwrites
  * the entire instance.
  */
-export function mergeConfig<T extends BaseConfig>(target: T, source: DeepPartial<BaseConfig>): T {
+export function mergeConfig<T extends MpcastConfig>(target: T, source: DeepPartial<MpcastConfig>): T {
   if (!source) {
     return target;
   }
