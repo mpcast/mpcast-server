@@ -1,6 +1,6 @@
 {
   "name": "@mpcast/common",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -20,5 +20,5 @@
   "devDependencies": {
     "rimraf": "^2.6.3"
   },
-  "gitHead": "2d41c33d5a3bdaf8586b20cf9d45d8f009f5a5cf"
+  "gitHead": "1d8186dc88236b349e84531ae3bd0f3287895f69"
 }

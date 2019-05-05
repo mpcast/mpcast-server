@@ -1,14 +1,18 @@
 {
   "name": "@mpcast/core",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "A Mini Program cast server.",
   "author": "Baisheng <baisheng@gmail.com>",
+  "private": false,
   "license": "MIT",
   "scripts": {
     "lint": "tslint --project tsconfig.json -c tslint.json",
     "tsc:watch": "tsc -p ./build/tsconfig.build.json --watch",
     "build": "rimraf dist && tsc -p ./build/tsconfig.build.json && tsc -p ./build/tsconfig.cli.json",
     "publish:alpha": "yarn build && npm publish --access public --tag alpha"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",
@@ -72,5 +76,5 @@
   },
   "main": "index.js",
   "repository": "git@github.com:caixie-ltd/podcast-server.git",
-  "gitHead": "2d41c33d5a3bdaf8586b20cf9d45d8f009f5a5cf"
+  "gitHead": "1d8186dc88236b349e84531ae3bd0f3287895f69"
 }

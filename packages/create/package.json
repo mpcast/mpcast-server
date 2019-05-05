@@ -1,9 +1,12 @@
 {
   "name": "@mpcast/create",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "license": "MIT",
   "bin": {
     "create": "./index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "copy-assets": "rimraf assets && ts-node ./build.ts",
@@ -29,5 +32,5 @@
     "rxjs": "^6.5.1",
     "semver": "^6.0.0"
   },
-  "gitHead": "2d41c33d5a3bdaf8586b20cf9d45d8f009f5a5cf"
+  "gitHead": "1d8186dc88236b349e84531ae3bd0f3287895f69"
 }
