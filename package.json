@@ -1,7 +1,7 @@
 {
   "name": "mpcast",
   "version": "0.1.0-alpha.1",
-  "private": true,
+  "private": false,
   "scripts": {
     "core:watch": "concurrently -n tsc,gulp \"cd packages/core && yarn tsc:watch\" \"cd packages/core && yarn gulp:watch\"",
     "bootstrap": "lerna bootstrap",
