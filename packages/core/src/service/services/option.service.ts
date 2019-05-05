@@ -1,12 +1,12 @@
-import { CacheService } from '../../cache/cache.service';
-import { Option } from '../../entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { Connection, Repository } from 'typeorm';
 
+import { CacheService } from '../../cache/cache.service';
 import * as CACHE_KEY from '../../common/constants/cache.constant';
+import { ID } from '../../common/shared-types';
+import { Option } from '../../entity';
 
 @Injectable()
 export class OptionService {
@@ -23,6 +23,7 @@ export class OptionService {
   async initOptions() {
     await this.load(true);
   }
+
   /**
    * 从缓存中加载系统配置
    * @param flag 如果标识为 true 则更新缓存
@@ -36,7 +37,7 @@ export class OptionService {
 
     if (_.isEmpty(cacheOptions)) {
       const data = await this.optionRepository.find();
-      const result = {};
+      const result: { [key: string]: any } = {};
       data.forEach(item => {
         result[item.key] = item.value;
       });
@@ -51,14 +52,14 @@ export class OptionService {
    * @param optionKey
    * @param optionValue
    */
-  async updateOptions(optionKey, optionValue) {
-    const data = _.isObject(optionKey) ? _.extend({}, optionKey) : { [optionKey]: optionValue };
-    let cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
+  async updateOptions(optionKey: any, optionValue: any) {
+    const data: any = _.isObject(optionKey) ? _.extend({}, optionKey) : { [optionKey]: optionValue };
+    let cacheOptions: any = await this.cacheService.get(CACHE_KEY.OPTIONS);
     if (_.isEmpty(cacheOptions)) {
       cacheOptions = await this.load();
     }
 
-    const changedOptions = {};
+    const changedOptions: { [key: string]: any } = {};
     for (const tempKey in data) {
       if (data[tempKey] !== cacheOptions[tempKey]) {
         changedOptions[tempKey] = data[tempKey];
@@ -87,10 +88,10 @@ export class OptionService {
    * @param key 置顶位置（EP. home、category and others）
    * @param itemId
    */
-  async addSticky(key, itemId): Promise<any> {
+  async addSticky(key: string, itemId: ID): Promise<any> {
     const options = await this.load();
     const stickys: {
-      [key: string]: [number];
+      [key: string]: [ID];
     } = options.stickys;
     for (const stickysKey in stickys) {
       if (stickysKey === key) {
@@ -105,10 +106,10 @@ export class OptionService {
   /**
    * 删除置顶数据项
    */
-  async removeSticky(key, itemId) {
+  async removeSticky(key: string, itemId: ID) {
     const options = await this.load();
     const stickys: {
-      [key: string]: [number];
+      [key: string]: [ID];
     } = options.stickys;
     for (const stickysKey in stickys) {
       if (stickysKey === key) {
@@ -128,7 +129,7 @@ export class OptionService {
    * 保存置顶数据配置
    * @param stickys
    */
-  async saveSticky(stickys) {
+  async saveSticky(stickys: { [key: string]: [ID] }) {
     const updateResult = await this.connection
       .createQueryBuilder()
       .update(Option)

@@ -1,13 +1,14 @@
-import { CacheService } from '../../cache/cache.service';
-import { ID } from '../../common/shared-types';
-import { PostEntity, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
-import { AttachmentService } from 'service/services/attachment.service';
 import { Connection, In } from 'typeorm';
 
+import { CacheService } from '../../cache/cache.service';
 import * as CACHE_KEY from '../../common/constants/cache.constant';
+import { ID } from '../../common/shared-types';
+import { PostEntity, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
+
+import { AttachmentService } from './attachment.service';
 
 @Injectable()
 export class CategoriesService {
@@ -54,7 +55,7 @@ export class CategoriesService {
       .getRawMany();
 
     // 按 termId 查询 term
-    const terms = [];
+    const terms: any[] = [];
     taxonomies.forEach(item => {
       terms.push(_.filter(allTerms, {
         taxonomyId: item.taxonomyId,
@@ -148,7 +149,7 @@ export class CategoriesService {
       .limit(pageSize)
       .getRawMany();
     // 以下处理元数据
-    const objIds = [];
+    const objIds: ID[] = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -234,7 +235,7 @@ export class CategoriesService {
       .getRawMany();
 
     // 以下处理元数据
-    const objIds = [];
+    const objIds: ID[] = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -274,9 +275,9 @@ export class CategoriesService {
    */
   async getTermsByTaxonomy(taxonomy: string) {
     const allTerms = await this.loadAllTerms();
-    const terms = allTerms.filter(term => {
+    const terms = allTerms.filter((term: any) => {
       return term.taxonomy === taxonomy;
-    }).map(t => Object.assign({}, t));
+    }).map((t: any) => Object.assign({}, t));
     for (const item of terms) {
       // item.url = '';
       // 如果有封面 默认是 thumbnail 缩略图，分类封面特色图片 featured_image

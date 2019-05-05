@@ -63,7 +63,7 @@ export class PostService {
     // 1 如果仅有一项内容，暂存至数组，后续批量获取
     // 2 如果有多项内容，直接批量获取
     for (const item of dataList) {
-      const typeObject = await this.categoriesService.formatTermForObject(item.id);
+      const typeObject = <Term> await this.categoriesService.formatTermForObject(item.id);
       if (!_.isEmpty(typeObject)) {
         item.type = typeObject.slug;
         await this.getFormatData(item);
@@ -212,7 +212,7 @@ export class PostService {
     // return new pagination_1.Pagination(items, items.length, total, Math.round(total / limit), routes.next, routes.previous);
 
     // 以下处理元数据
-    const objIds = [];
+    const objIds: any = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -303,7 +303,7 @@ export class PostService {
     //   },
     // });
     // 以下处理元数据
-    const objIds = [];
+    const objIds: any = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -315,8 +315,8 @@ export class PostService {
         item.metas = _.filter(metaData, { id: item.id });
       });
     }
-  //   const pageData = new Pagination(data, data.length, data.length, limit);
-  //   return pageData;
+    //   const pageData = new Pagination(data, data.length, data.length, limit);
+    //   return pageData;
     return data;
   }
 
@@ -337,7 +337,7 @@ export class PostService {
       // .limit(pageSize)
       .getRawMany();
     // 以下处理元数据
-    const objIds = [];
+    const objIds: any = [];
     data.forEach(item => {
       objIds.push(item.id);
     });

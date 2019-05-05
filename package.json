@@ -1,7 +1,7 @@
 {
   "name": "mpcast",
   "version": "0.1.0-alpha.1",
-  "private": false,
+  "private": true,
   "scripts": {
     "core:watch": "concurrently -n tsc,gulp \"cd packages/core && yarn tsc:watch\" \"cd packages/core && yarn gulp:watch\"",
     "bootstrap": "lerna bootstrap",
@@ -35,7 +35,7 @@
     "prettier": "^1.15.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
+    "tslint": "^5.16.0",
     "typescript": "^3.2.4"
   },
   "repository": "git@github.com:caixie-ltd/podcast-server.git",

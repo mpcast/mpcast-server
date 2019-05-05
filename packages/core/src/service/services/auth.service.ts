@@ -3,18 +3,19 @@
  * @file 权限与管理员模块服务
  * @module module/auth/service
  */
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectConnection } from '@nestjs/typeorm';
+// import { Base64 } from 'js-base64';
+import { Connection } from 'typeorm';
+
+import * as APP_CONFIG from '../../app.config';
 import { HttpUnauthorizedError } from '../../common/errors/unauthorized.error';
 import { ID } from '../../common/shared-types';
 import { ITokenResult } from '../../common/types/common-types';
 import { formatOneMeta } from '../../common/utils';
 import { UserEntity } from '../../entity';
 import { PasswordCiper } from '../helpers/password-cipher/password-ciper';
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { InjectConnection } from '@nestjs/typeorm';
-import * as APP_CONFIG from 'app.config';
-import { Base64 } from 'js-base64';
-import { Connection } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -78,7 +79,7 @@ export class AuthService {
     });
     return Promise.resolve({
       token,
-      expiresIn: APP_CONFIG.AUTH.expiresIn,
+      expiresIn: APP_CONFIG.AUTH.expiresIn as number,
     });
     // 处理用户是否需要验证与用户是否已经验证
     // if (this.configService.authOptions.requireVerification && !user.verified) {
@@ -101,13 +102,13 @@ export class AuthService {
         id: userId,
       },
       select: ['passwordHash'],
-    });
+    }) as UserEntity;
 
     if (!user) {
       throw new HttpUnauthorizedError();
     }
     // const pwd = await this.passwordCipher.hash('abcd1234');
-    const passwordMathces = await this.passwordCipher.check(password, user.passwordHash);
+    const passwordMathces = await this.passwordCipher.check(password, user.passwordHash ? user.passwordHash : '');
     if (!passwordMathces) {
       throw new HttpUnauthorizedError();
     }
@@ -118,7 +119,7 @@ export class AuthService {
    * 根据用户唯一标识查找用户
    * @param identifier
    */
-  async getUserFromIdentifier(identifier) {
+  async getUserFromIdentifier(identifier: string) {
     const user = await this.connection.getRepository(UserEntity).findOne({
       where: {
         identifier,

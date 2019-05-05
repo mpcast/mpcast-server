@@ -2,8 +2,7 @@ import { ID } from '../../common/shared-types';
 import { UserEntity } from '../../entity';
 import { patchEntity } from '../helpers/utils/patch-entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 
 @Injectable()
@@ -49,7 +48,7 @@ export class UserService {
     // this.connection.getRepository(UserMeta).save()
   }
 
-  public getDetailById(id: number): Promise<UserEntity> {
+  public getDetailById(id: number): Promise<UserEntity | undefined> {
     return this.userRepository.findOne({
       relations: ['metas'],
       where: {
@@ -70,7 +69,7 @@ export class UserService {
    * 按用户唯一标识查询用户是否存在
    * @param identifier
    */
-  findByIdentifier(identifier: string): Promise<UserEntity> {
+  findByIdentifier(identifier: string): Promise<UserEntity | undefined> {
     return this.userRepository.findOne({
       relations: ['metas'],
       where: {

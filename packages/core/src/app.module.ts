@@ -1,6 +1,6 @@
-import { ApiModule } from 'api/api.module';
-import { ConfigModule } from 'config/config.module';
-import { ConfigService } from 'config/config.service';
+import { ApiModule } from './api/api.module';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { CorsMiddleware } from './middlewares/cors.middleware';
@@ -16,7 +16,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
     // 根据不同路径处理配置路由中间件
     // const defaultMiddleware: Array<{ handler: RequestHandler; route?: string }> = [
-      // { handler: i18nextHandler, route: adminApiPath },
+    // { handler: i18nextHandler, route: adminApiPath },
     // ];
     // const allMiddleware = defaultMiddleware.concat(this.configService.middleware);
     // for (const [route, handlers] of Object.entries(middlewareByRoute)) {

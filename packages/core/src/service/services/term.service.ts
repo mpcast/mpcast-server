@@ -3,7 +3,7 @@ import { ID } from '../../common/shared-types';
 import { PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
 import { Injectable, Post } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import * as CACHE_KEY from 'common/constants/cache.constant';
+import * as CACHE_KEY from '../../common/constants/cache.constant';
 import * as _ from 'lodash';
 import { Connection, In } from 'typeorm';
 
@@ -97,7 +97,7 @@ export class TermService {
       .limit(pageSize)
       .getRawMany();
     // 以下处理元数据
-    const objIds = [];
+    const objIds: any = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -183,7 +183,7 @@ export class TermService {
       .getRawMany();
 
     // 以下处理元数据
-    const objIds = [];
+    const objIds: any = [];
     data.forEach(item => {
       objIds.push(item.id);
     });
@@ -223,9 +223,10 @@ export class TermService {
    */
   async getTermsByTaxonomy(taxonomy: string) {
     const allTerms = await this.loadAllTerms();
-    return allTerms.filter(term => {
+    // <Term>
+    return allTerms.filter((term: any) => {
       return term.taxonomy === taxonomy;
-    }).map(t => Object.assign({}, t));
+    }).map((t: any) => Object.assign({}, t));
   }
 
   /**

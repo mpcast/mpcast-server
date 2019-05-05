@@ -1,0 +1,24 @@
+import { CommentMeta } from './comments/comment-meta.entity';
+import { CommentEntity } from './comments/comment.entity';
+import { Option } from './options/option.entity';
+import { PostMeta } from './posts/post-meta.entity';
+import { PostEntity } from './posts/post.entity';
+import { TermMeta } from './terms/term-meta.entity';
+import { TermRelationships } from './terms/term-relationships.entity';
+import { TermTaxonomy } from './terms/term-taxonomy.entity';
+import { Term } from './terms/term.entity';
+import { UserMeta } from './users/user-meta.entity';
+import { UserEntity } from './users/user.entity';
+export declare const coreEntitiesMap: {
+    CommentMeta: typeof CommentMeta;
+    CommentEntity: typeof CommentEntity;
+    Option: typeof Option;
+    PostMeta: typeof PostMeta;
+    PostEntity: typeof PostEntity;
+    TermMeta: typeof TermMeta;
+    TermTaxonomy: typeof TermTaxonomy;
+    TermRelationships: typeof TermRelationships;
+    Term: typeof Term;
+    UserMeta: typeof UserMeta;
+    UserEntity: typeof UserEntity;
+};
