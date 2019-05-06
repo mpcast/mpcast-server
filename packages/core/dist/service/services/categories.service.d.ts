@@ -1,9 +1,7 @@
 import { Connection } from 'typeorm';
-
 import { CacheService } from '../../cache/cache.service';
 import { ID } from '../../common/shared-types';
 import { PostMeta, Term } from '../../entity';
-
 import { AttachmentService } from './attachment.service';
 export declare class CategoriesService {
     private connection;
@@ -13,9 +11,9 @@ export declare class CategoriesService {
     findTermBySlug(taxonomy: string, slug: string): Promise<any>;
     findCategoriesByObject(objectId: ID): Promise<any[]>;
     formatTermForObject(objectId: ID): Promise<Term | undefined>;
-    getFromCategory(categorySlug: string, status?: string, querys?: any): Promise<Array<{
+    getFromCategory(categorySlug: string, status?: string, querys?: any): Promise<{
         id: string;
-        author: string | number;
+        author: ID;
         status: string;
         guid?: string | undefined;
         allowComment: number;
@@ -35,7 +33,7 @@ export declare class CategoriesService {
         content: string;
         category: string;
         metas?: PostMeta[] | undefined;
-    }>>;
+    }[]>;
     getPopular(isRandom?: boolean, limit?: number): Promise<any>;
     getNews(limit: number): Promise<any>;
     getStickys(stickys: [number]): Promise<any[]>;

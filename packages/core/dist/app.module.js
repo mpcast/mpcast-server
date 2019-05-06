@@ -9,10 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = require("@nestjs/common");
 const api_module_1 = require("./api/api.module");
 const config_module_1 = require("./config/config.module");
 const config_service_1 = require("./config/config.service");
-const common_1 = require("@nestjs/common");
 const cors_middleware_1 = require("./middlewares/cors.middleware");
 const origin_middleware_1 = require("./middlewares/origin.middleware");
 let AppModule = class AppModule {

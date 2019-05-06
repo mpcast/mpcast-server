@@ -1,8 +1,8 @@
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+
 import { ApiModule } from './api/api.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-
 import { CorsMiddleware } from './middlewares/cors.middleware';
 import { OriginMiddleware } from './middlewares/origin.middleware';
 

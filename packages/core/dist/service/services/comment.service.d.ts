@@ -5,8 +5,7 @@ import { CommentEntity, UserEntity } from '../../entity';
 export declare class CommentService {
     private connection;
     private readonly usersRepository;
-    private readonly commentRepository;
-    constructor(connection: Connection, usersRepository: Repository<UserEntity>, commentRepository: Repository<CommentEntity>);
+    constructor(connection: Connection, usersRepository: Repository<UserEntity>);
     paginate(options: IPaginationOptions): Promise<Pagination<CommentEntity>>;
     findById(id: ID): Promise<CommentEntity | undefined>;
     create(comment: CommentEntity): Promise<CommentEntity>;

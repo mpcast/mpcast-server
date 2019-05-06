@@ -14,6 +14,14 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mpcast": "dist/cli/mpcast-cli.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
   "dependencies": {
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
@@ -78,7 +86,6 @@
     "tslint": "5.12.1",
     "typescript": "^3.2.4"
   },
-  "main": "index.js",
   "repository": "git@github.com:caixie-ltd/podcast-server.git",
   "gitHead": "1d8186dc88236b349e84531ae3bd0f3287895f69"
 }

@@ -19,7 +19,7 @@ export declare class PostService {
     paginate(options: IPaginationOptions): Promise<Pagination<PostEntity>>;
     getFromCategory(categorySlug: string, status?: string, querys?: any): Promise<{
         id: string;
-        author: string | number;
+        author: ID;
         status: string;
         guid?: string | undefined;
         allowComment: number;

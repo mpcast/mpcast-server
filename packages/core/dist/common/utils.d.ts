@@ -6,5 +6,5 @@ export interface IFilterConfig {
     filterKey?: any;
     cleanMeta?: boolean;
 }
-export declare function formatAllMeta(list: any[], config?: IFilterConfig): any[];
+export declare function formatAllMeta(list: any, config?: IFilterConfig): any;
 export declare function formatOneMeta(item: any, config?: IFilterConfig): any;

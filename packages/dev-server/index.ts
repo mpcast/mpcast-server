@@ -1,4 +1,5 @@
-import { bootstrap } from '@mpcast/core/src';
+
+import { bootstrap } from '../core/dist/bootstrap';
 
 import { devConfig } from './dev-config';
 

@@ -12,7 +12,6 @@ export class CommentService {
   constructor(
     @InjectConnection() private connection: Connection,
     @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
-    @InjectRepository(CommentEntity) private readonly commentRepository: Repository<CommentEntity>,
   ) {
   }
 
@@ -21,7 +20,7 @@ export class CommentService {
    * @param options
    */
   async paginate(options: IPaginationOptions): Promise<Pagination<CommentEntity>> {
-    const paginationObj = await paginate<CommentEntity>(this.commentRepository, options, {
+    const paginationObj = await paginate<CommentEntity>(this.connection.getRepository(CommentEntity), options, {
       relations: ['user'],
       // 仅加载 postId
       loadRelationIds: {
@@ -41,7 +40,7 @@ export class CommentService {
    * @param id
    */
   async findById(id: ID) {
-    const data = await this.commentRepository.findOne({
+    const data = await this.connection.getRepository(CommentEntity).findOne({
       relations: ['user'],
       where: {
         id,
@@ -59,7 +58,7 @@ export class CommentService {
    * @param comment
    */
   async create(comment: CommentEntity) {
-    const data = await this.commentRepository.save(comment);
+    const data = await this.connection.getRepository(CommentEntity).save(comment);
     formatOneMeta(data);
     return data;
   }

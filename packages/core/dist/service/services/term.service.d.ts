@@ -1,4 +1,5 @@
 import { CacheService } from '../../cache/cache.service';
+import { ID } from '../../common/shared-types';
 import { PostMeta } from '../../entity';
 import { Connection } from 'typeorm';
 export declare class TermService {
@@ -8,7 +9,7 @@ export declare class TermService {
     findTermBySlug(taxonomy: string, slug: string): Promise<any>;
     getFromCategory(categorySlug: string, status?: string, querys?: any): Promise<{
         id: string;
-        author: string | number;
+        author: ID;
         status: string;
         guid?: string | undefined;
         allowComment: number;

@@ -10,5 +10,8 @@
   "dependencies": {
     "@mpcast/common": "^0.1.2",
     "typescript": "^3.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
   }
 }

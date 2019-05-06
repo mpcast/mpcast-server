@@ -357,7 +357,7 @@ export class CategoriesService {
   }
 
   private formatMeta(list: any[]) {
-    const items = [];
+    const items: any = [];
     for (const item of list) {
       item.meta = {};
       if (_.has(item, 'metas') && item.metas.length > 0) {

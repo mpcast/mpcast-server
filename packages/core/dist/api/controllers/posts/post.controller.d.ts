@@ -15,13 +15,13 @@ export declare class PostController {
     getViews(postId: ID, req: any): Promise<{
         found: number;
         iView: boolean;
-        postId: string | number;
+        postId: ID;
         views: import("../../../entity/index").UserEntity[];
     }>;
     newViewer(postId: ID, req: any, params: IQueryParamsResult): Promise<{
         iView: boolean;
         viewCount: number;
-        postId: string | number;
+        postId: ID;
     }>;
     getComments(postId: ID, req: any, page: number, limit: number): Promise<import("../../../common/paginate/pagination").Pagination<CommentEntity>>;
     newComment(postId: ID, req: any, params: IQueryParamsResult, comment: CommentEntity): Promise<CommentEntity>;

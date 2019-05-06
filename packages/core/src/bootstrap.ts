@@ -8,10 +8,11 @@ import helmet from 'helmet';
 
 import { Type } from './common/shared-types';
 import { ReadOnlyRequired } from './common/types/common-types';
-import { getConfig, setConfig } from './config/config-helpers';
-import { Logger } from './config/logger/mpcast-logger';
 // import { DefaultLogger } from './config/logger/default-logger';
-import { MpcastConfig } from './config/mpcast-config';
+import { Logger, MpcastConfig } from './config';
+import { getConfig, setConfig } from './config/config-helpers';
+// import { EntitySchema } from 'typeorm';
+import { BaseEntity } from './entity/base.entity';
 import { HttpExceptionFilter } from './filters/error.filter';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
@@ -38,7 +39,7 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
   // DefaultLogger.restoreOriginalLogLevel();
   // app.useLogger(new Logger());
   app.use(helmet());
-  app.use(compression());
+  // app.use(compression());
   app.use(bodyParser.json({ limit: '1mb' }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
@@ -69,6 +70,7 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
 export async function preBootstrapConfig(
   userConfig: Partial<MpcastConfig>,
 ): Promise<ReadOnlyRequired<MpcastConfig>> {
+  console.log('config ....');
   if (userConfig) {
     setConfig(userConfig);
   }
@@ -92,11 +94,11 @@ export async function preBootstrapConfig(
    * Directories support glob patterns.
    */
 // readonly subscribers?: (Function | string)[];
-  setConfig({
-    dbConnectionOptions: {
-      entities: [entities],
-    },
-  });
+//   setConfig({
+//     dbConnectionOptions: {
+//       entities,
+//     },
+//   });
   const config = getConfig();
   Logger.useLogger(config.logger);
   return config;
@@ -106,8 +108,10 @@ export async function preBootstrapConfig(
  * Returns an array of core entities and any additional entities defined in plugins.
  */
 async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<Array<Type<any>>> {
+// readonly entities?: ((Function | string | EntitySchema<any>))[];
   const { coreEntitiesMap } = await import('./entity/entities');
-  const coreEntities = Object.values(coreEntitiesMap) as Array<Type<any>>;
+  console.log(coreEntitiesMap);
+  const coreEntities = Object.values(coreEntitiesMap) as Array<Type<BaseEntity>>;
   console.log(coreEntities);
   // TODO: 后面增加获取插件 Entity 处理k
   return [...coreEntities];

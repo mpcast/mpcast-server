@@ -73,8 +73,8 @@ export interface IFilterConfig {
  * @param list
  * @param config IFilterConfig
  */
-export function formatAllMeta(list: any[], config?: IFilterConfig) {
-  const items = [];
+export function formatAllMeta(list: any, config?: IFilterConfig) {
+  const items: any = [];
   for (const item of (config && config.filterKey ? _.map(list, config.filterKey) : list)) {
     item.meta = {};
     if (_.has(item, 'metas') && item.metas.length > 0) {
