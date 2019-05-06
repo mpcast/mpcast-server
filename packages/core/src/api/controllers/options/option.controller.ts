@@ -1,5 +1,6 @@
-import { OptionService } from '../../../service';
 import { Controller, Get, Param } from '@nestjs/common';
+
+import { OptionService } from '../../../service';
 
 @Controller('options')
 export class OptionController {
@@ -10,7 +11,7 @@ export class OptionController {
   }
 
   @Get(':type')
-  async index(@Param('type') type) {
+  async index(@Param('type') type: any) {
     const allOption = await this.optionService.load();
     const foundOption = allOption[type];
     if (foundOption) {

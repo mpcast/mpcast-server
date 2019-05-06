@@ -16,12 +16,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const operators_1 = require("rxjs/operators");
-const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
-const http_interface_1 = require("../common/types/interfaces/http.interface");
+const core_1 = require("@nestjs/core");
+const operators_1 = require("rxjs/operators");
 const META = __importStar(require("../common/constants/meta.constant"));
 const TEXT = __importStar(require("../common/constants/text.constant"));
+const http_interface_1 = require("../common/types/interfaces/http.interface");
 function transformDataToPaginate(data, request) {
     return {
         data: data.docs,

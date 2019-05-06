@@ -21,7 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse();
     const status = exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
     const errorOption: TExceptionOption = exception.message as TExceptionOption;
-    const isString = (value): value is TMessage => lodash.isString(value);
+    const isString = (value: any): value is TMessage => lodash.isString(value);
     const errMessage = isString(errorOption) ? errorOption : errorOption.message;
     const errorInfo = isString(errorOption) ? null : errorOption.error;
     const parentErrorInfo = errorInfo ? String(errorInfo) : null;
@@ -32,7 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status: EHttpStatus.Error,
       message: errMessage,
       error: resultError,
-      debug: isDevMode ? exception.stack : null,
+      debug: isDevMode ? exception.stack : undefined,
     };
     // 对默认的 404 进行特殊处理
     if (status === HttpStatus.NOT_FOUND && data.error === 'Not Found') {

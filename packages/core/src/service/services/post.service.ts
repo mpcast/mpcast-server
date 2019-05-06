@@ -28,8 +28,8 @@ export class PostService {
    * 根据 ID 查找
    * @param id
    */
-  async findById(id: ID) {
-    const data = await this.postRepository.findOne({
+  async findById(id: ID): Promise<PostEntity> {
+    const data: PostEntity = await this.postRepository.findOneOrFail({
       where: {
         id,
       },

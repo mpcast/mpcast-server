@@ -1,6 +1,7 @@
-import { HttpUnauthorizedError } from '../../../common/errors/unauthorized.error';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
+import { HttpUnauthorizedError } from '../../../common/errors/unauthorized.error';
 
 /**
  * @class JwtAuthGuard
@@ -18,11 +19,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
    * @description 如果解析出的数据对不上，则判定为无效
    */
   // handleRequest<TUser = any>(err: any, user: any, info: any): TUser;
-  handleRequest(error, user, errInfo) {
+  handleRequest(error: any, user: any, errInfo: any) {
     if (user && !error && !errInfo) {
       return user;
     } else {
-      throw error || new HttpUnauthorizedError(null, errInfo && errInfo.message);
+      throw error || new HttpUnauthorizedError(undefined, errInfo && errInfo.message);
     }
   }
 }

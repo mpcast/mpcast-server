@@ -1,9 +1,9 @@
-import { TermRelationships } from '..';
-import { TermMeta } from 'term-meta.entity';
-import { TermTaxonomy } from 'term-taxonomy.entity';
 import { Column, DeepPartial, Entity, OneToMany, OneToOne } from 'typeorm';
 
 import { BaseEntity } from '../base.entity';
+
+import { TermMeta } from './term-meta.entity';
+import { TermTaxonomy } from './term-taxonomy.entity';
 
 // @Index(['name'], { unique: true })
 /**

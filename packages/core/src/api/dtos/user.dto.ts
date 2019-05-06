@@ -1,7 +1,11 @@
-export class CreateUserDto {
-    readonly identifier: string;
-    passwordHash: string;
-    // readonly name: string;
-    // readonly age: number;
-    // readonly breed: string;
+import { UserMeta } from '../../entity';
+
+export class UserDto {
+  readonly identifier: string;
+  passwordHash?: string;
+  displayName?: string;
+  verified?: boolean;
+  verificationToken?: string | null;
+  identifierChangeToken?: string | null;
+  metas?: UserMeta[];
 }

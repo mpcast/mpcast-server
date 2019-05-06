@@ -4,9 +4,10 @@
  * @module guard/humanized-auth
  */
 
-import { HttpUnauthorizedError } from '../../../common/errors/unauthorized.error';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
+import { HttpUnauthorizedError } from '../../../common/errors/unauthorized.error';
 
 /**
  * @class HumanizedJwtAuthGuard
@@ -23,13 +24,13 @@ export class HumanizedJwtAuthGuard extends AuthGuard('jwt') {
    * @function handleRequest
    * @description 如果 Token 不存在或 Token 存在并有效，都是通行
    */
-  handleRequest(error, authInfo, errInfo) {
+  handleRequest(error: any, authInfo: any, errInfo: any) {
     const okToken = !!authInfo;
     const noToken = !authInfo && errInfo && errInfo.message === 'No auth token';
     if (!error && (okToken || noToken)) {
       return authInfo;
     } else {
-      throw error || new HttpUnauthorizedError(null, errInfo && errInfo.message);
+      throw error || new HttpUnauthorizedError(undefined, errInfo && errInfo.message);
     }
   }
 }

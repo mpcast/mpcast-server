@@ -37,7 +37,7 @@ let PostService = class PostService {
         this.optionService = optionService;
     }
     async findById(id) {
-        const data = await this.postRepository.findOne({
+        const data = await this.postRepository.findOneOrFail({
             where: {
                 id,
             },

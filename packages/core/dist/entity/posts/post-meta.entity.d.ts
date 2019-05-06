@@ -1,5 +1,5 @@
-import { PostEntity } from '..';
 import { DeepPartial } from 'typeorm';
+import { PostEntity } from '..';
 import { BaseEntity } from '../base.entity';
 export declare class PostMeta extends BaseEntity {
     constructor(input?: DeepPartial<PostMeta>);

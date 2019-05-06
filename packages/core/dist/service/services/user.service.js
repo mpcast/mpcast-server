@@ -12,11 +12,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const entity_1 = require("../../entity");
-const patch_entity_1 = require("../helpers/utils/patch-entity");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const entity_1 = require("../../entity");
+const patch_entity_1 = require("../helpers/utils/patch-entity");
 let UserService = class UserService {
     constructor(connection, userRepository) {
         this.connection = connection;

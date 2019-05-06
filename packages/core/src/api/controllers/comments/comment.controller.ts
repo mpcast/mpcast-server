@@ -1,6 +1,7 @@
-import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
-import { CommentService, UserService } from '../../../service';
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+
+import { CommentService, UserService } from '../../../service';
+import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 // import { Post } from './post.entity';
 
@@ -34,7 +35,7 @@ export class CommentController {
    * @param id
    */
   @Get(':id')
-  async one(@Param('id') id) {
+  async one(@Param('id') id: any) {
     const data = await this.commentService.findById(id);
     return data;
   }

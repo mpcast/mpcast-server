@@ -1,9 +1,11 @@
+import { Injectable } from '@nestjs/common';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { Connection, Repository } from 'typeorm';
+
+import { UserDto } from '../../api/dtos/user.dto';
 import { ID } from '../../common/shared-types';
 import { UserEntity } from '../../entity';
 import { patchEntity } from '../helpers/utils/patch-entity';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -13,7 +15,7 @@ export class UserService {
   ) {
   }
 
-  public create(newUser: UserEntity): Promise<UserEntity> {
+  public create(newUser: UserDto): Promise<UserEntity> {
     return this.userRepository.save(newUser).then(user => {
       return user;
     });

@@ -1,13 +1,14 @@
-import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import * as _ from 'lodash';
+
 import { ID } from '../../../common/shared-types';
 import { EUserPostsBehavior } from '../../../common/types/common-types';
 import { formatAllMeta, formatOneMeta } from '../../../common/utils';
 import { HttpProcessor } from '../../../decorators/http.decorator';
-import { QueryParams } from '../../../decorators/query-params.decorator';
-import { CommentEntity, PostEntity } from '../../../entity';
+import { IQueryParamsResult, QueryParams } from '../../../decorators/query-params.decorator';
+import { CommentEntity, PostEntity, Term } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
-import * as _ from 'lodash';
+import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
@@ -43,8 +44,8 @@ export class PostController {
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
   async findByCategory(
-    @Req() req,
-    @Param('category') category,
+    @Req() req: any,
+    @Param('category') category: any,
     @Query('page') page: number = 0, @Query('limit') limit: number = 10,
   ): Promise<any> {
     const query = req.query;
@@ -68,7 +69,7 @@ export class PostController {
         break;
       }
       default: {
-        list = await this.postService.getFromCategory(category, null, query);
+        list = await this.postService.getFromCategory(category, undefined, query);
       }
     }
     // await this.dealData(list.items);
@@ -85,7 +86,7 @@ export class PostController {
    */
   @Get(':id/views')
   @HttpProcessor.handle('获取单个内容数据')
-  async getViews(@Param('id') postId: ID, @Req() req) {
+  async getViews(@Param('id') postId: ID, @Req() req: any) {
     const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
     let iView = false;
     let found = 0;
@@ -123,7 +124,8 @@ export class PostController {
    * @param ip
    */
   @Post(':id/views/new')
-  async newViewer(@Param('id') postId: ID, @Req() req, @QueryParams() { visitors: { ip } }) {
+  async newViewer(@Param('id') postId: ID, @Req() req: any, @QueryParams() params: IQueryParamsResult) {
+    const ip = params.visitors.ip;
     const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
     let iView = false;
     let viewCount = 0;
@@ -172,7 +174,7 @@ export class PostController {
   @Get(':id/comments')
   async getComments(
     @Param('id') postId: ID,
-    @Req() req,
+    @Req() req: any,
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
@@ -191,10 +193,13 @@ export class PostController {
   @Post(':id/comments/new')
   async newComment(
     @Param('id') postId: ID,
-    @Req() req,
-    @QueryParams() { visitors: { ip } },
+    @Req() req: any,
+    @QueryParams() params: IQueryParamsResult,
     @Body() comment: CommentEntity,
   ) {
+    // { visitors: { ip } }
+    // const { visitors: any } = params;
+    const ip = params.visitors.ip;
     const commentInput = new CommentEntity({
       user: {
         id: req.user.id,
@@ -211,6 +216,7 @@ export class PostController {
 
   @Get(':id')
   @HttpProcessor.handle('获取单个内容数据')
+  // @OnUndefined(404)
   async one(@Param('id') id: ID) {
     // this.postService.
     // return await this.postService.findById(id);
@@ -244,7 +250,7 @@ export class PostController {
     return await this._formatOneData(data);
   }
 
-  private async dealDataList(list) {
+  private async dealDataList(list: any[]) {
     formatAllMeta(list);
     // this.formatMeta(data);
     // const items = [];
@@ -254,7 +260,7 @@ export class PostController {
     return list;
   }
 
-  private async _formatOneData(item) {
+  private async _formatOneData(item: any) {
     if (_.has(item.meta, '_items')) {
       // 用于处理标注 block 数据状态
       // item.items = JSON.parse(item.meta._items);
@@ -320,7 +326,7 @@ export class PostController {
     data.categories = _.map(await this.categoriesService.findCategoriesByObject(post.id), 'taxonomyId');
     // 查询 post-format 是何种类型的格式分类, 比如是 audio、doc 等
     const postTermFormat = await this.categoriesService.formatTermForObject(post.id);
-    if (!_.isEmpty(postTermFormat)) {
+    if (postTermFormat && !_.isEmpty(postTermFormat)) {
       post.type = postTermFormat.slug;
     }
     return Object.assign({}, post, PostEntity);

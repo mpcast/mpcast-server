@@ -68,7 +68,7 @@ export class CategoriesService {
   /**
    * 处理 post-format 格式对象
    */
-  async formatTermForObject(objectId: ID) {
+  async formatTermForObject(objectId: ID): Promise<Term | undefined> {
     const allTerms: Term[] = await this.cacheService.get(CACHE_KEY.TERMS);
     // 此处的 taxonomyId 设置别名为 termId 将会与全部分类别的 termId 进行比对
     const taxonomies = await this.connection.manager

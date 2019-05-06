@@ -1,12 +1,12 @@
-import { CacheService } from '../../../cache/cache.service';
-import { HttpProcessor } from '../../../decorators/http.decorator';
-import { UserService } from '../../../service';
 import { Body, Controller, Get, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MiniProgram, Wechat } from 'wechat-jssdk';
 
 import * as APP_CONFIG from '../../../app.config';
+import { CacheService } from '../../../cache/cache.service';
 import * as CACHE_KEY from '../../../common/constants/cache.constant';
+import { HttpProcessor } from '../../../decorators/http.decorator';
+import { UserService } from '../../../service';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 // const wx = new Wechat(wechatConfig);
@@ -26,7 +26,7 @@ export class WechatController {
       appSecret: '71ac7ed4bf869bc2b7b578395a89eb44',
     },
   };
-  private wx;
+  private wx: Wechat;
   private mp: MiniProgram;
 
   constructor(
@@ -48,7 +48,7 @@ export class WechatController {
    * @param code
    */
   @Get(':code')
-  async login(@Param('code') code: string): Promise<{ token: string, expires_in: string }> {
+  async login(@Param('code') code: string) {
     // { session_key: 'Ns9nf0SX+r9IlSzvu48GsA==',
     //   openid: 'oMFrD5PyOzXajhasUje_f81lSg8Q' }
     const { openid, session_key } = await this.mp.getSession(code);
@@ -77,7 +77,7 @@ export class WechatController {
   @Post('verify')
   @UseGuards(JwtAuthGuard)
   @HttpProcessor.handle({ message: '数据完整性验证', error: HttpStatus.FORBIDDEN })
-  async verifySignature(@Req() req, @Body() body: {
+  async verifySignature(@Req() req: any, @Body() body: {
     rawData: string,
     signature: string,
   }) {
@@ -93,7 +93,7 @@ export class WechatController {
 
   @Post('decrypt')
   @UseGuards(JwtAuthGuard)
-  async decryptData(@Req() req, @Body() body: {
+  async decryptData(@Req() req: any, @Body() body: {
     encryptedData: string,
     iv: string,
   }) {
@@ -102,22 +102,26 @@ export class WechatController {
     const res = await this.mp.decryptData(body.encryptedData, body.iv, sessionKey);
     const user = await this.usersService.findByIdentifier(req.user);
     // 更新用户的微信数据
-    for (const meta of user.metas) {
-      if (meta.key === '_wechat') {
-        meta.value = res;
+    if (user && user.metas) {
+      for (const meta of user.metas) {
+        if (meta.key === '_wechat') {
+          meta.value = res;
+        }
       }
-    }
-    const newUser = await this.usersService.updateUser(user);
-    const resData: object = {};
-    for (const meta of newUser.metas) {
-      if (meta.key === '_wechat') {
-        Object.assign(resData, {
-          id: newUser.id,
-          ...meta.value,
-        });
+      const newUser = await this.usersService.updateUser(user);
+      const resData: object = {};
+      if (newUser && newUser.metas) {
+        for (const meta of newUser.metas) {
+          if (meta.key === '_wechat') {
+            Object.assign(resData, {
+              id: newUser.id,
+              ...meta.value,
+            });
+          }
+        }
       }
+      return resData;
     }
-    return resData;
   }
 
   @Post('check')
@@ -132,7 +136,7 @@ export class WechatController {
 
   @Post('me')
   @UseGuards(JwtAuthGuard)
-  me(@Req() req) {
+  me(@Req() req: any) {
     // console.log(req.user);
   }
 }

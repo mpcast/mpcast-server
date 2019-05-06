@@ -18,7 +18,7 @@ const APP_CONFIG = __importStar(require("../app.config"));
 const app_environment_1 = require("../app.environment");
 let CorsMiddleware = class CorsMiddleware {
     use(request, response, next) {
-        const getMethod = method => common_1.RequestMethod[method];
+        const getMethod = (method) => common_1.RequestMethod[method];
         const origin = request.headers.origin || '';
         const allowedOrigins = [...APP_CONFIG.CROSS_DOMAIN.allowedOrigins];
         const allowedMethods = [common_1.RequestMethod.GET, common_1.RequestMethod.HEAD, common_1.RequestMethod.PUT, common_1.RequestMethod.PATCH, common_1.RequestMethod.POST, common_1.RequestMethod.DELETE];

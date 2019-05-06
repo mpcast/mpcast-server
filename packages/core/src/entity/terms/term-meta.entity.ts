@@ -1,6 +1,6 @@
 import { Column, DeepPartial, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../base.entity';
-import { Term } from 'term.entity';
+import { Term } from './term.entity';
 
 // @Index(['name'], { unique: true })
 /**

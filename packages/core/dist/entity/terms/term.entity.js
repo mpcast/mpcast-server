@@ -9,12 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _a;
-"use strict";
-const term_meta_entity_1 = require("term-meta.entity");
-const term_taxonomy_entity_1 = require("term-taxonomy.entity");
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("../base.entity");
+const term_meta_entity_1 = require("./term-meta.entity");
+const term_taxonomy_entity_1 = require("./term-taxonomy.entity");
 let Term = class Term extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -53,7 +51,7 @@ __decorate([
     typeorm_1.OneToOne(type => term_taxonomy_entity_1.TermTaxonomy, termTaxonomy => termTaxonomy.term, {
         cascade: true,
     }),
-    __metadata("design:type", typeof (_a = typeof term_taxonomy_entity_1.TermTaxonomy !== "undefined" && term_taxonomy_entity_1.TermTaxonomy) === "function" ? _a : Object)
+    __metadata("design:type", term_taxonomy_entity_1.TermTaxonomy)
 ], Term.prototype, "taxonomy", void 0);
 Term = __decorate([
     typeorm_1.Entity('terms'),

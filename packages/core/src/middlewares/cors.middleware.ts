@@ -5,6 +5,7 @@
  */
 
 import { HttpStatus, Injectable, NestMiddleware, RequestMethod } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 import * as APP_CONFIG from '../app.config';
 import { isDevMode } from '../app.environment';
@@ -15,9 +16,9 @@ import { isDevMode } from '../app.environment';
  */
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
-  use(request, response, next) {
-    const getMethod = method => RequestMethod[method];
-    const origin = request.headers.origin || '';
+  use(request: Request, response: Response, next: any) {
+    const getMethod = (method: any) => RequestMethod[method];
+    const origin: any = request.headers.origin || '';
     const allowedOrigins = [...APP_CONFIG.CROSS_DOMAIN.allowedOrigins];
     const allowedMethods = [RequestMethod.GET, RequestMethod.HEAD, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.POST, RequestMethod.DELETE];
     const allowedHeaders = ['Authorization', 'Origin', 'No-Cache', 'X-Requested-With', 'If-Modified-Since', 'Pragma',

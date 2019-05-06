@@ -1,9 +1,10 @@
-import { CreateUserDto } from '../../dtos/user.dto';
-import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+
 import { formatOneMeta } from '../../../common/utils';
 import { UserEntity } from '../../../entity';
 import { UserService } from '../../../service';
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { UserDto } from '../../dtos/user.dto';
+import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -14,10 +15,9 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() userInput: CreateUserDto): Promise<UserEntity> {
+  createUser(@Body() userInput: UserDto): Promise<UserEntity> {
     return this.userService.create({
-      identifier: userInput.identifier,
-      passwordHash: userInput.passwordHash,
+      ...userInput,
     });
   }
 
@@ -27,7 +27,7 @@ export class UserController {
   // }
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async oneself(@Req() request): Promise<UserEntity> {
+  async oneself(@Req() request: any) {
     const user = await this.userService.findByIdentifier(request.user.identifier);
     if (user) {
       formatOneMeta(user);
@@ -37,7 +37,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<UserEntity> {
+  findOne(@Param('id') id: number) {
     return this.userService.getDetailById(id);
   }
 }

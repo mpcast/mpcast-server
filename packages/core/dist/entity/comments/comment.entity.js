@@ -9,10 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __1 = require("..");
-const comment_meta_entity_1 = require("comment-meta.entity");
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const base_entity_1 = require("../base.entity");
+const comment_meta_entity_1 = require("./comment-meta.entity");
 let CommentEntity = class CommentEntity extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);

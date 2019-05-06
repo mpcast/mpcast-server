@@ -1,8 +1,9 @@
-import { Term } from 'term.entity';
 import { Column, DeepPartial, Entity, OneToOne } from 'typeorm';
 
 import { ID } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+
+import { Term } from './term.entity';
 
 /**
  * 分类法

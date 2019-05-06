@@ -1,9 +1,10 @@
-import * as APP_CONFIG from '../app.config';
-import { JwtStrategy } from '../common/jwt.strategy';
-import { ServiceModule } from '../service/service.module';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+
+import * as APP_CONFIG from '../app.config';
+import { JwtStrategy } from '../common/jwt.strategy';
+import { ServiceModule } from '../service/service.module';
 
 import { AuthController } from './controllers/auth/auth.controller';
 import { CategoriesController } from './controllers/categories/categories.controller';
@@ -29,8 +30,8 @@ const controllers = [
       defaultStrategy: 'jwt',
     }),
     JwtModule.register({
-      secretOrPrivateKey: APP_CONFIG.AUTH.jwtTokenSecret,
-      signOptions: { expiresIn: APP_CONFIG.AUTH.expiresIn },
+      secretOrPrivateKey: APP_CONFIG.AUTH.jwtTokenSecret as string,
+      signOptions: { expiresIn: APP_CONFIG.AUTH.expiresIn } as object,
     }),
   ],
   controllers: [...controllers],

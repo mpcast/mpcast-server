@@ -11,7 +11,7 @@ export declare class PostService {
     private readonly categoriesService;
     private readonly optionService;
     constructor(connection: Connection, usersRepository: Repository<UserEntity>, postRepository: Repository<PostEntity>, categoriesService: CategoriesService, optionService: OptionService);
-    findById(id: ID): Promise<PostEntity | undefined>;
+    findById(id: ID): Promise<PostEntity>;
     loadBLock(blocks: number[]): Promise<any[]>;
     getFormatData(item: PostEntity): Promise<PostEntity>;
     private getAttachmentInfo;
@@ -19,7 +19,7 @@ export declare class PostService {
     paginate(options: IPaginationOptions): Promise<Pagination<PostEntity>>;
     getFromCategory(categorySlug: string, status?: string, querys?: any): Promise<{
         id: string;
-        author: ID;
+        author: string | number;
         status: string;
         guid?: string | undefined;
         allowComment: number;

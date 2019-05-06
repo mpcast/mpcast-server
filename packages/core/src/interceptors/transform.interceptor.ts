@@ -4,15 +4,17 @@
  * @module interceptor/transform
  */
 
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+// @ts-ignore
+import { PaginateResult } from 'mongoose';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Reflector } from '@nestjs/core';
-import { PaginateResult } from 'mongoose';
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { THttpSuccessResponse, IHttpResultPaginate, EHttpStatus } from '../common/types/interfaces/http.interface';
-import { TMessage } from '../common/types/interfaces/http.interface';
+
 import * as META from '../common/constants/meta.constant';
 import * as TEXT from '../common/constants/text.constant';
+import { EHttpStatus, IHttpResultPaginate, THttpSuccessResponse } from '../common/types/interfaces/http.interface';
+import { TMessage } from '../common/types/interfaces/http.interface';
 
 // 转换为标准的数据结构
 export function transformDataToPaginate<T>(data: PaginateResult<T>, request?: any): IHttpResultPaginate<T[]> {

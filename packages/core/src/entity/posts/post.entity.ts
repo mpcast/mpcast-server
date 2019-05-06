@@ -1,9 +1,10 @@
-import { CommentEntity } from '../comments/comment.entity';
-import { PostMeta } from 'post-meta.entity';
 import { IsArray, IsJSON, IsString } from 'class-validator';
 import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
+import { CommentEntity } from '..';
 import { BaseEntity } from '../base.entity';
+
+import { PostMeta } from './post-meta.entity';
 // import { User } from '@app/entity';
 
 // @Index(['name'], { unique: true })

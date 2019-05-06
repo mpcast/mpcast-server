@@ -1,6 +1,6 @@
-import { PostEntity } from '..';
 import { Column, DeepPartial, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
+import { PostEntity } from '..';
 import { BaseEntity } from '../base.entity';
 
 @Entity()

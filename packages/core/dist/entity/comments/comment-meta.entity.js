@@ -9,9 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __1 = require("..");
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("../base.entity");
+const comment_entity_1 = require("./comment.entity");
 let CommentMeta = class CommentMeta extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -34,11 +34,11 @@ __decorate([
     __metadata("design:type", Object)
 ], CommentMeta.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => __1.CommentEntity, comment => comment.metas, {
+    typeorm_1.ManyToOne(type => comment_entity_1.CommentEntity, comment => comment.metas, {
         onDelete: 'CASCADE',
     }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", __1.CommentEntity)
+    __metadata("design:type", comment_entity_1.CommentEntity)
 ], CommentMeta.prototype, "comment", void 0);
 CommentMeta = __decorate([
     typeorm_1.Entity(),

@@ -9,11 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _a;
-"use strict";
-const base_entity_1 = require("../base.entity");
-const user_entity_1 = require("user.entity");
 const typeorm_1 = require("typeorm");
+const base_entity_1 = require("../base.entity");
+const user_entity_1 = require("./user.entity");
 let UserMeta = class UserMeta extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -36,7 +34,7 @@ __decorate([
         onDelete: 'CASCADE',
     }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", typeof (_a = typeof user_entity_1.UserEntity !== "undefined" && user_entity_1.UserEntity) === "function" ? _a : Object)
+    __metadata("design:type", user_entity_1.UserEntity)
 ], UserMeta.prototype, "user", void 0);
 UserMeta = __decorate([
     typeorm_1.Entity(),

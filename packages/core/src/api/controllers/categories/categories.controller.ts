@@ -1,5 +1,6 @@
-import { CategoriesService } from '../../../service';
 import { Controller, Get, Param } from '@nestjs/common';
+
+import { CategoriesService } from '../../../service';
 
 @Controller('categories')
 export class CategoriesController {
@@ -14,7 +15,7 @@ export class CategoriesController {
   }
 
   @Get(':taxonomy/:slug')
-  findByTaxonomySlug(@Param('slug') slug, @Param('taxonomy') taxonomy): Promise<any> {
+  findByTaxonomySlug(@Param('slug') slug: any, @Param('taxonomy') taxonomy: any): Promise<any> {
     return this.categoriesService.findTermBySlug(taxonomy, slug);
   }
 }

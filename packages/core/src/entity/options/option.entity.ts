@@ -1,12 +1,12 @@
 import { IsJSON } from 'class-validator';
-import { DeepPartial, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Entity, Index, PrimaryColumn } from 'typeorm';
 import { Column } from 'typeorm';
 
 @Entity('options')
 @Index(['key'])
 export class Option {
-  constructor(input?: DeepPartial<Option>) {
-  }
+  // constructor(input?: DeepPartial<Option>) {
+  // }
   @Column({ type: 'varchar', length: 100 })
   @PrimaryColumn()
   key: string;

@@ -1,4 +1,3 @@
-import { TermTaxonomy } from '..';
 import { Column, Entity, Index, OneToOne, PrimaryColumn } from 'typeorm';
 
 /**

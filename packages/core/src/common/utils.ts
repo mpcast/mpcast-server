@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import { ID } from 'common/shared-types';
 
 /**
  * Takes a predicate function and returns a negated version.
@@ -117,5 +116,6 @@ function _formatMeta(item: any, clean?: boolean) {
     item.meta[meta.key] = meta.value;
   }
   Reflect.deleteProperty(item, 'metas');
+  // tslint:disable-next-line:no-unused-expression
   clean && Reflect.deleteProperty(item, 'meta');
 }

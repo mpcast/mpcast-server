@@ -1,7 +1,7 @@
-import { CommentEntity } from '../comments/comment.entity';
-import { PostMeta } from 'post-meta.entity';
 import { DeepPartial } from 'typeorm';
+import { CommentEntity } from '..';
 import { BaseEntity } from '../base.entity';
+import { PostMeta } from './post-meta.entity';
 export declare class PostEntity extends BaseEntity {
     constructor(input?: DeepPartial<PostEntity>);
     author: number;

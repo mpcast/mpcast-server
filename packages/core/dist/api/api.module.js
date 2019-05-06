@@ -6,14 +6,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const api_internal_modules_1 = require("api-internal-modules");
-const auth_guard_1 = require("middleware/guards/auth.guard");
-const humanized_auth_guard_1 = require("middleware/guards/humanized-auth.guard");
+const common_1 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
 const cache_module_1 = require("../cache/cache.module");
 const cache_interceptor_1 = require("../interceptors/cache.interceptor");
 const service_module_1 = require("../service/service.module");
-const common_1 = require("@nestjs/common");
-const core_1 = require("@nestjs/core");
+const api_internal_modules_1 = require("./api-internal-modules");
+const auth_guard_1 = require("./middleware/guards/auth.guard");
+const humanized_auth_guard_1 = require("./middleware/guards/humanized-auth.guard");
 let ApiModule = class ApiModule {
 };
 ApiModule = __decorate([

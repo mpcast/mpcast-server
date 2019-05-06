@@ -1,7 +1,8 @@
+import { DeepPartial, Entity, OneToMany } from 'typeorm';
+import { Column } from 'typeorm';
+
 import { CommentEntity, UserMeta } from '..';
 import { BaseEntity } from '../base.entity';
-import { DeepPartial, Entity, JoinColumn, OneToMany } from 'typeorm';
-import { Column } from 'typeorm';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {

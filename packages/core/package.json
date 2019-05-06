@@ -23,6 +23,8 @@
     "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.0.0",
     "@types/helmet": "^0.0.43",
+    "@types/mongoose": "^5.3.27",
+    "@types/passport-jwt": "^3.0.1",
     "akismet-api": "^4.2.0",
     "bcrypt": "^3.0.6",
     "cache-manager": "^2.9.0",

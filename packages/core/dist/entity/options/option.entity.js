@@ -13,8 +13,6 @@ const class_validator_1 = require("class-validator");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("typeorm");
 let Option = class Option {
-    constructor(input) {
-    }
 };
 __decorate([
     typeorm_2.Column({ type: 'varchar', length: 100 }),
@@ -39,8 +37,7 @@ __decorate([
 ], Option.prototype, "description", void 0);
 Option = __decorate([
     typeorm_1.Entity('options'),
-    typeorm_1.Index(['key']),
-    __metadata("design:paramtypes", [Object])
+    typeorm_1.Index(['key'])
 ], Option);
 exports.Option = Option;
 //# sourceMappingURL=option.entity.js.map

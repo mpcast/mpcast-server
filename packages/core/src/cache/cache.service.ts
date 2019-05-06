@@ -10,7 +10,9 @@ import * as schedule from 'node-schedule';
 // Cache 客户端管理器
 export interface ICacheManager {
   store: any;
+
   get(key: TCacheKey): any;
+
   set(key: TCacheKey, value: string, options?: { ttl: number }): any;
 }
 
@@ -21,12 +23,14 @@ export type TCacheResult<T> = Promise<T>;
 // IO 模式通用返回结构
 export interface ICacheIoResult<T> {
   get(): TCacheResult<T>;
+
   update(): TCacheResult<T>;
 }
 
 // Promise 模式参数
 export interface ICachePromiseOption<T> {
   key: TCacheKey;
+
   promise(): TCacheResult<T>;
 }
 
@@ -50,7 +54,9 @@ export interface ICacheIntervalTimingOption {
 // Interval 模式参数
 export interface ICacheIntervalOption<T> {
   key: TCacheKey;
+
   promise(): TCacheResult<T>;
+
   timeout?: ICacheIntervalTimeoutOption;
   timing?: ICacheIntervalTimingOption;
 }
@@ -108,13 +114,13 @@ export class CacheService {
    */
   promise<T>(options: ICachePromiseOption<T>): TCacheResult<T>;
   promise<T>(options: ICachePromiseIoOption<T>): ICacheIoResult<T>;
-  promise(options) {
+  promise(options: { key: string, promise: any, ioMode: boolean }) {
 
     const { key, promise, ioMode = false } = options;
 
     // 包装任务
-    const promiseTask = (resolve, reject) => {
-      return promise().then(data => {
+    const promiseTask = (resolve: any, reject: any) => {
+      return promise().then((data: any) => {
         this.set(key, data);
         resolve(data);
       }).catch(reject);
@@ -147,13 +153,13 @@ export class CacheService {
    */
   public interval<T>(options: ICacheIntervalOption<T>): TCacheIntervalResult<T>;
   public interval<T>(options: ICacheIntervalIOOption<T>): ICacheIoResult<T>;
-  public interval<T>(options) {
+  public interval<T>(options: any) {
 
     const { key, promise, timeout, timing, ioMode = false } = options;
 
     // 包装任务
     const promiseTask = (): Promise<T> => {
-      return promise().then(data => {
+      return promise().then((data: any) => {
         this.set(key, data);
         return Promise.resolve(data);
       });

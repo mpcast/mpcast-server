@@ -44,7 +44,7 @@ let CacheService = class CacheService {
     promise(options) {
         const { key, promise, ioMode = false } = options;
         const promiseTask = (resolve, reject) => {
-            return promise().then(data => {
+            return promise().then((data) => {
                 this.set(key, data);
                 resolve(data);
             }).catch(reject);
@@ -66,7 +66,7 @@ let CacheService = class CacheService {
     interval(options) {
         const { key, promise, timeout, timing, ioMode = false } = options;
         const promiseTask = () => {
-            return promise().then(data => {
+            return promise().then((data) => {
                 this.set(key, data);
                 return Promise.resolve(data);
             });

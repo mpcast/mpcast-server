@@ -4,12 +4,13 @@
  * @module decorator/query-params
  */
 
+import { createParamDecorator } from '@nestjs/common';
 import * as lodash from 'lodash';
 import { Types } from 'mongoose';
-import { createParamDecorator } from '@nestjs/common';
-import { HttpForbiddenError } from '../common/errors/forbidden.error';
+
 import { HttpBadRequestError } from '../common/errors/bad-request.error';
-import { EPublishState, EPublicState, EOriginState, ECommentState, ESortType } from '../common/types/interfaces/state.interface';
+import { HttpForbiddenError } from '../common/errors/forbidden.error';
+import { ECommentState, EOriginState, EPublicState, EPublishState, ESortType } from '../common/types/interfaces/state.interface';
 
 // 预置转换器可选字段
 export enum EQueryParamsField {
@@ -249,7 +250,7 @@ export const QueryParams = createParamDecorator((customConfig: TTransformConfig[
   ];
 
   // 验证字段是否被允许
-  const isEnableField = field => field != null && field !== false;
+  const isEnableField = (field: any) => field != null && field !== false;
 
   // 验证参数及生成参数
   validates.forEach(validate => {
@@ -281,14 +282,14 @@ export const QueryParams = createParamDecorator((customConfig: TTransformConfig[
   // 将所有待处理字段循环，将值循环至 querys
   todoFields.forEach(field => {
     const targetValue = request.query[field];
-    if (targetValue != null) querys[field] = targetValue;
+    if (targetValue != null) { querys[field] = targetValue; }
   });
 
   // 挂载到 request 上下文
   request.queryParams = { querys, options, params, isAuthenticated };
 
   // 来源 IP
-  const ip = (
+  const ip: any = (
     request.headers['x-forwarded-for'] ||
     request.headers['x-real-ip'] ||
     request.connection.remoteAddress ||
@@ -301,7 +302,19 @@ export const QueryParams = createParamDecorator((customConfig: TTransformConfig[
   // 用户标识
   const ua = request.headers['user-agent'];
 
-  const result = {
+  const result: {
+    querys: IQueryParamsConfig;
+    options: IQueryParamsConfig;
+    params: IQueryParamsConfig;
+    request: any;
+    origin: IQueryParamsConfig;
+    visitors: { // 访客信息
+      ip: string; // 真实 IP
+      ua: string; // 用户 UA
+      referer: string; // 跳转来源
+    };
+    isAuthenticated: boolean;
+  } = {
     querys,
     options,
     params,

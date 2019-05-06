@@ -9,7 +9,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import * as APP_CONFIG from '../app.config';
-import { AuthService } from '../service/services/auth.service';
+import { AuthService } from '../service';
 
 import { HttpUnauthorizedError } from './errors/unauthorized.error';
 

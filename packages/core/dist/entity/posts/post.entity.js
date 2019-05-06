@@ -9,11 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const comment_entity_1 = require("../comments/comment.entity");
-const post_meta_entity_1 = require("post-meta.entity");
 const class_validator_1 = require("class-validator");
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const base_entity_1 = require("../base.entity");
+const post_meta_entity_1 = require("./post-meta.entity");
 let PostEntity = class PostEntity extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -158,7 +158,7 @@ __decorate([
     __metadata("design:type", Array)
 ], PostEntity.prototype, "metas", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => comment_entity_1.CommentEntity, comment => comment.post, {
+    typeorm_1.OneToMany(type => __1.CommentEntity, comment => comment.post, {
         cascade: true,
     }),
     __metadata("design:type", Array)

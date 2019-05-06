@@ -1,7 +1,7 @@
-import { TMessage } from '../types/interfaces/http.interface';
 import { UnauthorizedException } from '@nestjs/common';
 
 import * as TEXT from '../constants/text.constant';
+import { TMessage } from '../types/interfaces/http.interface';
 
 /**
  * @class HttpUnauthorizedError

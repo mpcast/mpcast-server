@@ -4,8 +4,9 @@
  * @module error/validation
  */
 
-import * as TEXT from '../constants/text.constant';
 import { HttpException, HttpStatus } from '@nestjs/common';
+
+import * as TEXT from '../constants/text.constant';
 
 /**
  * @class ValidationError

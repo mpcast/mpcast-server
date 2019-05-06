@@ -1,9 +1,10 @@
-import { PostEntity, UserEntity } from '..';
-import { CommentMeta } from 'comment-meta.entity';
-import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
+import { PostEntity, UserEntity } from '..';
 import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+
+import { CommentMeta } from './comment-meta.entity';
 
 @Entity('comments')
 export class CommentEntity extends BaseEntity {

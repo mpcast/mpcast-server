@@ -34,7 +34,7 @@ let HttpExceptionFilter = class HttpExceptionFilter {
             status: http_interface_1.EHttpStatus.Error,
             message: errMessage,
             error: resultError,
-            debug: app_environment_1.isDevMode ? exception.stack : null,
+            debug: app_environment_1.isDevMode ? exception.stack : undefined,
         };
         if (status === common_1.HttpStatus.NOT_FOUND && data.error === 'Not Found') {
             data.error = `资源不存在`;

@@ -13,16 +13,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const TEXT = __importStar(require("../common/constants/text.constant"));
-const http_interface_1 = require("../common/types/interfaces/http.interface");
 const common_1 = require("@nestjs/common");
 const app_config_1 = require("../app.config");
 const app_environment_1 = require("../app.environment");
+const TEXT = __importStar(require("../common/constants/text.constant"));
+const http_interface_1 = require("../common/types/interfaces/http.interface");
 let OriginMiddleware = class OriginMiddleware {
     use(request, response, next) {
         if (app_environment_1.isProdMode) {
             const { origin, referer } = request.headers;
-            const checkHeader = field => !field || field.includes(app_config_1.CROSS_DOMAIN.allowedReferer);
+            const checkHeader = (field) => !field || field.includes(app_config_1.CROSS_DOMAIN.allowedReferer);
             const isVerifiedOrigin = checkHeader(origin);
             const isVerifiedReferer = checkHeader(referer);
             if (!isVerifiedOrigin && !isVerifiedReferer) {

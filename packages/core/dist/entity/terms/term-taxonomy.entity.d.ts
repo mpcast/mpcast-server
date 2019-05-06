@@ -1,7 +1,7 @@
-import { Term } from 'term.entity';
 import { DeepPartial } from 'typeorm';
 import { ID } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+import { Term } from './term.entity';
 export declare class TermTaxonomy extends BaseEntity {
     constructor(input?: DeepPartial<TermTaxonomy>);
     term: Term;

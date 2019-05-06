@@ -1,6 +1,8 @@
-import { BaseEntity } from '../base.entity';
-import { UserEntity } from 'user.entity';
 import { Column, DeepPartial, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
+import { BaseEntity } from '../base.entity';
+
+import { UserEntity } from './user.entity';
 
 @Entity()
 export class UserMeta extends BaseEntity {
