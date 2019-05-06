@@ -1,16 +1,14 @@
+import { Connection } from 'typeorm';
+import { CategoriesService, OptionService } from '..';
 import { IPaginationOptions, Pagination } from '../../common/paginate';
 import { ID } from '../../common/shared-types';
 import { EUserPostsBehavior } from '../../common/types/common-types';
-import { PostEntity, PostMeta, UserEntity } from '../../entity';
-import { CategoriesService, OptionService } from '..';
-import { Connection, Repository } from 'typeorm';
+import { PostEntity, PostMeta } from '../../entity';
 export declare class PostService {
     private connection;
-    private readonly usersRepository;
-    private readonly postRepository;
     private readonly categoriesService;
     private readonly optionService;
-    constructor(connection: Connection, usersRepository: Repository<UserEntity>, postRepository: Repository<PostEntity>, categoriesService: CategoriesService, optionService: OptionService);
+    constructor(connection: Connection, categoriesService: CategoriesService, optionService: OptionService);
     findById(id: ID): Promise<PostEntity>;
     loadBLock(blocks: number[]): Promise<any[]>;
     getFormatData(item: PostEntity): Promise<PostEntity>;

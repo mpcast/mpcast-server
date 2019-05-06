@@ -36,7 +36,7 @@ let AuthService = class AuthService {
     }
     async validateAuthData(payload) {
         if (payload.type === 'wechat' || payload.type === 'member') {
-            const user = await this.connection.getRepository(entity_1.UserEntity).findOne({
+            const user = await this.connection.getRepository(entity_1.User).findOne({
                 identifier: payload.identifier,
             });
             if (user) {
@@ -60,7 +60,7 @@ let AuthService = class AuthService {
         });
     }
     async verifyUserPassword(userId, password) {
-        const user = await this.connection.getRepository(entity_1.UserEntity).findOne({
+        const user = await this.connection.getRepository(entity_1.User).findOne({
             loadEagerRelations: false,
             where: {
                 id: userId,
@@ -77,7 +77,7 @@ let AuthService = class AuthService {
         return true;
     }
     async getUserFromIdentifier(identifier) {
-        const user = await this.connection.getRepository(entity_1.UserEntity).findOne({
+        const user = await this.connection.getRepository(entity_1.User).findOne({
             where: {
                 identifier,
             },

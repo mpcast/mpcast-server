@@ -18,18 +18,17 @@ const typeorm_2 = require("typeorm");
 const entity_1 = require("../../entity");
 const patch_entity_1 = require("../helpers/utils/patch-entity");
 let UserService = class UserService {
-    constructor(connection, userRepository) {
+    constructor(connection) {
         this.connection = connection;
-        this.userRepository = userRepository;
     }
     create(newUser) {
-        return this.userRepository.save(newUser).then(user => {
+        return this.connection.getRepository(entity_1.User).save(newUser).then(user => {
             return user;
         });
     }
     async createOrUpdate(input) {
         let user;
-        const existing = await this.userRepository.findOne({
+        const existing = await this.connection.getRepository(entity_1.User).findOne({
             where: {
                 identifier: input.identifier,
             },
@@ -38,15 +37,15 @@ let UserService = class UserService {
             user = patch_entity_1.patchEntity(existing, input);
         }
         else {
-            user = new entity_1.UserEntity(input);
+            user = new entity_1.User(input);
         }
-        return this.userRepository.save(user);
+        return this.connection.getRepository(entity_1.User).save(user);
     }
     async updateUser(user) {
-        return await this.userRepository.save(user);
+        return await this.connection.getRepository(entity_1.User).save(user);
     }
     getDetailById(id) {
-        return this.userRepository.findOne({
+        return this.connection.getRepository(entity_1.User).findOne({
             relations: ['metas'],
             where: {
                 id,
@@ -54,10 +53,10 @@ let UserService = class UserService {
         });
     }
     getUsersDetailByIds(ids) {
-        return this.userRepository.findByIds(ids);
+        return this.connection.getRepository(entity_1.User).findByIds(ids);
     }
     findByIdentifier(identifier) {
-        return this.userRepository.findOne({
+        return this.connection.getRepository(entity_1.User).findOne({
             relations: ['metas'],
             where: {
                 identifier,
@@ -68,9 +67,7 @@ let UserService = class UserService {
 UserService = __decorate([
     common_1.Injectable(),
     __param(0, typeorm_1.InjectConnection()),
-    __param(1, typeorm_1.InjectRepository(entity_1.UserEntity)),
-    __metadata("design:paramtypes", [typeorm_2.Connection,
-        typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Connection])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

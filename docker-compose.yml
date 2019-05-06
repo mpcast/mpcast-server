@@ -16,7 +16,7 @@ services:
     volumes:
       - redis-vol:/bitnami/redis/data
     networks:
-      - db
+      - database
   #    volumes:
   #      - redis-data:/data
   mysql:
@@ -31,10 +31,26 @@ services:
       - MYSQL_ROOT_PASSWORD=abcd1234
       - MYSQL_PASSWORD=abcd1234
     volumes:
-#      - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      #      - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
       - mysql_vol:/var/lib/mysql
     networks:
-      - db
+      - database
+  db:
+    image: mysql:5.7
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES UTF8MB4;' --sql-mode="NO_ENGINE_SUBSTITUTION" --innodb-flush-log-at-trx-commit=0
+    environment:
+      - MYSQL_DATABASE=mpcast
+      - MYSQL_ROOT_PASSWORD=abcd1234
+      - MYSQL_PASSWORD=abcd1234
+    volumes:
+      #      - ./mysql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - db_vol:/var/lib/mysql
+    networks:
+      - database
 #  caixie.love_api:
 #    tty: true
 #    stdin_open: true
@@ -67,10 +83,11 @@ services:
 #      - redis
 volumes:
   mysql_vol:
+  db_vol:
   redis-vol:
   app-vol:
 networks:
-  db:
+  database:
   traefik:
     external:
       name: traefik

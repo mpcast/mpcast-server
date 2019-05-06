@@ -10,10 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
 const base_entity_1 = require("../base.entity");
 const comment_meta_entity_1 = require("./comment-meta.entity");
-let CommentEntity = class CommentEntity extends base_entity_1.BaseEntity {
+let Comment = class Comment extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
     }
@@ -26,13 +25,13 @@ __decorate([
         comment: '内容状态',
     }),
     __metadata("design:type", String)
-], CommentEntity.prototype, "approved", void 0);
+], Comment.prototype, "approved", void 0);
 __decorate([
     typeorm_1.Column('text', {
         comment: '留言内容',
     }),
     __metadata("design:type", String)
-], CommentEntity.prototype, "content", void 0);
+], Comment.prototype, "content", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'varchar',
@@ -40,13 +39,13 @@ __decorate([
         comment: 'IP 地址',
     }),
     __metadata("design:type", String)
-], CommentEntity.prototype, "ip", void 0);
+], Comment.prototype, "ip", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'int',
     }),
     __metadata("design:type", Number)
-], CommentEntity.prototype, "commentCount", void 0);
+], Comment.prototype, "commentCount", void 0);
 __decorate([
     typeorm_1.Column({
         comment: '父级内容',
@@ -55,24 +54,16 @@ __decorate([
         default: 0,
     }),
     __metadata("design:type", Number)
-], CommentEntity.prototype, "parent", void 0);
+], Comment.prototype, "parent", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => comment_meta_entity_1.CommentMeta, commentMeta => commentMeta.comment, {
+    typeorm_1.OneToMany(type => comment_meta_entity_1.CommentMeta, commentMeta => commentMeta.replay, {
         cascade: true,
     }),
     __metadata("design:type", Array)
-], CommentEntity.prototype, "metas", void 0);
-__decorate([
-    typeorm_1.ManyToOne(type => __1.PostEntity, post => post.comments, {}),
-    __metadata("design:type", __1.PostEntity)
-], CommentEntity.prototype, "post", void 0);
-__decorate([
-    typeorm_1.ManyToOne(type => __1.UserEntity, user => user.comments, {}),
-    __metadata("design:type", __1.UserEntity)
-], CommentEntity.prototype, "user", void 0);
-CommentEntity = __decorate([
+], Comment.prototype, "metas", void 0);
+Comment = __decorate([
     typeorm_1.Entity('comments'),
     __metadata("design:paramtypes", [Object])
-], CommentEntity);
-exports.CommentEntity = CommentEntity;
+], Comment);
+exports.Comment = Comment;
 //# sourceMappingURL=comment.entity.js.map

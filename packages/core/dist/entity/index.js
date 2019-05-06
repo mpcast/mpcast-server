@@ -8,11 +8,10 @@ __export(require("./terms/term-meta.entity"));
 __export(require("./terms/term.entity"));
 __export(require("./terms/term-relationships.entity"));
 __export(require("./terms/term-taxonomy.entity"));
-__export(require("./users/user.entity"));
 __export(require("./users/user-meta.entity"));
-__export(require("./posts/post.entity"));
+__export(require("./users/user.entity"));
 __export(require("./posts/post-meta.entity"));
-__export(require("./comments/comment.entity"));
+__export(require("./posts/post.entity"));
 __export(require("./comments/comment-meta.entity"));
-__export(require("./options/option.entity"));
+__export(require("./comments/comment.entity"));
 //# sourceMappingURL=index.js.map

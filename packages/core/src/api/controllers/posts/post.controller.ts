@@ -6,7 +6,7 @@ import { EUserPostsBehavior } from '../../../common/types/common-types';
 import { formatAllMeta, formatOneMeta } from '../../../common/utils';
 import { HttpProcessor } from '../../../decorators/http.decorator';
 import { IQueryParamsResult, QueryParams } from '../../../decorators/query-params.decorator';
-import { CommentEntity, PostEntity, Term } from '../../../entity';
+import { Comment, PostEntity, Term } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
@@ -195,18 +195,12 @@ export class PostController {
     @Param('id') postId: ID,
     @Req() req: any,
     @QueryParams() params: IQueryParamsResult,
-    @Body() comment: CommentEntity,
+    @Body() comment: Comment,
   ) {
     // { visitors: { ip } }
     // const { visitors: any } = params;
     const ip = params.visitors.ip;
-    const commentInput = new CommentEntity({
-      user: {
-        id: req.user.id,
-      },
-      post: {
-        id: postId,
-      },
+    const commentInput = new Comment({
       ip,
       ...comment,
     });

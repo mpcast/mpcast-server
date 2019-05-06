@@ -14,7 +14,7 @@ import { HttpUnauthorizedError } from '../../common/errors/unauthorized.error';
 import { ID } from '../../common/shared-types';
 import { ITokenResult } from '../../common/types/common-types';
 import { formatOneMeta } from '../../common/utils';
-import { UserEntity } from '../../entity';
+import { User } from '../../entity';
 import { PasswordCiper } from '../helpers/password-cipher/password-ciper';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class AuthService {
     // IF 是微信，返回唯一标识，一般为用户的 openid
     // IF Member 成员，会处理权限等，暂时未处理
     if (payload.type === 'wechat' || payload.type === 'member') {
-      const user = await this.connection.getRepository(UserEntity).findOne({
+      const user = await this.connection.getRepository(User).findOne({
         identifier: payload.identifier,
       });
       if (user) {
@@ -95,14 +95,14 @@ export class AuthService {
    * @param password
    */
   async verifyUserPassword(userId: ID, password: string): Promise<boolean> {
-    // const user = await this.connection.getRepository(UserEntity).findOne(userId);
-    const user = await this.connection.getRepository(UserEntity).findOne({
+    // const user = await this.connection.getRepository(User).findOne(userId);
+    const user = await this.connection.getRepository(User).findOne({
       loadEagerRelations: false,
       where: {
         id: userId,
       },
       select: ['passwordHash'],
-    }) as UserEntity;
+    }) as User;
 
     if (!user) {
       throw new HttpUnauthorizedError();
@@ -120,7 +120,7 @@ export class AuthService {
    * @param identifier
    */
   async getUserFromIdentifier(identifier: string) {
-    const user = await this.connection.getRepository(UserEntity).findOne({
+    const user = await this.connection.getRepository(User).findOne({
       where: {
         identifier,
       },

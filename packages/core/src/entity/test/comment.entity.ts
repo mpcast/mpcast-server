@@ -1,9 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
+import { CommentMeta, PostEntity, User } from '..';
 import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
-import { CommentMeta } from './comment-meta.entity';
-import { User } from '..';
 
 @Entity('comments')
 export class Comment extends BaseEntity {
@@ -44,16 +43,22 @@ export class Comment extends BaseEntity {
   })
   parent: number;
 
-  @OneToMany(type => CommentMeta, commentMeta => commentMeta.replay, {
-    cascade: true,
-  })
-  metas?: CommentMeta[];
-
-  // @ManyToOne(type => PostEntity, post => post.replies, {})
-  // post: PostEntity;
-  //
-  // @ManyToOne(type => User, user => user.comments, {
-  //   onDelete: 'CASCADE',
+  // @OneToMany(type => CommentMeta, commentMeta => commentMeta.comment, {
+  //   cascade: true,
   // })
-  // user: User;
+  // metas?: CommentMeta[];
+
+  @OneToMany(type => Comment, comment => comment.relay)
+  reference?: Comment;
+
+  @ManyToOne(type => Comment, comment => comment.reference)
+  relay?: Comment;
+
+  @ManyToOne(type => PostEntity, post => post.comments, {})
+  post: PostEntity;
+
+  @ManyToOne(type => User, user => user.comments, {
+    onDelete: 'CASCADE',
+  })
+  author: User;
 }

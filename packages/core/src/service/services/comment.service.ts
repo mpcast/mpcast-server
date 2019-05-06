@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, In, Repository } from 'typeorm';
+import { InjectConnection } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
 
 import { IPaginationOptions, paginate, Pagination } from '../../common/paginate';
 import { ID } from '../../common/shared-types';
 import { formatAllMeta, formatOneMeta } from '../../common/utils';
-import { CommentEntity, UserEntity } from '../../entity';
+import { Comment } from '../../entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectConnection() private connection: Connection,
-    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
   ) {
   }
 
@@ -19,8 +18,8 @@ export class CommentService {
    * 分页查询全部评论
    * @param options
    */
-  async paginate(options: IPaginationOptions): Promise<Pagination<CommentEntity>> {
-    const paginationObj = await paginate<CommentEntity>(this.connection.getRepository(CommentEntity), options, {
+  async paginate(options: IPaginationOptions): Promise<Pagination<Comment>> {
+    const paginationObj = await paginate<Comment>(this.connection.getRepository(Comment), options, {
       relations: ['user'],
       // 仅加载 postId
       loadRelationIds: {
@@ -40,7 +39,7 @@ export class CommentService {
    * @param id
    */
   async findById(id: ID) {
-    const data = await this.connection.getRepository(CommentEntity).findOne({
+    const data = await this.connection.getRepository(Comment).findOne({
       relations: ['user'],
       where: {
         id,
@@ -57,8 +56,8 @@ export class CommentService {
    * 创建新评论
    * @param comment
    */
-  async create(comment: CommentEntity) {
-    const data = await this.connection.getRepository(CommentEntity).save(comment);
+  async create(comment: Comment) {
+    const data = await this.connection.getRepository(Comment).save(comment);
     formatOneMeta(data);
     return data;
   }

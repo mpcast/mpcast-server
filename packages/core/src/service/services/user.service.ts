@@ -4,26 +4,25 @@ import { Connection, Repository } from 'typeorm';
 
 import { UserDto } from '../../api/dtos/user.dto';
 import { ID } from '../../common/shared-types';
-import { UserEntity } from '../../entity';
+import { User } from '../../entity';
 import { patchEntity } from '../helpers/utils/patch-entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
-    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {
   }
 
-  public create(newUser: UserDto): Promise<UserEntity> {
-    return this.userRepository.save(newUser).then(user => {
+  public create(newUser: UserDto): Promise<User> {
+    return this.connection.getRepository(User).save(newUser).then(user => {
       return user;
     });
   }
 
-  async createOrUpdate(input: Partial<UserEntity>): Promise<UserEntity> {
-    let user: UserEntity;
-    const existing = await this.userRepository.findOne({
+  async createOrUpdate(input: Partial<User>): Promise<User> {
+    let user: User;
+    const existing = await this.connection.getRepository(User).findOne({
       where: {
         identifier: input.identifier,
       },
@@ -32,10 +31,10 @@ export class UserService {
       user = patchEntity(existing, input);
       // user = new Users(input);
     } else {
-      user = new UserEntity(input);
+      user = new User(input);
     }
 
-    return this.userRepository.save(user);
+    return this.connection.getRepository(User).save(user);
   }
 
 // 创建几个相片
@@ -45,13 +44,13 @@ export class UserService {
 //   photo.filename = "photo-with-bears.jpg";
 //   photo.albums = [album1, album2];
 //   await connection.manager.save(photo);
-  async updateUser(user: UserEntity): Promise<UserEntity> {
-    return await this.userRepository.save(user);
+  async updateUser(user: User): Promise<User> {
+    return await this.connection.getRepository(User).save(user);
     // this.connection.getRepository(UserMeta).save()
   }
 
-  public getDetailById(id: number): Promise<UserEntity | undefined> {
-    return this.userRepository.findOne({
+  public getDetailById(id: number): Promise<User | undefined> {
+    return this.connection.getRepository(User).findOne({
       relations: ['metas'],
       where: {
         id,
@@ -64,15 +63,15 @@ export class UserService {
    * @param ids
    */
   getUsersDetailByIds(ids: ID[]) {
-    return this.userRepository.findByIds(ids);
+    return this.connection.getRepository(User).findByIds(ids);
   }
 
   /**
    * 按用户唯一标识查询用户是否存在
    * @param identifier
    */
-  findByIdentifier(identifier: string): Promise<UserEntity | undefined> {
-    return this.userRepository.findOne({
+  findByIdentifier(identifier: string): Promise<User | undefined> {
+    return this.connection.getRepository(User).findOne({
       relations: ['metas'],
       where: {
         identifier,

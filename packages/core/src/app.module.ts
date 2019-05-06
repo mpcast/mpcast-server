@@ -1,13 +1,14 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { ApiModule } from './api/api.module';
+import { CacheModule } from './cache/cache.module';
+import { ConfigService } from './config';
 import { ConfigModule } from './config/config.module';
-import { ConfigService } from './config/config.service';
-import { CorsMiddleware } from './middlewares/cors.middleware';
-import { OriginMiddleware } from './middlewares/origin.middleware';
+// import { CorsMiddleware } from './middlewares/cors.middleware';
+// import { OriginMiddleware } from './middlewares/origin.middleware';
 
 @Module({
-  imports: [ConfigModule, ApiModule],
+  imports: [CacheModule, ConfigModule, ApiModule],
 })
 export class AppModule implements NestModule {
   constructor(private configService: ConfigService) {
@@ -22,6 +23,6 @@ export class AppModule implements NestModule {
     // for (const [route, handlers] of Object.entries(middlewareByRoute)) {
     //   consumer.apply(...handlers).forRoutes(route);
     // }
-    consumer.apply(CorsMiddleware, OriginMiddleware).forRoutes('*');
+    // consumer.apply(CorsMiddleware, OriginMiddleware).forRoutes('*');
   }
 }

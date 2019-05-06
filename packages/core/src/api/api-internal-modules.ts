@@ -35,7 +35,7 @@ const controllers = [
     }),
   ],
   controllers: [...controllers],
-  providers: [ServiceModule, JwtStrategy],
+  providers: [ServiceModule],
 })
 export class RestApiModule {
 }

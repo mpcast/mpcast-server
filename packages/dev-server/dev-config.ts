@@ -12,7 +12,7 @@ export const devConfig: MpcastConfig = {
   },
   port: API_PORT,
   dbConnectionOptions: {
-    synchronize: false,
+    synchronize: true,
     logging: false,
     ...getDbConfig(),
   },
@@ -50,6 +50,8 @@ function getDbConfig(): ConnectionOptions {
         username: 'root',
         password: 'abcd1234',
         database: 'mpcast',
+        dropSchema: true,
+        // database: 'mpcast',
       };
   }
 }

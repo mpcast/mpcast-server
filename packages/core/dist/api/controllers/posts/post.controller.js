@@ -149,11 +149,7 @@ let PostController = class PostController {
     }
     async newComment(postId, req, params, comment) {
         const ip = params.visitors.ip;
-        const commentInput = new entity_1.CommentEntity(Object.assign({ user: {
-                id: req.user.id,
-            }, post: {
-                id: postId,
-            }, ip }, comment));
+        const commentInput = new entity_1.Comment(Object.assign({ ip }, comment));
         const data = await this.commentService.create(commentInput);
         return data;
     }
@@ -316,7 +312,7 @@ __decorate([
     __param(2, query_params_decorator_1.QueryParams()),
     __param(3, common_1.Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object, entity_1.CommentEntity]),
+    __metadata("design:paramtypes", [Object, Object, Object, entity_1.Comment]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "newComment", null);
 __decorate([

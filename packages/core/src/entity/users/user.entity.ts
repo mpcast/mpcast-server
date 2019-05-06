@@ -1,12 +1,14 @@
-import { DeepPartial, Entity, OneToMany } from 'typeorm';
+import { Entity, OneToMany } from 'typeorm';
 import { Column } from 'typeorm';
 
-import { CommentEntity, UserMeta } from '..';
+// import { CommentEntity, UserMeta } from '..';
+import { Comment, UserMeta } from '..';
+import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
 
 @Entity('users')
-export class UserEntity extends BaseEntity {
-  constructor(input?: DeepPartial<UserEntity>) {
+export class User extends BaseEntity {
+  constructor(input?: DeepPartial<User>) {
     super(input);
   }
 
@@ -42,8 +44,8 @@ export class UserEntity extends BaseEntity {
   })
   metas?: UserMeta[];
 
-  @OneToMany(type => CommentEntity, comment => comment.user, {
-    cascade: true,
-  })
-  comments?: CommentEntity[];
+  // @OneToMany(type => Comment, comment => comment.user)
+  // comments?: Comment[];
+  // @OneToMany(type => Replay, comment => comment.user)
+  // replies?: Replay[];
 }

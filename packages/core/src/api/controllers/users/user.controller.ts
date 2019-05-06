@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 
 import { formatOneMeta } from '../../../common/utils';
-import { UserEntity } from '../../../entity';
+import { User } from '../../../entity';
 import { UserService } from '../../../service';
 import { UserDto } from '../../dtos/user.dto';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
@@ -15,7 +15,7 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() userInput: UserDto): Promise<UserEntity> {
+  createUser(@Body() userInput: UserDto): Promise<User> {
     return this.userService.create({
       ...userInput,
     });

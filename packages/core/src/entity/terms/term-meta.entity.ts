@@ -1,5 +1,8 @@
-import { Column, DeepPartial, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
+import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+
 import { Term } from './term.entity';
 
 // @Index(['name'], { unique: true })

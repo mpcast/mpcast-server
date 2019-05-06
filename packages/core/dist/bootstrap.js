@@ -40,20 +40,25 @@ async function bootstrap(userConfig) {
 }
 exports.bootstrap = bootstrap;
 async function preBootstrapConfig(userConfig) {
-    console.log('config ....');
     if (userConfig) {
         config_helpers_1.setConfig(userConfig);
     }
     const entities = await getAllEntities(userConfig);
     const { coreSubscribersMap } = await Promise.resolve().then(() => __importStar(require('./entity/subscribers')));
+    console.log(userConfig);
+    config_helpers_1.setConfig({
+        dbConnectionOptions: {
+            entities,
+        },
+    });
     const config = config_helpers_1.getConfig();
+    console.log(config);
     config_1.Logger.useLogger(config.logger);
     return config;
 }
 exports.preBootstrapConfig = preBootstrapConfig;
 async function getAllEntities(userConfig) {
     const { coreEntitiesMap } = await Promise.resolve().then(() => __importStar(require('./entity/entities')));
-    console.log(coreEntitiesMap);
     const coreEntities = Object.values(coreEntitiesMap);
     console.log(coreEntities);
     return [...coreEntities];

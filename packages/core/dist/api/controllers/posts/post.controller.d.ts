@@ -1,6 +1,6 @@
 import { ID } from '../../../common/shared-types';
 import { IQueryParamsResult } from '../../../decorators/query-params.decorator';
-import { CommentEntity, PostEntity } from '../../../entity';
+import { Comment, PostEntity } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
 export declare class PostController {
     private readonly userService;
@@ -16,15 +16,15 @@ export declare class PostController {
         found: number;
         iView: boolean;
         postId: ID;
-        views: import("../../../entity/index").UserEntity[];
+        views: import("../../../entity/index").User[];
     }>;
     newViewer(postId: ID, req: any, params: IQueryParamsResult): Promise<{
         iView: boolean;
         viewCount: number;
         postId: ID;
     }>;
-    getComments(postId: ID, req: any, page: number, limit: number): Promise<import("../../../common/paginate/pagination").Pagination<CommentEntity>>;
-    newComment(postId: ID, req: any, params: IQueryParamsResult, comment: CommentEntity): Promise<CommentEntity>;
+    getComments(postId: ID, req: any, page: number, limit: number): Promise<import("../../../common/paginate/pagination").Pagination<Comment>>;
+    newComment(postId: ID, req: any, params: IQueryParamsResult, comment: Comment): Promise<Comment>;
     one(id: ID): Promise<any>;
     private decoratorSingleData;
     private dealDataList;

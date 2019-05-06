@@ -1,5 +1,6 @@
-import { Column, DeepPartial, Entity, OneToOne } from 'typeorm';
+import { Column,  Entity, OneToOne } from 'typeorm';
 
+import { DeepPartial } from '../../common/shared-types';
 import { ID } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
 

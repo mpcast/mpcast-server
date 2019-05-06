@@ -1,13 +1,14 @@
-import { IPaginationOptions, paginate, Pagination } from '../../common/paginate';
-import { ID } from '../../common/shared-types';
-import { EUserPostsBehavior } from '../../common/types/common-types';
-import { formatAllMeta, formatOneMeta } from '../../common/utils';
-import { PostEntity, PostMeta, Term, TermRelationships, TermTaxonomy, UserEntity } from '../../entity';
-import { CategoriesService, OptionService } from '..';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { Connection, In, Repository } from 'typeorm';
+
+import { CategoriesService, OptionService } from '..';
+import { IPaginationOptions, paginate, Pagination } from '../../common/paginate';
+import { ID } from '../../common/shared-types';
+import { EUserPostsBehavior } from '../../common/types/common-types';
+import { formatAllMeta, formatOneMeta } from '../../common/utils';
+import { PostEntity, PostMeta, Term, TermRelationships, TermTaxonomy, User } from '../../entity';
 // import { rpc } from 'qiniu';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
@@ -16,8 +17,8 @@ import { Connection, In, Repository } from 'typeorm';
 export class PostService {
   constructor(
     @InjectConnection() private connection: Connection,
-    @InjectRepository(UserEntity) private readonly usersRepository: Repository<UserEntity>,
-    @InjectRepository(PostEntity) private readonly postRepository: Repository<PostEntity>,
+    // @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    // @InjectRepository(PostEntity) private readonly postRepository: Repository<PostEntity>,
     // private optionsService
     private readonly categoriesService: CategoriesService,
     private readonly optionService: OptionService,
@@ -29,7 +30,7 @@ export class PostService {
    * @param id
    */
   async findById(id: ID): Promise<PostEntity> {
-    const data: PostEntity = await this.postRepository.findOneOrFail({
+    const data: PostEntity = await this.connection.getRepository(PostEntity).findOneOrFail({
       where: {
         id,
       },
@@ -63,7 +64,7 @@ export class PostService {
     // 1 如果仅有一项内容，暂存至数组，后续批量获取
     // 2 如果有多项内容，直接批量获取
     for (const item of dataList) {
-      const typeObject = <Term> await this.categoriesService.formatTermForObject(item.id);
+      const typeObject = await this.categoriesService.formatTermForObject(item.id) as Term;
       if (!_.isEmpty(typeObject)) {
         item.type = typeObject.slug;
         await this.getFormatData(item);
@@ -143,7 +144,7 @@ export class PostService {
    */
   async paginate(options: IPaginationOptions): Promise<Pagination<PostEntity>> {
     // this.postRepository.findAndCount()
-    return await paginate<PostEntity>(this.postRepository, options, {
+    return await paginate<PostEntity>(this.connection.getRepository(PostEntity), options, {
       type: 'page',
     });
   }
@@ -367,7 +368,7 @@ export class PostService {
     if (userId) {
       where.author = userId;
     }
-    return await this.postRepository.find({
+    return await this.connection.getRepository(PostEntity).find({
         where,
         take: take || 10,
         skip: 0,

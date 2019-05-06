@@ -30,11 +30,11 @@ __decorate([
     __metadata("design:type", Object)
 ], UserMeta.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => user_entity_1.UserEntity, user => user.metas, {
+    typeorm_1.ManyToOne(type => user_entity_1.User, user => user.metas, {
         onDelete: 'CASCADE',
     }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", user_entity_1.UserEntity)
+    __metadata("design:type", user_entity_1.User)
 ], UserMeta.prototype, "user", void 0);
 UserMeta = __decorate([
     typeorm_1.Entity(),

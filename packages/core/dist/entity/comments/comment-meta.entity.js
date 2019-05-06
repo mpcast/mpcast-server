@@ -34,12 +34,11 @@ __decorate([
     __metadata("design:type", Object)
 ], CommentMeta.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => comment_entity_1.CommentEntity, comment => comment.metas, {
+    typeorm_1.ManyToOne(type => comment_entity_1.Comment, comment => comment.metas, {
         onDelete: 'CASCADE',
     }),
-    typeorm_1.JoinColumn(),
-    __metadata("design:type", comment_entity_1.CommentEntity)
-], CommentMeta.prototype, "comment", void 0);
+    __metadata("design:type", comment_entity_1.Comment)
+], CommentMeta.prototype, "replay", void 0);
 CommentMeta = __decorate([
     typeorm_1.Entity(),
     __metadata("design:paramtypes", [Object])

@@ -12,16 +12,16 @@ const term_entity_1 = require("./terms/term.entity");
 const user_meta_entity_1 = require("./users/user-meta.entity");
 const user_entity_1 = require("./users/user.entity");
 exports.coreEntitiesMap = {
-    CommentMeta: comment_meta_entity_1.CommentMeta,
-    CommentEntity: comment_entity_1.CommentEntity,
     Option: option_entity_1.Option,
-    PostMeta: post_meta_entity_1.PostMeta,
-    PostEntity: post_entity_1.PostEntity,
     TermMeta: term_meta_entity_1.TermMeta,
     TermTaxonomy: term_taxonomy_entity_1.TermTaxonomy,
     TermRelationships: term_relationships_entity_1.TermRelationships,
     Term: term_entity_1.Term,
+    CommentMeta: comment_meta_entity_1.CommentMeta,
+    Comment: comment_entity_1.Comment,
+    PostMeta: post_meta_entity_1.PostMeta,
+    PostEntity: post_entity_1.PostEntity,
     UserMeta: user_meta_entity_1.UserMeta,
-    UserEntity: user_entity_1.UserEntity,
+    User: user_entity_1.User,
 };
 //# sourceMappingURL=entities.js.map

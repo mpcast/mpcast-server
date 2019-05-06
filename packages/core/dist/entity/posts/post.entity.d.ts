@@ -1,5 +1,4 @@
-import { DeepPartial } from 'typeorm';
-import { CommentEntity } from '..';
+import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
 import { PostMeta } from './post-meta.entity';
 export declare class PostEntity extends BaseEntity {
@@ -21,5 +20,4 @@ export declare class PostEntity extends BaseEntity {
     menuOrder: number;
     sort: number;
     metas?: PostMeta[];
-    comments?: CommentEntity[];
 }

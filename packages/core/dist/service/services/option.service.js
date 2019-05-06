@@ -27,9 +27,8 @@ const cache_service_1 = require("../../cache/cache.service");
 const CACHE_KEY = __importStar(require("../../common/constants/cache.constant"));
 const entity_1 = require("../../entity");
 let OptionService = class OptionService {
-    constructor(connection, optionRepository, cacheService) {
+    constructor(connection, cacheService) {
         this.connection = connection;
-        this.optionRepository = optionRepository;
         this.cacheService = cacheService;
     }
     async initOptions() {
@@ -41,7 +40,7 @@ let OptionService = class OptionService {
         }
         let cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
         if (_.isEmpty(cacheOptions)) {
-            const data = await this.optionRepository.find();
+            const data = await this.connection.getRepository(entity_1.Option).find();
             const result = {};
             data.forEach(item => {
                 result[item.key] = item.value;
@@ -119,9 +118,7 @@ let OptionService = class OptionService {
 OptionService = __decorate([
     common_1.Injectable(),
     __param(0, typeorm_1.InjectConnection()),
-    __param(1, typeorm_1.InjectRepository(entity_1.Option)),
     __metadata("design:paramtypes", [typeorm_2.Connection,
-        typeorm_2.Repository,
         cache_service_1.CacheService])
 ], OptionService);
 exports.OptionService = OptionService;

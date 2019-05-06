@@ -18,6 +18,8 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { ValidationPipe } from './pipes/validation.pipe';
+// import { EntitySchema, EntitySubscriberInterface } from 'typeorm';
+// import { logColored } from '../cli/cli-utils';
 
 export type BootstrapFunction = (config: MpcastConfig) => Promise<INestApplication>;
 
@@ -70,7 +72,6 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
 export async function preBootstrapConfig(
   userConfig: Partial<MpcastConfig>,
 ): Promise<ReadOnlyRequired<MpcastConfig>> {
-  console.log('config ....');
   if (userConfig) {
     setConfig(userConfig);
   }
@@ -82,6 +83,7 @@ export async function preBootstrapConfig(
   // const pluginEntities = getEntitiesFromPlugins(userConfig);
   const entities = await getAllEntities(userConfig);
   const { coreSubscribersMap } = await import('./entity/subscribers');
+  console.log(userConfig);
   /**
    * Entities to be loaded for this connection.
    * Accepts both entity classes and directories where from entities need to be loaded.
@@ -94,12 +96,14 @@ export async function preBootstrapConfig(
    * Directories support glob patterns.
    */
 // readonly subscribers?: (Function | string)[];
-//   setConfig({
-//     dbConnectionOptions: {
-//       entities,
-//     },
-//   });
+  //tslint:disable
+  setConfig({
+    dbConnectionOptions: {
+      entities,
+    },
+  });
   const config = getConfig();
+  console.log(config);
   Logger.useLogger(config.logger);
   return config;
 }
@@ -107,11 +111,12 @@ export async function preBootstrapConfig(
 /**
  * Returns an array of core entities and any additional entities defined in plugins.
  */
-async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<Array<Type<any>>> {
+async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<any[]> {
 // readonly entities?: ((Function | string | EntitySchema<any>))[];
   const { coreEntitiesMap } = await import('./entity/entities');
-  console.log(coreEntitiesMap);
-  const coreEntities = Object.values(coreEntitiesMap) as Array<Type<BaseEntity>>;
+  // console.log(coreEntitiesMap);
+// readonly entities?: ((Function | string | EntitySchema<any>))[];
+  const coreEntities = Object.values(coreEntitiesMap) as any[];
   console.log(coreEntities);
   // TODO: 后面增加获取插件 Entity 处理k
   return [...coreEntities];

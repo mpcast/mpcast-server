@@ -1,4 +1,4 @@
-import { DeepPartial } from 'typeorm';
+import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
 import { TermMeta } from './term-meta.entity';
 import { TermTaxonomy } from './term-taxonomy.entity';

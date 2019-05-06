@@ -19,12 +19,11 @@ const paginate_1 = require("../../common/paginate");
 const utils_1 = require("../../common/utils");
 const entity_1 = require("../../entity");
 let CommentService = class CommentService {
-    constructor(connection, usersRepository) {
+    constructor(connection) {
         this.connection = connection;
-        this.usersRepository = usersRepository;
     }
     async paginate(options) {
-        const paginationObj = await paginate_1.paginate(this.connection.getRepository(entity_1.CommentEntity), options, {
+        const paginationObj = await paginate_1.paginate(this.connection.getRepository(entity_1.Comment), options, {
             relations: ['user'],
             loadRelationIds: {
                 relations: ['post'],
@@ -37,7 +36,7 @@ let CommentService = class CommentService {
         return paginationObj;
     }
     async findById(id) {
-        const data = await this.connection.getRepository(entity_1.CommentEntity).findOne({
+        const data = await this.connection.getRepository(entity_1.Comment).findOne({
             relations: ['user'],
             where: {
                 id,
@@ -50,7 +49,7 @@ let CommentService = class CommentService {
         return data;
     }
     async create(comment) {
-        const data = await this.connection.getRepository(entity_1.CommentEntity).save(comment);
+        const data = await this.connection.getRepository(entity_1.Comment).save(comment);
         utils_1.formatOneMeta(data);
         return data;
     }
@@ -58,9 +57,7 @@ let CommentService = class CommentService {
 CommentService = __decorate([
     common_1.Injectable(),
     __param(0, typeorm_1.InjectConnection()),
-    __param(1, typeorm_1.InjectRepository(entity_1.UserEntity)),
-    __metadata("design:paramtypes", [typeorm_2.Connection,
-        typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Connection])
 ], CommentService);
 exports.CommentService = CommentService;
 //# sourceMappingURL=comment.service.js.map

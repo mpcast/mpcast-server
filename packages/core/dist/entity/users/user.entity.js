@@ -13,7 +13,7 @@ const typeorm_1 = require("typeorm");
 const typeorm_2 = require("typeorm");
 const __1 = require("..");
 const base_entity_1 = require("../base.entity");
-let UserEntity = class UserEntity extends base_entity_1.BaseEntity {
+let User = class User extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
     }
@@ -21,7 +21,7 @@ let UserEntity = class UserEntity extends base_entity_1.BaseEntity {
 __decorate([
     typeorm_2.Column({ unique: true }),
     __metadata("design:type", String)
-], UserEntity.prototype, "identifier", void 0);
+], User.prototype, "identifier", void 0);
 __decorate([
     typeorm_2.Column({
         type: 'varchar',
@@ -29,39 +29,33 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", String)
-], UserEntity.prototype, "displayName", void 0);
+], User.prototype, "displayName", void 0);
 __decorate([
     typeorm_2.Column({ select: false, nullable: true }),
     __metadata("design:type", String)
-], UserEntity.prototype, "passwordHash", void 0);
+], User.prototype, "passwordHash", void 0);
 __decorate([
     typeorm_2.Column({ default: false }),
     __metadata("design:type", Boolean)
-], UserEntity.prototype, "verified", void 0);
+], User.prototype, "verified", void 0);
 __decorate([
     typeorm_2.Column({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
-], UserEntity.prototype, "verificationToken", void 0);
+], User.prototype, "verificationToken", void 0);
 __decorate([
     typeorm_2.Column({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
-], UserEntity.prototype, "identifierChangeToken", void 0);
+], User.prototype, "identifierChangeToken", void 0);
 __decorate([
     typeorm_1.OneToMany(type => __1.UserMeta, userMeta => userMeta.user, {
         cascade: true,
         eager: true,
     }),
     __metadata("design:type", Array)
-], UserEntity.prototype, "metas", void 0);
-__decorate([
-    typeorm_1.OneToMany(type => __1.CommentEntity, comment => comment.user, {
-        cascade: true,
-    }),
-    __metadata("design:type", Array)
-], UserEntity.prototype, "comments", void 0);
-UserEntity = __decorate([
+], User.prototype, "metas", void 0);
+User = __decorate([
     typeorm_1.Entity('users'),
     __metadata("design:paramtypes", [Object])
-], UserEntity);
-exports.UserEntity = UserEntity;
+], User);
+exports.User = User;
 //# sourceMappingURL=user.entity.js.map

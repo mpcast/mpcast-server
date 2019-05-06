@@ -1,8 +1,8 @@
-import { DeepPartial } from 'typeorm';
-import { CommentEntity, UserMeta } from '..';
+import { UserMeta } from '..';
+import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
-export declare class UserEntity extends BaseEntity {
-    constructor(input?: DeepPartial<UserEntity>);
+export declare class User extends BaseEntity {
+    constructor(input?: DeepPartial<User>);
     identifier: string;
     displayName?: string;
     passwordHash?: string;
@@ -10,5 +10,4 @@ export declare class UserEntity extends BaseEntity {
     verificationToken?: string | null;
     identifierChangeToken?: string | null;
     metas?: UserMeta[];
-    comments?: CommentEntity[];
 }

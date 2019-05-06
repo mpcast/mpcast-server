@@ -1,5 +1,6 @@
-import {DeepPartial, ID} from '../common/shared-types';
 import {CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+
+import {DeepPartial, ID} from '../common/shared-types';
 
 // const keyType = primaryKeyType();
 

@@ -12,7 +12,6 @@ import { Option } from '../../entity';
 export class OptionService {
   constructor(
     @InjectConnection() private readonly connection: Connection,
-    @InjectRepository(Option) private readonly optionRepository: Repository<Option>,
     private readonly cacheService: CacheService,
   ) {
   }
@@ -36,7 +35,7 @@ export class OptionService {
     let cacheOptions = await this.cacheService.get(CACHE_KEY.OPTIONS);
 
     if (_.isEmpty(cacheOptions)) {
-      const data = await this.optionRepository.find();
+      const data = await this.connection.getRepository(Option).find();
       const result: { [key: string]: any } = {};
       data.forEach(item => {
         result[item.key] = item.value;

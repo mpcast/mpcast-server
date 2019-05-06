@@ -19,25 +19,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const paginate_1 = require("../../common/paginate");
-const common_types_1 = require("../../common/types/common-types");
-const utils_1 = require("../../common/utils");
-const entity_1 = require("../../entity");
-const __1 = require("..");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const _ = __importStar(require("lodash"));
 const typeorm_2 = require("typeorm");
+const __1 = require("..");
+const paginate_1 = require("../../common/paginate");
+const common_types_1 = require("../../common/types/common-types");
+const utils_1 = require("../../common/utils");
+const entity_1 = require("../../entity");
 let PostService = class PostService {
-    constructor(connection, usersRepository, postRepository, categoriesService, optionService) {
+    constructor(connection, categoriesService, optionService) {
         this.connection = connection;
-        this.usersRepository = usersRepository;
-        this.postRepository = postRepository;
         this.categoriesService = categoriesService;
         this.optionService = optionService;
     }
     async findById(id) {
-        const data = await this.postRepository.findOneOrFail({
+        const data = await this.connection.getRepository(entity_1.PostEntity).findOneOrFail({
             where: {
                 id,
             },
@@ -94,7 +92,7 @@ let PostService = class PostService {
             .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
     }
     async paginate(options) {
-        return await paginate_1.paginate(this.postRepository, options, {
+        return await paginate_1.paginate(this.connection.getRepository(entity_1.PostEntity), options, {
             type: 'page',
         });
     }
@@ -227,7 +225,7 @@ let PostService = class PostService {
         if (userId) {
             where.author = userId;
         }
-        return await this.postRepository.find({
+        return await this.connection.getRepository(entity_1.PostEntity).find({
             where,
             take: take || 10,
             skip: 0,
@@ -350,11 +348,7 @@ let PostService = class PostService {
 PostService = __decorate([
     common_1.Injectable(),
     __param(0, typeorm_1.InjectConnection()),
-    __param(1, typeorm_1.InjectRepository(entity_1.UserEntity)),
-    __param(2, typeorm_1.InjectRepository(entity_1.PostEntity)),
     __metadata("design:paramtypes", [typeorm_2.Connection,
-        typeorm_2.Repository,
-        typeorm_2.Repository,
         __1.CategoriesService,
         __1.OptionService])
 ], PostService);

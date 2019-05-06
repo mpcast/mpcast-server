@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const APP_CONFIG = __importStar(require("../app.config"));
-const jwt_strategy_1 = require("../common/jwt.strategy");
 const service_module_1 = require("../service/service.module");
 const auth_controller_1 = require("./controllers/auth/auth.controller");
 const categories_controller_1 = require("./controllers/categories/categories.controller");
@@ -49,7 +48,7 @@ RestApiModule = __decorate([
             }),
         ],
         controllers: [...controllers],
-        providers: [service_module_1.ServiceModule, jwt_strategy_1.JwtStrategy],
+        providers: [service_module_1.ServiceModule],
     })
 ], RestApiModule);
 exports.RestApiModule = RestApiModule;

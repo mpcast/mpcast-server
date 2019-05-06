@@ -6,6 +6,6 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     createToken({ visitors: { ip } }: IQueryParamsResult, body: AuthLogin): Promise<ITokenResult>;
-    getUser(req: any): Promise<import("../../../entity/index").UserEntity>;
+    getUser(req: any): Promise<import("../../../entity/index").User>;
     checkToken(): string;
 }

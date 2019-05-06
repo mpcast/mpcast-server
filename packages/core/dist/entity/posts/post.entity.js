@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const class_validator_1 = require("class-validator");
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
 const base_entity_1 = require("../base.entity");
 const post_meta_entity_1 = require("./post-meta.entity");
 let PostEntity = class PostEntity extends base_entity_1.BaseEntity {
@@ -157,12 +156,6 @@ __decorate([
     typeorm_1.JoinColumn(),
     __metadata("design:type", Array)
 ], PostEntity.prototype, "metas", void 0);
-__decorate([
-    typeorm_1.OneToMany(type => __1.CommentEntity, comment => comment.post, {
-        cascade: true,
-    }),
-    __metadata("design:type", Array)
-], PostEntity.prototype, "comments", void 0);
 PostEntity = __decorate([
     typeorm_1.Entity('posts'),
     __metadata("design:paramtypes", [Object])
