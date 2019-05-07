@@ -24,88 +24,88 @@ import { ValidationPipe } from './pipes/validation.pipe';
 export type BootstrapFunction = (config: MpcastConfig) => Promise<INestApplication>;
 
 export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INestApplication> {
-  const config = await preBootstrapConfig(userConfig);
-  Logger.info(`Bootstrapping Podcast Server...`);
+    const config = await preBootstrapConfig(userConfig);
+    Logger.info(`Bootstrapping Podcast Server...`);
 
-  // AppModule 的启动必需在 entities 已经加载并配置之后
-  // 以便在 AppModule decorator 中可以使用它们
-  // tslint:disable-next-line:whitespace
-  const appModule = await import('./app.module');
-  // DefaultLogger.hideNestBoostrapLogs();
-  let app: INestApplication;
-  // app = await NestFactory.create(appModule.AppModule, isProdMode ? { logger: false } : null);
-  app = await NestFactory.create(appModule.AppModule, {
-    cors: config.cors,
-    logger: new Logger(),
-  });
-  // DefaultLogger.restoreOriginalLogLevel();
-  // app.useLogger(new Logger());
-  app.use(helmet());
-  // app.use(compression());
-  app.use(bodyParser.json({ limit: '1mb' }));
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(
-    new TransformInterceptor(new Reflector()),
-    new ErrorInterceptor(new Reflector()),
-    new LoggingInterceptor(),
-  );
+    // AppModule 的启动必需在 entities 已经加载并配置之后
+    // 以便在 AppModule decorator 中可以使用它们
+    // tslint:disable-next-line:whitespace
+    const appModule = await import('./app.module');
+    // DefaultLogger.hideNestBoostrapLogs();
+    let app: INestApplication;
+    // app = await NestFactory.create(appModule.AppModule, isProdMode ? { logger: false } : null);
+    app = await NestFactory.create(appModule.AppModule, {
+        cors: config.cors,
+        logger: new Logger(),
+    });
+    // DefaultLogger.restoreOriginalLogLevel();
+    // app.useLogger(new Logger());
+    app.use(helmet());
+    // app.use(compression());
+    app.use(bodyParser.json({ limit: '1mb' }));
+    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalInterceptors(
+        new TransformInterceptor(new Reflector()),
+        new ErrorInterceptor(new Reflector()),
+        new LoggingInterceptor(),
+    );
 
-  // const options = new DocumentBuilder()
-  //   .setTitle('播客系统服务端 API')
-  //   .setDescription('The Podcast API')
-  //   .setVersion('2.0')
-  //   .addTag('Podcast Server')
-  //   .build();
-  // const document = SwaggerModule.createDocument(app, options);
-  // SwaggerModule.setup('apidoc', app, document);
+    // const options = new DocumentBuilder()
+    //   .setTitle('播客系统服务端 API')
+    //   .setDescription('The Podcast API')
+    //   .setVersion('2.0')
+    //   .addTag('Podcast Server')
+    //   .build();
+    // const document = SwaggerModule.createDocument(app, options);
+    // SwaggerModule.setup('apidoc', app, document);
 
-  // return await app.listen(appConfig.APP.PORT);
-  await app.listen(config.port, config.hostname);
-  logWelcomeMessage(config);
-  return app;
+    // return await app.listen(appConfig.APP.PORT);
+    await app.listen(config.port, config.hostname);
+    logWelcomeMessage(config);
+    return app;
 }
 
 /**
  * Setting the global config must be done prior to loading the AppModule.
  */
 export async function preBootstrapConfig(
-  userConfig: Partial<MpcastConfig>,
+    userConfig: Partial<MpcastConfig>,
 ): Promise<ReadOnlyRequired<MpcastConfig>> {
-  if (userConfig) {
-    setConfig(userConfig);
-  }
+    if (userConfig) {
+        setConfig(userConfig);
+    }
 
-  // Entities *must* be loaded after the user config is set in order for the
-  // base BaseEntity to be correctly configured with the primary key type
-  // specified in the EntityIdStrategy.
-  // tslint:disable-next-line:whitespace
-  // const pluginEntities = getEntitiesFromPlugins(userConfig);
-  const entities = await getAllEntities(userConfig);
-  const { coreSubscribersMap } = await import('./entity/subscribers');
-  console.log(userConfig);
-  /**
-   * Entities to be loaded for this connection.
-   * Accepts both entity classes and directories where from entities need to be loaded.
-   * Directories support glob patterns.
-   */
+    // Entities *must* be loaded after the user config is set in order for the
+    // base BaseEntity to be correctly configured with the primary key type
+    // specified in the EntityIdStrategy.
+    // tslint:disable-next-line:whitespace
+    // const pluginEntities = getEntitiesFromPlugins(userConfig);
+    const entities = await getAllEntities(userConfig);
+    const { coreSubscribersMap } = await import('./entity/subscribers');
+    console.log(userConfig);
+    /**
+     * Entities to be loaded for this connection.
+     * Accepts both entity classes and directories where from entities need to be loaded.
+     * Directories support glob patterns.
+     */
 // readonly entities?: ((Function | string | EntitySchema<any>))[];
-  /**
-   * Subscribers to be loaded for this connection.
-   * Accepts both subscriber classes and directories where from subscribers need to be loaded.
-   * Directories support glob patterns.
-   */
+    /**
+     * Subscribers to be loaded for this connection.
+     * Accepts both subscriber classes and directories where from subscribers need to be loaded.
+     * Directories support glob patterns.
+     */
 // readonly subscribers?: (Function | string)[];
-  //tslint:disable
-  setConfig({
-    dbConnectionOptions: {
-      entities,
-    },
-  });
-  const config = getConfig();
-  console.log(config);
-  Logger.useLogger(config.logger);
-  return config;
+    //tslint:disable
+    setConfig({
+        dbConnectionOptions: {
+            entities,
+        },
+    });
+    const config = getConfig();
+    console.log(config);
+    Logger.useLogger(config.logger);
+    return config;
 }
 
 /**
@@ -113,26 +113,25 @@ export async function preBootstrapConfig(
  */
 async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<any[]> {
 // readonly entities?: ((Function | string | EntitySchema<any>))[];
-  const { coreEntitiesMap } = await import('./entity/entities');
-  // console.log(coreEntitiesMap);
+    const { coreEntitiesMap } = await import('./entity/entities');
+    // console.log(coreEntitiesMap);
 // readonly entities?: ((Function | string | EntitySchema<any>))[];
-  const coreEntities = Object.values(coreEntitiesMap) as any[];
-  console.log(coreEntities);
-  // TODO: 后面增加获取插件 Entity 处理
-  return [...coreEntities];
+    const coreEntities = Object.values(coreEntitiesMap) as any[];
+    console.log(coreEntities);
+    // TODO: 后面增加获取插件 Entity 处理
+    return [...coreEntities];
 }
 
 function logWelcomeMessage(config: MpcastConfig) {
-  console.log('welcome...');
-  let version: string;
-  // Logger.info(`${label}: http://${config.hostname || 'localhost'}:${config.port}/${route}/ -> http://${hostname || 'localhost'}:${port}`);
-
-  try {
-    version = require('../pacakge.json').version;
-  } catch (e) {
-    version = ' unknown';
-  }
-  Logger.info(`=================================================`);
-  Logger.info(`Mpcast server (v${version}) now running on port ${config.port}`);
-  Logger.info(`=================================================`);
+    let version: string;
+    try {
+        version = require('../pacakge.json');
+        console.log(version);
+    } catch (e) {
+        console.log(e);
+        version = ' unknown';
+    }
+    Logger.info(`=================================================`);
+    Logger.info(`Mpcast server (v${version}) now running on port ${config.port}`);
+    Logger.info(`=================================================`);
 }

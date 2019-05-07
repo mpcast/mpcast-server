@@ -2,6 +2,13 @@
   "name": "@mpcast/core",
   "version": "0.2.2",
   "description": "A Mini Program cast server.",
+  "keywords": [
+    "mpcast",
+    "podcast",
+    "headless",
+    "graphql",
+    "typescript"
+  ],
   "author": "Baisheng <baisheng@gmail.com>",
   "private": false,
   "license": "MIT",

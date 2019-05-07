@@ -64,12 +64,13 @@ async function getAllEntities(userConfig) {
     return [...coreEntities];
 }
 function logWelcomeMessage(config) {
-    console.log('welcome...');
     let version;
     try {
-        version = require('../pacakge.json').version;
+        version = require('../pacakge.json');
+        console.log(version);
     }
     catch (e) {
+        console.log(e);
         version = ' unknown';
     }
     config_1.Logger.info(`=================================================`);

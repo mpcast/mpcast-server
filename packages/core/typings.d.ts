@@ -1,10 +1,9 @@
 declare module 'wechat-jssdk' {
 
   // const EventEmitter = require('events');
-  import * as EventEmitter from 'events';
-  import { WechatController } from '@app/modules/wechat/wechat.controller';
+    import * as EventEmitter from 'events';
 
-  class Store extends EventEmitter {
+    class Store extends EventEmitter {
     getGlobalToken(): Promise<object>;
 
     /**
@@ -52,7 +51,7 @@ declare module 'wechat-jssdk' {
     clearStroe();
   }
 
-  interface WechatOptions {
+    interface WechatOptions {
     appId?: string;
     appSecret?: string;
     store?: object;
@@ -62,7 +61,7 @@ declare module 'wechat-jssdk' {
     };
   }
 
-  interface Code2SessionResponse {
+    interface Code2SessionResponse {
     // openid	string	用户唯一标识
     // session_key	string	会话密钥
     // unionid	string	用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回，详见 UnionID 机制说明。
@@ -74,7 +73,7 @@ declare module 'wechat-jssdk' {
     errcode?: number;
     errmsg?: string;
   }
-  class MiniProgram {
+    class MiniProgram {
     constructor(options: WechatOptions);
 
     getSession(code: string, key?: string): Promise<Code2SessionResponse>;
@@ -86,7 +85,7 @@ declare module 'wechat-jssdk' {
     decryptData(encryptedData: string, iv: string, sessionKey: string, key?: string): Promise<object>;
   }
 
-  class OAuth {
+    class OAuth {
     /**
      * OAuth class
      * @constructor
@@ -179,13 +178,13 @@ declare module 'wechat-jssdk' {
     static isAccessTokenExpired(tokenInfo: object): boolean;
   }
 
-  class Wechat {
+    class Wechat {
     public miniProgram: MiniProgram;
     public oauth: OAuth;
     constructor(options: WechatOptions);
   }
 
-  class Card {
+    class Card {
 
   }
 }
