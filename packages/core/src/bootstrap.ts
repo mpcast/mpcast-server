@@ -118,7 +118,7 @@ async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<any[]>
 // readonly entities?: ((Function | string | EntitySchema<any>))[];
   const coreEntities = Object.values(coreEntitiesMap) as any[];
   console.log(coreEntities);
-  // TODO: 后面增加获取插件 Entity 处理k
+  // TODO: 后面增加获取插件 Entity 处理
   return [...coreEntities];
 }
 

@@ -1,6 +1,6 @@
 import { Connection } from 'typeorm';
 import { ID } from '../../common/shared-types';
-import { PostEntity, PostMeta } from '../../entity';
+import { Post as PostEntity, PostMeta } from '../../entity';
 export declare class AttachmentService {
     private connection;
     constructor(connection: Connection);

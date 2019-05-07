@@ -35,7 +35,7 @@ let PostService = class PostService {
         this.optionService = optionService;
     }
     async findById(id) {
-        const data = await this.connection.getRepository(entity_1.PostEntity).findOneOrFail({
+        const data = await this.connection.getRepository(entity_1.Post).findOneOrFail({
             where: {
                 id,
             },
@@ -45,7 +45,7 @@ let PostService = class PostService {
     async loadBLock(blocks) {
         const dataList = await this.connection.manager.createQueryBuilder()
             .select()
-            .from(entity_1.PostEntity, 'p')
+            .from(entity_1.Post, 'p')
             .where(`id IN (:blocks)`, { blocks })
             .orderBy(`INSTR (',${blocks},', CONCAT(',',id,','))`)
             .getRawMany();
@@ -88,11 +88,11 @@ let PostService = class PostService {
     }
     async getAudios(ids) {
         this.connection.manager
-            .createQueryBuilder(entity_1.PostEntity, 'post')
+            .createQueryBuilder(entity_1.Post, 'post')
             .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
     }
     async paginate(options) {
-        return await paginate_1.paginate(this.connection.getRepository(entity_1.PostEntity), options, {
+        return await paginate_1.paginate(this.connection.getRepository(entity_1.Post), options, {
             type: 'page',
         });
     }
@@ -118,7 +118,7 @@ let PostService = class PostService {
             return query.from(entity_1.TermRelationships, 'tr');
         }, 'tr', 'tr.taxonomyId = tt.id')
             .innerJoin(query => {
-            return query.from(entity_1.PostEntity, 'obj');
+            return query.from(entity_1.Post, 'obj');
         }, 'obj', 'obj.id = tr.objectId')
             .where('obj.type = :type', { type: 'page' })
             .andWhere(where)
@@ -147,7 +147,7 @@ let PostService = class PostService {
         data = await this.connection.manager
             .createQueryBuilder()
             .select('p.*, JSON_LENGTH(value) as viewCount')
-            .from(entity_1.PostEntity, 'p')
+            .from(entity_1.Post, 'p')
             .innerJoin(query => {
             return query.from(entity_1.PostMeta, 'meta');
         }, 'meta', 'meta.postId = p.id')
@@ -170,7 +170,7 @@ let PostService = class PostService {
             return query.from(entity_1.TermRelationships, 'tr');
         }, 'tr', 'tr.taxonomyId = tt.id')
             .innerJoin(query => {
-            return query.from(entity_1.PostEntity, 'obj');
+            return query.from(entity_1.Post, 'obj');
         }, 'obj', 'obj.id = tr.objectId')
             .where('obj.type = :type', { type: 'page' })
             .andWhere('obj.status IN (:status)', { status: 'publish' })
@@ -196,7 +196,7 @@ let PostService = class PostService {
         const data = await this.connection.manager
             .createQueryBuilder()
             .select()
-            .from(entity_1.PostEntity, 'p')
+            .from(entity_1.Post, 'p')
             .where('p.id IN (:stickys)', { stickys })
             .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
             .getRawMany();
@@ -225,7 +225,7 @@ let PostService = class PostService {
         if (userId) {
             where.author = userId;
         }
-        return await this.connection.getRepository(entity_1.PostEntity).find({
+        return await this.connection.getRepository(entity_1.Post).find({
             where,
             take: take || 10,
             skip: 0,

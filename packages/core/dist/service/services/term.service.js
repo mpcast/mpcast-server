@@ -19,13 +19,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const cache_service_1 = require("../../cache/cache.service");
-const entity_1 = require("../../entity");
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const CACHE_KEY = __importStar(require("../../common/constants/cache.constant"));
 const _ = __importStar(require("lodash"));
 const typeorm_2 = require("typeorm");
+const cache_service_1 = require("../../cache/cache.service");
+const CACHE_KEY = __importStar(require("../../common/constants/cache.constant"));
+const entity_1 = require("../../entity");
 let TermService = class TermService {
     constructor(connection, cacheService) {
         this.connection = connection;

@@ -97,7 +97,7 @@ let CategoriesService = class CategoriesService {
             return query.from(entity_1.TermRelationships, 'tr');
         }, 'tr', 'tr.taxonomyId = tt.id')
             .innerJoin(query => {
-            return query.from(entity_1.PostEntity, 'obj');
+            return query.from(entity_1.Post, 'obj');
         }, 'obj', 'obj.id = tr.objectId')
             .where('obj.type = :type', { type: 'page' })
             .andWhere(where)
@@ -126,7 +126,7 @@ let CategoriesService = class CategoriesService {
         data = await this.connection.manager
             .createQueryBuilder()
             .select('p.*, JSON_LENGTH(value) as viewCount')
-            .from(entity_1.PostEntity, 'p')
+            .from(entity_1.Post, 'p')
             .innerJoin(query => {
             return query.from(entity_1.PostMeta, 'meta');
         }, 'meta', 'meta.postId = p.id')
@@ -149,7 +149,7 @@ let CategoriesService = class CategoriesService {
             return query.from(entity_1.TermRelationships, 'tr');
         }, 'tr', 'tr.taxonomyId = tt.id')
             .innerJoin(query => {
-            return query.from(entity_1.PostEntity, 'obj');
+            return query.from(entity_1.Post, 'obj');
         }, 'obj', 'obj.id = tr.objectId')
             .where('obj.type = :type', { type: 'page' })
             .andWhere('obj.status IN (:status)', { status: 'publish' })
@@ -175,7 +175,7 @@ let CategoriesService = class CategoriesService {
         const data = await this.connection.manager
             .createQueryBuilder()
             .select()
-            .from(entity_1.PostEntity, 'p')
+            .from(entity_1.Post, 'p')
             .where('p.id IN (:stickys)', { stickys })
             .orderBy(`INSTR (',${stickys},', CONCAT(',',id,','))`)
             .getRawMany();

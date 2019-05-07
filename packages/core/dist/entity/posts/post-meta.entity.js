@@ -10,8 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const __1 = require("..");
 const base_entity_1 = require("../base.entity");
+const post_entity_1 = require("./post.entity");
 let PostMeta = class PostMeta extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -34,11 +34,11 @@ __decorate([
     __metadata("design:type", Object)
 ], PostMeta.prototype, "value", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => __1.PostEntity, post => post.metas, {
+    typeorm_1.ManyToOne(type => post_entity_1.Post, post => post.metas, {
         onDelete: 'CASCADE',
     }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", __1.PostEntity)
+    __metadata("design:type", post_entity_1.Post)
 ], PostMeta.prototype, "post", void 0);
 PostMeta = __decorate([
     typeorm_1.Entity(),

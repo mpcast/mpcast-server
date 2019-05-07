@@ -1,8 +1,9 @@
 import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+import { Comment } from '../comments/comment.entity';
 import { PostMeta } from './post-meta.entity';
-export declare class PostEntity extends BaseEntity {
-    constructor(input?: DeepPartial<PostEntity>);
+export declare class Post extends BaseEntity {
+    constructor(input?: DeepPartial<Post>);
     author: number;
     status: string;
     password: string;
@@ -20,4 +21,5 @@ export declare class PostEntity extends BaseEntity {
     menuOrder: number;
     sort: number;
     metas?: PostMeta[];
+    comments?: Comment[];
 }

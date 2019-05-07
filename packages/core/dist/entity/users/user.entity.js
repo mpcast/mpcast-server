@@ -13,6 +13,7 @@ const typeorm_1 = require("typeorm");
 const typeorm_2 = require("typeorm");
 const __1 = require("..");
 const base_entity_1 = require("../base.entity");
+const comment_entity_1 = require("../comments/comment.entity");
 let User = class User extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
@@ -53,6 +54,13 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "metas", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => comment_entity_1.Comment, c => c.author, {
+        cascade: true,
+        eager: true,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "comments", void 0);
 User = __decorate([
     typeorm_1.Entity('users'),
     __metadata("design:paramtypes", [Object])

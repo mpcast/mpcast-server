@@ -3,7 +3,7 @@ import { CategoriesService, OptionService } from '..';
 import { IPaginationOptions, Pagination } from '../../common/paginate';
 import { ID } from '../../common/shared-types';
 import { EUserPostsBehavior } from '../../common/types/common-types';
-import { PostEntity, PostMeta } from '../../entity';
+import { Post as PostEntity, PostMeta } from '../../entity';
 export declare class PostService {
     private connection;
     private readonly categoriesService;

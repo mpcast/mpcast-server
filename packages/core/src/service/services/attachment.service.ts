@@ -6,7 +6,7 @@ import { Connection, In } from 'typeorm';
 
 import { ID } from '../../common/shared-types';
 import { formatOneMeta } from '../../common/utils';
-import { PostEntity, PostMeta } from '../../entity';
+import { Post as PostEntity, PostMeta } from '../../entity';
 
 @Injectable()
 export class AttachmentService {

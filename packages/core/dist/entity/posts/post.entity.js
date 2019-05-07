@@ -12,8 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const class_validator_1 = require("class-validator");
 const typeorm_1 = require("typeorm");
 const base_entity_1 = require("../base.entity");
+const comment_entity_1 = require("../comments/comment.entity");
 const post_meta_entity_1 = require("./post-meta.entity");
-let PostEntity = class PostEntity extends base_entity_1.BaseEntity {
+let Post = class Post extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
     }
@@ -26,7 +27,7 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", Number)
-], PostEntity.prototype, "author", void 0);
+], Post.prototype, "author", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'varchar',
@@ -35,7 +36,7 @@ __decorate([
         comment: '内容状态',
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "status", void 0);
+], Post.prototype, "status", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'varchar',
@@ -44,7 +45,7 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "password", void 0);
+], Post.prototype, "password", void 0);
 __decorate([
     typeorm_1.Column({
         name: 'title',
@@ -53,7 +54,7 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "title", void 0);
+], Post.prototype, "title", void 0);
 __decorate([
     typeorm_1.Column({
         comment: '内容标识',
@@ -62,7 +63,7 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "name", void 0);
+], Post.prototype, "name", void 0);
 __decorate([
     typeorm_1.Column({
         name: 'guid',
@@ -70,14 +71,14 @@ __decorate([
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "guid", void 0);
+], Post.prototype, "guid", void 0);
 __decorate([
     typeorm_1.Column({
         comment: '内容摘要',
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "excerpt", void 0);
+], Post.prototype, "excerpt", void 0);
 __decorate([
     typeorm_1.Column({
         name: 'type',
@@ -85,7 +86,7 @@ __decorate([
         comment: '内容类型',
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "type", void 0);
+], Post.prototype, "type", void 0);
 __decorate([
     typeorm_1.Column('text', {
         name: 'content',
@@ -94,7 +95,7 @@ __decorate([
     }),
     class_validator_1.IsArray(),
     __metadata("design:type", Array)
-], PostEntity.prototype, "content", void 0);
+], Post.prototype, "content", void 0);
 __decorate([
     typeorm_1.Column('json', {
         comment: '内容区块',
@@ -102,7 +103,7 @@ __decorate([
     }),
     class_validator_1.IsJSON(),
     __metadata("design:type", Object)
-], PostEntity.prototype, "block", void 0);
+], Post.prototype, "block", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'boolean',
@@ -110,13 +111,13 @@ __decorate([
         default: false,
     }),
     __metadata("design:type", Boolean)
-], PostEntity.prototype, "allowComment", void 0);
+], Post.prototype, "allowComment", void 0);
 __decorate([
     typeorm_1.Column({
         type: 'int',
     }),
     __metadata("design:type", Number)
-], PostEntity.prototype, "commentNum", void 0);
+], Post.prototype, "commentNum", void 0);
 __decorate([
     typeorm_1.Column({
         name: 'parent',
@@ -126,28 +127,28 @@ __decorate([
         default: 0,
     }),
     __metadata("design:type", Number)
-], PostEntity.prototype, "parent", void 0);
+], Post.prototype, "parent", void 0);
 __decorate([
     typeorm_1.Column({
         length: 100,
         nullable: true,
     }),
     __metadata("design:type", String)
-], PostEntity.prototype, "mimeType", void 0);
+], Post.prototype, "mimeType", void 0);
 __decorate([
     typeorm_1.Column({
         comment: '菜单顺序',
         default: 0,
     }),
     __metadata("design:type", Number)
-], PostEntity.prototype, "menuOrder", void 0);
+], Post.prototype, "menuOrder", void 0);
 __decorate([
     typeorm_1.Column({
         comment: '排序',
         default: 0,
     }),
     __metadata("design:type", Number)
-], PostEntity.prototype, "sort", void 0);
+], Post.prototype, "sort", void 0);
 __decorate([
     typeorm_1.OneToMany(type => post_meta_entity_1.PostMeta, postMeta => postMeta.post, {
         cascade: true,
@@ -155,10 +156,16 @@ __decorate([
     }),
     typeorm_1.JoinColumn(),
     __metadata("design:type", Array)
-], PostEntity.prototype, "metas", void 0);
-PostEntity = __decorate([
+], Post.prototype, "metas", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => comment_entity_1.Comment, comment => comment.post, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], Post.prototype, "comments", void 0);
+Post = __decorate([
     typeorm_1.Entity('posts'),
     __metadata("design:paramtypes", [Object])
-], PostEntity);
-exports.PostEntity = PostEntity;
+], Post);
+exports.Post = Post;
 //# sourceMappingURL=post.entity.js.map

@@ -8,7 +8,7 @@ import { IPaginationOptions, paginate, Pagination } from '../../common/paginate'
 import { ID } from '../../common/shared-types';
 import { EUserPostsBehavior } from '../../common/types/common-types';
 import { formatAllMeta, formatOneMeta } from '../../common/utils';
-import { PostEntity, PostMeta, Term, TermRelationships, TermTaxonomy, User } from '../../entity';
+import { Post as PostEntity, PostMeta, Term, TermRelationships, TermTaxonomy, User } from '../../entity';
 // import { rpc } from 'qiniu';
 
 // import { annotateWithChildrenErrors } from 'graphql-tools/dist/stitching/errors';
@@ -469,11 +469,12 @@ export class PostService {
    * @param ip
    */
   async newViewer(userId: ID, postId: ID, ip: any) {
-    const hasViewer = await this.connection.getRepository(PostMeta)
+    const hasViewer: any = await this.connection.getRepository(PostMeta)
       .findOne({
         post: { id: postId },
         key: EUserPostsBehavior.VIEW,
       });
+
     if (!hasViewer) {
       await this.connection.getRepository(PostMeta)
         .save({

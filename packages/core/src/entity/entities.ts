@@ -4,7 +4,7 @@ import { CommentMeta } from './comments/comment-meta.entity';
 import { Comment } from './comments/comment.entity';
 import { Option } from './options/option.entity';
 import { PostMeta } from './posts/post-meta.entity';
-import { PostEntity } from './posts/post.entity';
+import { Post } from './posts/post.entity';
 import { TermMeta } from './terms/term-meta.entity';
 import { TermRelationships } from './terms/term-relationships.entity';
 import { TermTaxonomy } from './terms/term-taxonomy.entity';
@@ -22,12 +22,10 @@ export const coreEntitiesMap = {
   TermTaxonomy,
   TermRelationships,
   Term,
-  // CommentMeta,
-  // Comment,
   CommentMeta,
   Comment,
   PostMeta,
-  PostEntity,
+  Post,
   UserMeta,
   User,
 };

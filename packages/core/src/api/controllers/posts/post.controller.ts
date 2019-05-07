@@ -6,7 +6,7 @@ import { EUserPostsBehavior } from '../../../common/types/common-types';
 import { formatAllMeta, formatOneMeta } from '../../../common/utils';
 import { HttpProcessor } from '../../../decorators/http.decorator';
 import { IQueryParamsResult, QueryParams } from '../../../decorators/query-params.decorator';
-import { Comment, PostEntity, Term } from '../../../entity';
+import { Comment, Post as PostEntity } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 

@@ -6,7 +6,7 @@ import { Connection, In } from 'typeorm';
 import { CacheService } from '../../cache/cache.service';
 import * as CACHE_KEY from '../../common/constants/cache.constant';
 import { ID } from '../../common/shared-types';
-import { PostEntity, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
+import { Post as PostEntity, PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
 
 import { AttachmentService } from './attachment.service';
 

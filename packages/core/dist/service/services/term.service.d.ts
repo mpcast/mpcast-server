@@ -1,7 +1,7 @@
+import { Connection } from 'typeorm';
 import { CacheService } from '../../cache/cache.service';
 import { ID } from '../../common/shared-types';
 import { PostMeta } from '../../entity';
-import { Connection } from 'typeorm';
 export declare class TermService {
     private connection;
     private readonly cacheService;

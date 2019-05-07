@@ -1,10 +1,10 @@
 import { Entity, OneToMany } from 'typeorm';
 import { Column } from 'typeorm';
 
-// import { CommentEntity, UserMeta } from '..';
-import { Comment, UserMeta } from '..';
+import { UserMeta } from '..';
 import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+import { Comment } from '../comments/comment.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -44,8 +44,9 @@ export class User extends BaseEntity {
   })
   metas?: UserMeta[];
 
-  // @OneToMany(type => Comment, comment => comment.user)
-  // comments?: Comment[];
-  // @OneToMany(type => Replay, comment => comment.user)
-  // replies?: Replay[];
+  @OneToMany(type => Comment, c => c.author, {
+    cascade: true,
+    eager: true,
+  })
+  comments?: Comment[];
 }

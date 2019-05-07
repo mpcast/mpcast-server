@@ -228,7 +228,7 @@ let PostController = class PostController {
         if (postTermFormat && !_.isEmpty(postTermFormat)) {
             post.type = postTermFormat.slug;
         }
-        return Object.assign({}, post, entity_1.PostEntity);
+        return Object.assign({}, post, entity_1.Post);
     }
     async decoratorTags(data) {
         data.tags = await this.categoriesService.getTagsByObject(data.id);

@@ -30,7 +30,7 @@ let AttachmentService = class AttachmentService {
         this.connection = connection;
     }
     async findById(id) {
-        return await this.connection.getRepository(entity_1.PostEntity)
+        return await this.connection.getRepository(entity_1.Post)
             .findOne({
             id,
         });
@@ -64,7 +64,7 @@ let AttachmentService = class AttachmentService {
     }
     async getAudios(ids) {
         this.connection.manager
-            .createQueryBuilder(entity_1.PostEntity, 'post')
+            .createQueryBuilder(entity_1.Post, 'post')
             .orderBy(`INSTR (',${ids},', CONCAT(',',id,','))`);
     }
     async getAttachment(postId, type = 'file') {

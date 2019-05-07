@@ -1,6 +1,6 @@
 import { ID } from '../../../common/shared-types';
 import { IQueryParamsResult } from '../../../decorators/query-params.decorator';
-import { Comment, PostEntity } from '../../../entity';
+import { Comment, Post as PostEntity } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
 export declare class PostController {
     private readonly userService;

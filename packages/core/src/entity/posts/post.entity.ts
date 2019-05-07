@@ -1,9 +1,9 @@
 import { IsArray, IsJSON, IsString } from 'class-validator';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
-import { Comment, Replay } from '..';
 import { DeepPartial } from '../../common/shared-types';
 import { BaseEntity } from '../base.entity';
+import { Comment} from '../comments/comment.entity';
 
 import { PostMeta } from './post-meta.entity';
 // import { User } from '@app/entity';
@@ -13,8 +13,8 @@ import { PostMeta } from './post-meta.entity';
 // @Index(['parent'])
 // @Index(['author'])
 @Entity('posts')
-export class PostEntity extends BaseEntity {
-  constructor(input?: DeepPartial<PostEntity>) {
+export class Post extends BaseEntity {
+  constructor(input?: DeepPartial<Post>) {
     super(input);
   }
 
@@ -139,8 +139,8 @@ export class PostEntity extends BaseEntity {
   @JoinColumn()
   metas?: PostMeta[];
 
-  // @OneToMany(type => Conversation, comment => comment.post, {
-  //   cascade: true,
-  // })
-  // comments?: Conversation[];
+  @OneToMany(type => Comment, comment => comment.post, {
+    cascade: true,
+  })
+  comments?: Comment[];
 }

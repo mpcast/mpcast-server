@@ -2,7 +2,7 @@ import { CommentMeta } from './comments/comment-meta.entity';
 import { Comment } from './comments/comment.entity';
 import { Option } from './options/option.entity';
 import { PostMeta } from './posts/post-meta.entity';
-import { PostEntity } from './posts/post.entity';
+import { Post } from './posts/post.entity';
 import { TermMeta } from './terms/term-meta.entity';
 import { TermRelationships } from './terms/term-relationships.entity';
 import { TermTaxonomy } from './terms/term-taxonomy.entity';
@@ -18,7 +18,7 @@ export declare const coreEntitiesMap: {
     CommentMeta: typeof CommentMeta;
     Comment: typeof Comment;
     PostMeta: typeof PostMeta;
-    PostEntity: typeof PostEntity;
+    Post: typeof Post;
     UserMeta: typeof UserMeta;
     User: typeof User;
 };

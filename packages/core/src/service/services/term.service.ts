@@ -1,11 +1,12 @@
-import { CacheService } from '../../cache/cache.service';
-import { ID } from '../../common/shared-types';
-import { PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
 import { Injectable, Post } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import * as CACHE_KEY from '../../common/constants/cache.constant';
 import * as _ from 'lodash';
 import { Connection, In } from 'typeorm';
+
+import { CacheService } from '../../cache/cache.service';
+import * as CACHE_KEY from '../../common/constants/cache.constant';
+import { ID } from '../../common/shared-types';
+import { PostMeta, Term, TermMeta, TermRelationships, TermTaxonomy } from '../../entity';
 
 @Injectable()
 export class TermService {

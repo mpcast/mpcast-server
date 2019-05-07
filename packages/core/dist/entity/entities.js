@@ -20,7 +20,7 @@ exports.coreEntitiesMap = {
     CommentMeta: comment_meta_entity_1.CommentMeta,
     Comment: comment_entity_1.Comment,
     PostMeta: post_meta_entity_1.PostMeta,
-    PostEntity: post_entity_1.PostEntity,
+    Post: post_entity_1.Post,
     UserMeta: user_meta_entity_1.UserMeta,
     User: user_entity_1.User,
 };
