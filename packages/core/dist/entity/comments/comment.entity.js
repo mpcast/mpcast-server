@@ -9,13 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Comment_1;
-"use strict";
 const typeorm_1 = require("typeorm");
 const __1 = require("..");
 const base_entity_1 = require("../base.entity");
 const comment_meta_entity_1 = require("./comment-meta.entity");
-let Comment = Comment_1 = class Comment extends base_entity_1.BaseEntity {
+let Comment = class Comment extends base_entity_1.BaseEntity {
     constructor(input) {
         super(input);
     }
@@ -50,29 +48,21 @@ __decorate([
     __metadata("design:type", Number)
 ], Comment.prototype, "commentCount", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => comment_meta_entity_1.CommentMeta, commentMeta => commentMeta.replay, {
+    typeorm_1.OneToMany(type => comment_meta_entity_1.CommentMeta, commentMeta => commentMeta.comment, {
         cascade: true,
     }),
     __metadata("design:type", Array)
 ], Comment.prototype, "metas", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => Comment_1, comment => comment.relay),
-    __metadata("design:type", Comment)
-], Comment.prototype, "reference", void 0);
-__decorate([
-    typeorm_1.ManyToOne(type => Comment_1, comment => comment.reference),
-    __metadata("design:type", Comment)
-], Comment.prototype, "relay", void 0);
-__decorate([
     typeorm_1.ManyToOne(type => __1.User, guest => guest.comments),
     __metadata("design:type", __1.User)
-], Comment.prototype, "author", void 0);
+], Comment.prototype, "user", void 0);
 __decorate([
     typeorm_1.ManyToOne(type => __1.Post, post => post.comments, {}),
     __metadata("design:type", __1.Post)
 ], Comment.prototype, "post", void 0);
-Comment = Comment_1 = __decorate([
-    typeorm_1.Entity('comment'),
+Comment = __decorate([
+    typeorm_1.Entity('comments'),
     __metadata("design:paramtypes", [Object])
 ], Comment);
 exports.Comment = Comment;

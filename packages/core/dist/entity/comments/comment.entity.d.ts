@@ -9,8 +9,6 @@ export declare class Comment extends BaseEntity {
     ip: string;
     commentCount: number;
     metas?: CommentMeta[];
-    reference?: Comment;
-    relay?: Comment;
-    author: User;
+    user: User;
     post: Post;
 }

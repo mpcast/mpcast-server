@@ -28,5 +28,5 @@ export class CommentMeta extends BaseEntity {
   @ManyToOne(type => Comment, comment => comment.metas, {
     onDelete: 'CASCADE',
   })
-  replay?: Comment;
+  comment?: Comment;
 }

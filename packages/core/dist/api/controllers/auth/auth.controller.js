@@ -24,6 +24,7 @@ let AuthController = class AuthController {
     }
     createToken({ visitors: { ip } }, body) {
         return this.authService.authenticate(body.identifier, body.password).then(token => {
+            console.log(token);
             return token;
         });
     }

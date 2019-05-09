@@ -10,15 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
-const api_module_1 = require("./api/api.module");
 const cache_module_1 = require("./cache/cache.module");
 const config_1 = require("./config");
 const config_module_1 = require("./config/config.module");
+const cors_middleware_1 = require("./middlewares/cors.middleware");
+const origin_middleware_1 = require("./middlewares/origin.middleware");
+const api_module_1 = require("./restApi/api.module");
 let AppModule = class AppModule {
     constructor(configService) {
         this.configService = configService;
     }
     configure(consumer) {
+        consumer.apply(cors_middleware_1.CorsMiddleware, origin_middleware_1.OriginMiddleware).forRoutes('*');
     }
 };
 AppModule = __decorate([

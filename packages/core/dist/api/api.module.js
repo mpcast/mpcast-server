@@ -11,8 +11,6 @@ const core_1 = require("@nestjs/core");
 const cache_module_1 = require("../cache/cache.module");
 const cache_interceptor_1 = require("../interceptors/cache.interceptor");
 const service_module_1 = require("../service/service.module");
-const auth_guard_1 = require("./middleware/guards/auth.guard");
-const humanized_auth_guard_1 = require("./middleware/guards/humanized-auth.guard");
 const auth_controller_1 = require("./controllers/auth/auth.controller");
 const categories_controller_1 = require("./controllers/categories/categories.controller");
 const comment_controller_1 = require("./controllers/comments/comment.controller");
@@ -20,6 +18,8 @@ const option_controller_1 = require("./controllers/options/option.controller");
 const post_controller_1 = require("./controllers/posts/post.controller");
 const user_controller_1 = require("./controllers/users/user.controller");
 const wechat_controller_1 = require("./controllers/wechat/wechat.controller");
+const auth_guard_1 = require("./middleware/guards/auth.guard");
+const humanized_auth_guard_1 = require("./middleware/guards/humanized-auth.guard");
 const controllers = [
     auth_controller_1.AuthController,
     categories_controller_1.CategoriesController,

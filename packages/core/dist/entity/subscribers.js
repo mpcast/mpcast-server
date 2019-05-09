@@ -13,7 +13,7 @@ let CalculatedPropertySubscriber = class CalculatedPropertySubscriber {
         this.moveCalculatedGettersToInstance(event);
     }
     afterInsert(event) {
-        this.moveCalculatedGettersToInstance(event.entity);
+        return this.moveCalculatedGettersToInstance(event.entity);
     }
     moveCalculatedGettersToInstance(entity) {
         if (entity) {

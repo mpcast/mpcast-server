@@ -82,7 +82,7 @@ export interface MpcastConfig {
    * @description
    * Configuration for authorization.
    */
-  authOptions: AuthOptions;
+  authOptions?: AuthOptions;
   /**
    * @description
    * Provide a logging service which implements the {@link MpcastLogger} interface.

@@ -38,7 +38,7 @@ __decorate([
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", comment_entity_1.Comment)
-], CommentMeta.prototype, "replay", void 0);
+], CommentMeta.prototype, "comment", void 0);
 CommentMeta = __decorate([
     typeorm_1.Entity(),
     __metadata("design:paramtypes", [Object])

@@ -29,6 +29,7 @@ async function bootstrap(userConfig) {
         cors: config.cors,
         logger: new config_1.Logger(),
     });
+    app.setGlobalPrefix('api');
     app.use(helmet_1.default());
     app.use(bodyParser.json({ limit: '1mb' }));
     app.useGlobalFilters(new error_filter_1.HttpExceptionFilter());
@@ -49,6 +50,7 @@ async function preBootstrapConfig(userConfig) {
     config_helpers_1.setConfig({
         dbConnectionOptions: {
             entities,
+            subscribers: Object.values(coreSubscribersMap),
         },
     });
     const config = config_helpers_1.getConfig();
@@ -66,7 +68,7 @@ async function getAllEntities(userConfig) {
 function logWelcomeMessage(config) {
     let version;
     try {
-        version = require('../pacakge.json');
+        version = require('../package.json').version;
         console.log(version);
     }
     catch (e) {

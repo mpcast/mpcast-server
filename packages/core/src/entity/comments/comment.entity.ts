@@ -6,7 +6,7 @@ import { BaseEntity } from '../base.entity';
 
 import { CommentMeta } from './comment-meta.entity';
 
-@Entity('comment')
+@Entity('comments')
 export class Comment extends BaseEntity {
   constructor(input?: DeepPartial<Comment>) {
     super(input);
@@ -44,19 +44,20 @@ export class Comment extends BaseEntity {
   //   default: 0,
   // })
   // parent: number;
-  @OneToMany(type => CommentMeta, commentMeta => commentMeta.replay, {
+  @OneToMany(type => CommentMeta, commentMeta => commentMeta.comment, {
     cascade: true,
   })
   metas?: CommentMeta[];
 
-  @OneToMany(type => Comment, comment => comment.relay)
-  reference?: Comment;
+  // @OneToMany(type => Comment, comment => comment.relay)
+  // reference?: Comment;
 
-  @ManyToOne(type => Comment, comment => comment.reference)
-  relay?: Comment;
-
+  // @ManyToOne(type => Comment, comment => comment.reference)
+  // relay?: Comment;
+  //
   @ManyToOne(type => User, guest => guest.comments)
-  author: User;
+  user: User;
+
   @ManyToOne(type => Post, post => post.comments, {})
   post: Post;
 

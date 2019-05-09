@@ -38,6 +38,7 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
         cors: config.cors,
         logger: new Logger(),
     });
+    app.setGlobalPrefix('api');
     // DefaultLogger.restoreOriginalLogLevel();
     // app.useLogger(new Logger());
     app.use(helmet());
@@ -50,7 +51,6 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
         new ErrorInterceptor(new Reflector()),
         new LoggingInterceptor(),
     );
-
     // const options = new DocumentBuilder()
     //   .setTitle('播客系统服务端 API')
     //   .setDescription('The Podcast API')
@@ -84,22 +84,10 @@ export async function preBootstrapConfig(
     const entities = await getAllEntities(userConfig);
     const { coreSubscribersMap } = await import('./entity/subscribers');
     console.log(userConfig);
-    /**
-     * Entities to be loaded for this connection.
-     * Accepts both entity classes and directories where from entities need to be loaded.
-     * Directories support glob patterns.
-     */
-// readonly entities?: ((Function | string | EntitySchema<any>))[];
-    /**
-     * Subscribers to be loaded for this connection.
-     * Accepts both subscriber classes and directories where from subscribers need to be loaded.
-     * Directories support glob patterns.
-     */
-// readonly subscribers?: (Function | string)[];
-    //tslint:disable
     setConfig({
         dbConnectionOptions: {
             entities,
+            subscribers: Object.values(coreSubscribersMap) as any[],
         },
     });
     const config = getConfig();
@@ -125,7 +113,7 @@ async function getAllEntities(userConfig: Partial<MpcastConfig>): Promise<any[]>
 function logWelcomeMessage(config: MpcastConfig) {
     let version: string;
     try {
-        version = require('../pacakge.json');
+        version = require('../package.json').version;
         console.log(version);
     } catch (e) {
         console.log(e);

@@ -20,47 +20,53 @@ import { TermService } from './services/term.service';
 import { UserService } from './services/user.service';
 
 const exportedProviders = [
-  JwtStrategy,
-  AttachmentService,
-  AuthService,
-  OptionService,
-  TermService,
-  CategoriesService,
-  PostService,
-  CommentService,
-  UserService,
+    JwtStrategy,
+    AttachmentService,
+    AuthService,
+    OptionService,
+    TermService,
+    CategoriesService,
+    PostService,
+    CommentService,
+    UserService,
 ];
 
 /**
  * 系统中所有业务服务的提供者
  */
 @Module({
-  imports: [
-    EventBusModule,
-    TypeOrmModule.forRoot(getConfig().dbConnectionOptions),
-    CacheModule,
-    PassportModule.register({
-      defaultStrategy: 'jwt',
-    }),
-    JwtModule.register({
-      secretOrPrivateKey: APP_CONFIG.AUTH.jwtTokenSecret as string,
-      signOptions: { expiresIn: APP_CONFIG.AUTH.expiresIn } as object,
-    }),
-  ],
+    imports: [
+        EventBusModule,
+        TypeOrmModule.forRoot(getConfig().dbConnectionOptions),
+        CacheModule,
+        PassportModule.register({
+            defaultStrategy: 'jwt',
+        }),
+        JwtModule.register({
+            secretOrPrivateKey: APP_CONFIG.AUTH.jwtTokenSecret as string,
+            signOptions: { expiresIn: APP_CONFIG.AUTH.expiresIn } as object,
+        }),
+    ],
 
-  providers: [
-    ...exportedProviders,
-    PasswordCiper,
-  ],
-  exports: exportedProviders,
+    providers: [
+        ...exportedProviders,
+        PasswordCiper,
+    ],
+    exports: exportedProviders,
 })
 export class ServiceModule implements OnModuleInit {
+    constructor(
+        private optionService: OptionService,
+    ) {
+    }
 
-  async onModuleInit() {
-    // TODO: 放置一些显示调用，配置与服务的初始
-    // 初始化系统角色
-    // 初始化管理员
-    // 初始化微信相关
-    // 初始化支付
-  }
+    async onModuleInit() {
+        // TODO: 放置一些显示调用，配置与服务的初始
+        // 初始化配置缓存
+        // await this.optionService.load();
+        // 初始化系统角色
+        // 初始化管理员
+        // 初始化微信相关
+        // 初始化支付
+    }
 }

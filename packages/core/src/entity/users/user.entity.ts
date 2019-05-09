@@ -44,7 +44,7 @@ export class User extends BaseEntity {
   })
   metas?: UserMeta[];
 
-  @OneToMany(type => Comment, c => c.author, {
+  @OneToMany(type => Comment, c => c.user, {
     cascade: true,
     eager: true,
   })

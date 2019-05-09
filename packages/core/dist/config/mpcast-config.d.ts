@@ -19,6 +19,6 @@ export interface MpcastConfig {
     plugins?: MpcastPlugin[];
     port?: number;
     cors?: boolean | CorsOptions;
-    authOptions: AuthOptions;
+    authOptions?: AuthOptions;
     logger?: MpcastLogger;
 }

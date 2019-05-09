@@ -5,5 +5,5 @@ export declare class CommentMeta extends BaseEntity {
     constructor(input?: DeepPartial<CommentMeta>);
     key: string;
     value: any;
-    replay?: Comment;
+    comment?: Comment;
 }

@@ -55,7 +55,7 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "metas", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => comment_entity_1.Comment, c => c.author, {
+    typeorm_1.OneToMany(type => comment_entity_1.Comment, c => c.user, {
         cascade: true,
         eager: true,
     }),
