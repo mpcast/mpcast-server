@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 
-import { UserDto } from '../../api/dtos/user.dto';
 import { ID } from '../../common/shared-types';
 import { User } from '../../entity';
+import { UserDto } from '../../restApi/dtos/user.dto';
 import { patchEntity } from '../helpers/utils/patch-entity';
 
 @Injectable()

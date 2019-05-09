@@ -5,7 +5,7 @@ import { CacheModule } from '../cache/cache.module';
 import { HttpCacheInterceptor } from '../interceptors/cache.interceptor';
 import { ServiceModule } from '../service/service.module';
 
-import { RestApiModule } from './api-internal-modules';
+// import { RestApiModule } from './api-internal-modules';
 import { AuthController } from './controllers/auth/auth.controller';
 import { CategoriesController } from './controllers/categories/categories.controller';
 import { CommentController } from './controllers/comments/comment.controller';
