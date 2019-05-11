@@ -1,0 +1,7 @@
+type User implements Node {
+    id: ID!
+    createdAt: DateTime!
+    identifier: String!
+    verified: Boolean!
+    metas: [Meta!]!
+}

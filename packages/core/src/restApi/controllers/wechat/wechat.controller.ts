@@ -5,8 +5,10 @@ import { MiniProgram, Wechat } from 'wechat-jssdk';
 import * as APP_CONFIG from '../../../app.config';
 import { CacheService } from '../../../cache/cache.service';
 import * as CACHE_KEY from '../../../common/constants/cache.constant';
+import { Permission } from '../../../common/generated-types';
 import { HttpProcessor } from '../../../decorators/http.decorator';
 import { UserService } from '../../../service';
+import { Allow } from '../../decorators/allow.decorator';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 // const wx = new Wechat(wechatConfig);
@@ -48,6 +50,7 @@ export class WechatController {
    * @param code
    */
   @Get(':code')
+  @Allow(Permission.Public)
   async login(@Param('code') code: string) {
     // { session_key: 'Ns9nf0SX+r9IlSzvu48GsA==',
     //   openid: 'oMFrD5PyOzXajhasUje_f81lSg8Q' }
@@ -75,7 +78,8 @@ export class WechatController {
   }
 
   @Post('verify')
-  @UseGuards(JwtAuthGuard)
+  @Allow(Permission.Public)
+  // @UseGuards(JwtAuthGuard)
   @HttpProcessor.handle({ message: '数据完整性验证', error: HttpStatus.FORBIDDEN })
   async verifySignature(@Req() req: any, @Body() body: {
     rawData: string,
@@ -92,7 +96,7 @@ export class WechatController {
   }
 
   @Post('decrypt')
-  @UseGuards(JwtAuthGuard)
+  @Allow(Permission.Owner)
   async decryptData(@Req() req: any, @Body() body: {
     encryptedData: string,
     iv: string,
@@ -125,6 +129,7 @@ export class WechatController {
   }
 
   @Post('check')
+  @Allow(Permission.Owner)
   check(@Body() body: {
     rawData: string,
     signature: string,
@@ -135,7 +140,7 @@ export class WechatController {
   }
 
   @Post('me')
-  @UseGuards(JwtAuthGuard)
+  @Allow(Permission.Owner)
   me(@Req() req: any) {
     // console.log(req.user);
   }
