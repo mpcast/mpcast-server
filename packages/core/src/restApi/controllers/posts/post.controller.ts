@@ -44,7 +44,7 @@ export class PostController {
   }
 
   @Get('categories/:category')
-  @HttpProcessor.handle('获取类别下的内容')
+  // @HttpProcessor.handle('获取类别下的内容')
   @Allow(Permission.Authenticated)
   async findByCategory(
     @Req() req: any,
@@ -216,7 +216,7 @@ export class PostController {
   }
 
   @Get(':id')
-  @HttpProcessor.handle('获取单个内容数据')
+  // @HttpProcessor.handle('获取单个内容数据')
   // @OnUndefined(404)
   @Allow(Permission.Authenticated)
   async one(@Param('id') id: ID) {

@@ -39,7 +39,7 @@ export class AuthController {
 
     @Post('check')
     @Allow(Permission.Owner)
-    @HttpProcessor.handle('检测 Token')
+    // @HttpProcessor.handle('检测 Token')
     checkToken(): string {
         return 'ok';
     }

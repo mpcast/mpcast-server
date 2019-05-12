@@ -3,8 +3,9 @@ import { NestFactory, Reflector } from '@nestjs/core';
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
-import helmet from 'helmet';
 // import { EntitySubscriberInterface } from 'typeorm';
+import * as rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 
 import { Type } from './common/shared-types';
 import { ReadOnlyRequired } from './common/types/common-types';
@@ -42,8 +43,10 @@ export async function bootstrap(userConfig: Partial<MpcastConfig>): Promise<INes
     // DefaultLogger.restoreOriginalLogLevel();
     // app.useLogger(new Logger());
     app.use(helmet());
-    // app.use(compression());
+    app.use(compression());
     app.use(bodyParser.json({ limit: '1mb' }));
+    app.use(bodyParser.urlencoded({ extended: true }));
+    // app.use(rateLimit({ max: 1000, windowMs: 15 * 60 * 1000 }));
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalInterceptors(
