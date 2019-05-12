@@ -4,6 +4,8 @@ import { PassportModule } from '@nestjs/passport';
 
 import * as APP_CONFIG from '../app.config';
 import { JwtStrategy } from '../common/jwt.strategy';
+import { AuthService } from '../service';
+// import { AuthService } from '../service';
 import { ServiceModule } from '../service/service.module';
 
 import { AuthController } from './controllers/auth/auth.controller';
@@ -34,8 +36,8 @@ const controllers = [
       signOptions: { expiresIn: APP_CONFIG.AUTH.expiresIn } as object,
     }),
   ],
-  controllers: [...controllers],
-  providers: [ServiceModule],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
 })
-export class RestApiModule {
+export class AuthModule {
 }

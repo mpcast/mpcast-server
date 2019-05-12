@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Permission } from '../../../common/generated-types';
 
 import { formatOneMeta } from '../../../common/utils';
 import { User } from '../../../entity';
 import { UserService } from '../../../service';
+import { Allow } from '../../decorators/allow.decorator';
 import { UserDto } from '../../dtos/user.dto';
-import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -15,6 +16,7 @@ export class UserController {
   }
 
   @Post()
+  @Allow(Permission.CreateCustomer)
   createUser(@Body() userInput: UserDto): Promise<User> {
     return this.userService.create({
       ...userInput,
@@ -26,7 +28,8 @@ export class UserController {
   //     return this.userService.getDetailById(id);
   // }
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  @Allow(Permission.Owner)
   async oneself(@Req() request: any) {
     const user = await this.userService.findByIdentifier(request.user.identifier);
     if (user) {
@@ -37,6 +40,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Allow(Permission.Authenticated)
   findOne(@Param('id') id: number) {
     return this.userService.getDetailById(id);
   }

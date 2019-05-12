@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
-import { Permission } from '../../../common/generated-types';
 
+import { Permission } from '../../../common/generated-types';
 import { ITokenResult } from '../../../common/types/common-types';
 import { Logger } from '../../../config';
 import { HttpProcessor } from '../../../decorators/http.decorator';

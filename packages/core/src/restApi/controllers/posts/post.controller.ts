@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import * as _ from 'lodash';
 
+import { Permission } from '../../../common/generated-types';
 import { ID } from '../../../common/shared-types';
 import { EUserPostsBehavior } from '../../../common/types/common-types';
 import { formatAllMeta, formatOneMeta } from '../../../common/utils';
@@ -8,10 +9,10 @@ import { HttpProcessor } from '../../../decorators/http.decorator';
 import { IQueryParamsResult, QueryParams } from '../../../decorators/query-params.decorator';
 import { Comment, Post as PostEntity } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
+import { Allow } from '../../decorators/allow.decorator';
 import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 @Controller('posts')
-@UseGuards(JwtAuthGuard)
 export class PostController {
   constructor(
     private readonly userService: UserService,
@@ -29,6 +30,7 @@ export class PostController {
    * @param limit
    */
   @Get()
+  @Allow(Permission.Authenticated)
   async index(@Query('page') page: number = 0, @Query('limit') limit: number = 10) {
     limit = limit > 100 ? 100 : limit;
     const data = await this.postService.paginate({
@@ -43,6 +45,7 @@ export class PostController {
 
   @Get('categories/:category')
   @HttpProcessor.handle('获取类别下的内容')
+  @Allow(Permission.Authenticated)
   async findByCategory(
     @Req() req: any,
     @Param('category') category: any,
@@ -86,6 +89,7 @@ export class PostController {
    */
   @Get(':id/views')
   @HttpProcessor.handle('获取单个内容数据')
+  @Allow(Permission.Owner)
   async getViews(@Param('id') postId: ID, @Req() req: any) {
     const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
     let iView = false;
@@ -124,6 +128,7 @@ export class PostController {
    * @param ip
    */
   @Post(':id/views/new')
+  @Allow(Permission.Owner)
   async newViewer(@Param('id') postId: ID, @Req() req: any, @QueryParams() params: IQueryParamsResult) {
     const ip = params.visitors.ip;
     const result = await this.postService.getUsersByBehavior(EUserPostsBehavior.VIEW, postId);
@@ -172,6 +177,7 @@ export class PostController {
    * @param limit
    */
   @Get(':id/comments')
+  @Allow(Permission.Owner)
   async getComments(
     @Param('id') postId: ID,
     @Req() req: any,
@@ -191,6 +197,7 @@ export class PostController {
    * 新评论
    */
   @Post(':id/comments/new')
+  @Allow(Permission.Owner)
   async newComment(
     @Param('id') postId: ID,
     @Req() req: any,
@@ -211,6 +218,7 @@ export class PostController {
   @Get(':id')
   @HttpProcessor.handle('获取单个内容数据')
   // @OnUndefined(404)
+  @Allow(Permission.Authenticated)
   async one(@Param('id') id: ID) {
     // this.postService.
     // return await this.postService.findById(id);

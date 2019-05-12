@@ -21,9 +21,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         // console.log('canActivate ' + JSON.stringify(context));
         const permissions = this.reflector.get<Permission[]>(PERMISSIONS_METADATA_KEY, context.getHandler());
         const isPublic = !!permissions && permissions.includes(Permission.Public);
-
+        const hasOwnerPermission = !!permissions && permissions.includes(Permission.Owner);
+        // console.log(hasOwnerPermission);
         if (!permissions || isPublic) {
-            console.log(permissions);
+            console.log('没设置权限')
             return true;
         } else {
             return super.canActivate(context);
