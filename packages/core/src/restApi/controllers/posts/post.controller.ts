@@ -10,7 +10,7 @@ import { IQueryParamsResult, QueryParams } from '../../../decorators/query-param
 import { Comment, Post as PostEntity } from '../../../entity';
 import { AttachmentService, CategoriesService, CommentService, OptionService, PostService, UserService } from '../../../service';
 import { Allow } from '../../decorators/allow.decorator';
-import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
+// import { JwtAuthGuard } from '../../middleware/guards/auth.guard';
 
 @Controller('posts')
 export class PostController {

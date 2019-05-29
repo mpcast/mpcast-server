@@ -62,3 +62,17 @@
 | **/graphql**   | 路由到graphql编辑器 query/mutations 请求 |
 | **/swagger**   | 使用 Swagger UI 的 API 文档 |
 | **/monitor**   | 一个简单的服务监控页面 |
+
+## ❯ 管理后台
+<p align="center">
+  <img src="./Admin1.png" alt="Mpcast" width="800" />
+</p>
+<p align="center">
+  <img src="./Admin2.png" alt="Mpcast" width="800" />
+</p>
+<p align="center">
+  <img src="./Content--List.png" alt="内容列表" width="800" />
+</p>
+<p align="center">
+  <img src="./Note--List.png" alt="文稿列表" width="800" />
+</p>
