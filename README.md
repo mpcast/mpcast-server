@@ -64,15 +64,16 @@
 | **/monitor**   | 一个简单的服务监控页面 |
 
 ## ❯ 管理后台
+
 <p align="center">
-  <img src="./Admin1.png" alt="Mpcast" width="800" />
+  <img src="./doc/screenshot/Admin1.png" alt="Mpcast" width="800" />
 </p>
 <p align="center">
-  <img src="./Admin2.png" alt="Mpcast" width="800" />
+  <img src="./doc/screenshot/Admin2.png" alt="Mpcast" width="800" />
 </p>
 <p align="center">
-  <img src="./Content--List.png" alt="内容列表" width="800" />
+  <img src="./doc/screenshot/Content--List.png" alt="内容列表" width="800" />
 </p>
 <p align="center">
-  <img src="./Note--List.png" alt="文稿列表" width="800" />
+  <img src="./doc/screenshot/Note--List.png" alt="文稿列表" width="800" />
 </p>
