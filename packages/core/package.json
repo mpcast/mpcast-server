@@ -46,7 +46,7 @@
     "@types/mongoose": "^5.3.27",
     "@types/passport-jwt": "^3.0.1",
     "akismet-api": "^4.2.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "cache-manager": "^2.9.0",
     "cache-manager-redis-store": "^1.5.0",
     "class-transformer": "^0.2.0",
