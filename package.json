@@ -20,7 +20,7 @@
     "@types/node": "^10.11.5",
     "concurrently": "^4.1.0",
     "graphql": "^14.1.1",
-    "graphql-code-generator": "^0.16.0",
+    "graphql-code-generator": "^0.18.2",
     "graphql-codegen-add": "^0.16.0",
     "graphql-codegen-time": "^0.16.0",
     "graphql-codegen-typescript-client": "^0.16.0",
